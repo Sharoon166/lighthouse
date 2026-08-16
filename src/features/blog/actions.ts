@@ -1,0 +1,552 @@
+"use server";
+
+import type { QueryFilter } from "mongoose";
+import { revalidatePath, unstable_cache, updateTag } from "next/cache";
+import { z } from "zod";
+import {
+  CLOUDINARY_DEFAULT_FOLDER,
+  deleteImage,
+  HERO_IMAGE_TRANSFORMATION,
+  uploadImage,
+} from "@/lib/cloudinary";
+import { connectToDatabase } from "@/lib/db";
+import { slugify } from "@/lib/utils";
+import {
+  type BlogPost,
+  type BlogPostHeroImage,
+  BlogPostModel,
+} from "@/models/blog-post";
+import { blogPostInputSchema } from "./validation";
+
+export type BlogPostActionResult =
+  | { ok: true; slug: string }
+  | { ok: false; fieldErrors: Record<string, string[]>; formErrors: string[] };
+
+export type BlogPostDraftData = {
+  slug: string;
+  title: string;
+  summary: string;
+  tags: string[];
+  content: Record<string, unknown> | null;
+  author: {
+    name: string;
+    designation: string;
+    bio: string;
+  };
+  status: "draft" | "published";
+  publishedAt: string | null;
+  heroImage: BlogPostHeroImage | null;
+  seo: {
+    metaTitle?: string;
+    metaDescription?: string;
+    focusKeyword?: string;
+    noIndex?: boolean;
+  };
+};
+
+function flattenValidation(error: z.ZodError) {
+  const flattened = error.flatten();
+  return {
+    fieldErrors: flattened.fieldErrors,
+    formErrors: flattened.formErrors,
+  };
+}
+
+function buildPostData(data: z.infer<typeof blogPostInputSchema>): {
+  title: string;
+  summary: string;
+  content: Record<string, unknown>;
+  tags: string[];
+  author: { name: string; designation: string; bio: string };
+  status: "draft" | "published";
+  heroImage: BlogPostHeroImage | null;
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    focusKeyword: string;
+    noIndex: boolean;
+  };
+} {
+  return {
+    title: data.title,
+    summary: data.summary,
+    content: data.content,
+    tags: data.tags,
+    author: {
+      name: data.author.name,
+      designation: data.author.designation,
+      bio: data.author.bio,
+    },
+    status: data.intent === "publish" ? "published" : "draft",
+    heroImage: data.heroImage ?? null,
+    seo: {
+      metaTitle: data.seo?.metaTitle?.trim() || "",
+      metaDescription: data.seo?.metaDescription?.trim() || "",
+      focusKeyword: data.seo?.focusKeyword?.trim() || "",
+      noIndex: data.seo?.noIndex ?? false,
+    },
+  };
+}
+
+async function uniqueSlug(title: string, excludeId?: string) {
+  const baseSlug = slugify(title) || "post";
+  let slug = baseSlug;
+  let counter = 2;
+  const existsQuery: QueryFilter<BlogPost> = excludeId
+    ? { slug, _id: { $ne: excludeId } }
+    : { slug };
+  while (await BlogPostModel.exists(existsQuery)) {
+    slug = `${baseSlug}-${counter}`;
+    counter += 1;
+    existsQuery.slug = slug;
+  }
+  return slug;
+}
+
+export async function createBlogPost(
+  input: unknown,
+): Promise<BlogPostActionResult> {
+  const parsed = blogPostInputSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { ok: false, ...flattenValidation(parsed.error) };
+  }
+
+  const data = parsed.data;
+
+  try {
+    await connectToDatabase();
+
+    const slug = await uniqueSlug(data.title);
+
+    await BlogPostModel.create({
+      ...buildPostData(data),
+      slug,
+      publishedAt: data.intent === "publish" ? new Date() : null,
+    });
+
+    revalidatePath("/admin/blog");
+    updateTag("blog-posts");
+
+    return { ok: true, slug };
+  } catch (error) {
+    console.error("Failed to create blog post:", error);
+    return {
+      ok: false,
+      fieldErrors: {},
+      formErrors: ["Something went wrong while saving. Please try again."],
+    };
+  }
+}
+
+export async function updateBlogPost(
+  slug: string,
+  input: unknown,
+): Promise<BlogPostActionResult> {
+  const parsed = blogPostInputSchema.safeParse(input);
+
+  if (!parsed.success) {
+    return { ok: false, ...flattenValidation(parsed.error) };
+  }
+
+  const data = parsed.data;
+
+  try {
+    await connectToDatabase();
+
+    const existing = await BlogPostModel.findOne({ slug, deletedAt: null });
+    if (!existing) {
+      return {
+        ok: false,
+        fieldErrors: {},
+        formErrors: ["This post no longer exists."],
+      };
+    }
+
+    const nextSlug = await uniqueSlug(data.title, String(existing._id));
+
+    existing.set({
+      ...buildPostData(data),
+      slug: nextSlug,
+      publishedAt:
+        data.intent === "publish" ? (existing.publishedAt ?? new Date()) : null,
+    });
+
+    await existing.save();
+
+    revalidatePath("/admin/blog");
+    updateTag("blog-posts");
+
+    return { ok: true, slug: nextSlug };
+  } catch (error) {
+    console.error("Failed to update blog post:", error);
+    return {
+      ok: false,
+      fieldErrors: {},
+      formErrors: ["Something went wrong while saving. Please try again."],
+    };
+  }
+}
+
+const cachedGetBlogPost = unstable_cache(
+  async (key: string): Promise<BlogPostDraftData | null> => {
+    await connectToDatabase();
+
+    const document = await BlogPostModel.findOne({
+      slug: key,
+      deletedAt: null,
+    }).lean();
+    if (!document) return null;
+
+    return {
+      slug: document.slug,
+      title: document.title,
+      summary: document.summary,
+      tags: document.tags,
+      content: document.content,
+      author: {
+        name: document.author.name,
+        designation: document.author.designation,
+        bio: document.author.bio,
+      },
+      status: document.status,
+      publishedAt: document.publishedAt
+        ? document.publishedAt.toISOString()
+        : null,
+      heroImage: document.heroImage,
+      seo: {
+        metaTitle: document.seo?.metaTitle || "",
+        metaDescription: document.seo?.metaDescription || "",
+        focusKeyword: document.seo?.focusKeyword || "",
+        noIndex: document.seo?.noIndex || false,
+      },
+    };
+  },
+  ["blog-posts", "get-post"],
+  { tags: ["blog-posts"] },
+);
+
+export async function getBlogPost(
+  slug: string,
+): Promise<BlogPostDraftData | null> {
+  return cachedGetBlogPost(slug);
+}
+
+export async function deleteBlogPost(
+  slug: string,
+): Promise<{ ok: boolean; message?: string }> {
+  await connectToDatabase();
+
+  const existing = await BlogPostModel.findOne({ slug, deletedAt: null });
+  if (!existing) {
+    return { ok: false, message: "This post no longer exists." };
+  }
+
+  existing.deletedAt = new Date();
+  await existing.save();
+
+  revalidatePath("/admin/blog");
+  revalidatePath("/admin/blog/trash");
+  updateTag("blog-posts");
+
+  return { ok: true, message: "Moved to trash." };
+}
+
+export async function restoreBlogPost(
+  slug: string,
+): Promise<{ ok: boolean; message?: string }> {
+  await connectToDatabase();
+
+  const existing = await BlogPostModel.findOne({
+    slug,
+    deletedAt: { $ne: null },
+  });
+  if (!existing) {
+    return { ok: false, message: "This post is not in the trash." };
+  }
+
+  existing.deletedAt = null;
+  await existing.save();
+
+  revalidatePath("/admin/blog");
+  revalidatePath("/admin/blog/trash");
+  updateTag("blog-posts");
+
+  return { ok: true, message: "Restored." };
+}
+
+export async function permanentlyDeleteBlogPost(
+  slug: string,
+): Promise<{ ok: boolean; message?: string }> {
+  await connectToDatabase();
+
+  const existing = await BlogPostModel.findOne({
+    slug,
+    deletedAt: { $ne: null },
+  });
+  if (!existing) {
+    return { ok: false, message: "This post is not in the trash." };
+  }
+
+  if (existing.heroImage?.publicId) {
+    await deleteImage(existing.heroImage.publicId).catch((error) => {
+      console.error("Failed to delete hero image from Cloudinary:", error);
+    });
+  }
+
+  await existing.deleteOne();
+
+  revalidatePath("/admin/blog");
+  revalidatePath("/admin/blog/trash");
+  updateTag("blog-posts");
+
+  return { ok: true, message: "Deleted forever." };
+}
+
+const listBlogPostsSchema = z.object({
+  page: z.number().int().min(1).default(1),
+  pageSize: z.number().int().min(1).max(100).default(8),
+  search: z.string().trim().max(200).default(""),
+  status: z.enum(["all", "draft", "published"]).default("all"),
+});
+
+export type BlogPostListItem = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  tags: string[];
+  authorName: string;
+  status: "draft" | "published";
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string | null;
+  heroImage: BlogPostHeroImage | null;
+  deletedAt: string | null;
+};
+
+export type BlogPostListResult = {
+  posts: BlogPostListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+export async function listBlogPosts(
+  input: unknown,
+): Promise<BlogPostListResult> {
+  const parsed = listBlogPostsSchema.safeParse(input);
+  const { page, pageSize, search, status } = parsed.success
+    ? parsed.data
+    : { page: 1, pageSize: 8, search: "", status: "all" as const };
+
+  const filter: QueryFilter<BlogPost> = { deletedAt: null };
+  if (status !== "all") {
+    filter.status = status;
+  }
+  if (search) {
+    filter.title = { $regex: escapeRegExp(search), $options: "i" };
+  }
+
+  await connectToDatabase();
+
+  const [total, documents] = await Promise.all([
+    BlogPostModel.countDocuments(filter),
+    BlogPostModel.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .lean(),
+  ]);
+
+  const posts: BlogPostListItem[] = documents.map((document) => ({
+    id: String(document._id),
+    title: document.title,
+    slug: document.slug,
+    summary: document.summary,
+    tags: document.tags,
+    authorName: document.author.name,
+    status: document.status,
+    createdAt: document.createdAt.toISOString(),
+    updatedAt: document.updatedAt.toISOString(),
+    publishedAt: document.publishedAt
+      ? document.publishedAt.toISOString()
+      : null,
+    heroImage: document.heroImage,
+    deletedAt: null,
+  }));
+
+  return {
+    posts,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
+}
+
+const listTrashedBlogPostsSchema = z.object({
+  page: z.number().int().min(1).default(1),
+  pageSize: z.number().int().min(1).max(100).default(8),
+  search: z.string().trim().max(200).default(""),
+});
+
+export async function listTrashedBlogPosts(
+  input: unknown,
+): Promise<BlogPostListResult> {
+  const parsed = listTrashedBlogPostsSchema.safeParse(input);
+  const { page, pageSize, search } = parsed.success
+    ? parsed.data
+    : { page: 1, pageSize: 8, search: "" };
+
+  const filter: QueryFilter<BlogPost> = { deletedAt: { $ne: null } };
+  if (search) {
+    filter.title = { $regex: escapeRegExp(search), $options: "i" };
+  }
+
+  await connectToDatabase();
+
+  const [total, documents] = await Promise.all([
+    BlogPostModel.countDocuments(filter),
+    BlogPostModel.find(filter)
+      .sort({ deletedAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .lean(),
+  ]);
+
+  const posts: BlogPostListItem[] = documents.map((document) => ({
+    id: String(document._id),
+    title: document.title,
+    slug: document.slug,
+    summary: document.summary,
+    tags: document.tags,
+    authorName: document.author.name,
+    status: document.status,
+    createdAt: document.createdAt.toISOString(),
+    updatedAt: document.updatedAt.toISOString(),
+    publishedAt: document.publishedAt
+      ? document.publishedAt.toISOString()
+      : null,
+    heroImage: document.heroImage,
+    deletedAt: document.deletedAt ? document.deletedAt.toISOString() : null,
+  }));
+
+  return {
+    posts,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
+}
+
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+export type UploadBlogImageResult =
+  | { ok: true; image: BlogPostHeroImage }
+  | { ok: false; message: string };
+
+export async function uploadBlogImage(
+  formData: FormData,
+): Promise<UploadBlogImageResult> {
+  const file = formData.get("file");
+
+  if (!(file instanceof File)) {
+    return { ok: false, message: "No image was provided." };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { ok: false, message: "Only image files are allowed." };
+  }
+  if (file.size > MAX_IMAGE_BYTES) {
+    return {
+      ok: false,
+      message: "Images must be 10 MB or smaller. Choose a smaller file.",
+    };
+  }
+
+  const previousPublicId = formData.get("previousPublicId");
+  const previousId =
+    typeof previousPublicId === "string" && previousPublicId.trim()
+      ? previousPublicId.trim()
+      : null;
+
+  try {
+    const uploaded = await uploadImage(file, {
+      transformation: HERO_IMAGE_TRANSFORMATION,
+    });
+
+    if (previousId) {
+      await deleteImage(previousId).catch((error) => {
+        console.error("Failed to delete previous hero image:", error);
+      });
+    }
+
+    return {
+      ok: true,
+      image: { url: uploaded.url, publicId: uploaded.publicId },
+    };
+  } catch (error) {
+    console.error("Failed to upload blog image:", error);
+    return {
+      ok: false,
+      message: "Upload failed. Please try again in a moment.",
+    };
+  }
+}
+
+export async function deleteBlogImage(
+  publicId: string,
+): Promise<{ ok: boolean }> {
+  try {
+    await deleteImage(publicId);
+    return { ok: true };
+  } catch (error) {
+    console.error("Failed to delete blog image:", error);
+    return { ok: false };
+  }
+}
+
+const MAX_INLINE_IMAGE_BYTES = 10 * 1024 * 1024;
+
+export type UploadInlineImageResult =
+  | { ok: true; url: string }
+  | { ok: false; message: string };
+
+export async function uploadInlineImage(
+  formData: FormData,
+): Promise<UploadInlineImageResult> {
+  const file = formData.get("file");
+
+  if (!(file instanceof File)) {
+    return { ok: false, message: "No image was provided." };
+  }
+  if (!file.type.startsWith("image/")) {
+    return { ok: false, message: "Only image files are allowed." };
+  }
+  if (file.size > MAX_INLINE_IMAGE_BYTES) {
+    return {
+      ok: false,
+      message: "Images must be 10 MB or smaller. Choose a smaller file.",
+    };
+  }
+
+  try {
+    const uploaded = await uploadImage(file, {
+      folder: `${CLOUDINARY_DEFAULT_FOLDER}/content`,
+    });
+
+    return { ok: true, url: uploaded.url };
+  } catch (error) {
+    console.error("Failed to upload inline image:", error);
+    return {
+      ok: false,
+      message: "Upload failed. Please try again in a moment.",
+    };
+  }
+}

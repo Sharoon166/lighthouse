@@ -70,21 +70,20 @@ export const dummyProjects = [
     title: "The Oak Residence",
     subtitle: "Residential Lighting Design",
     link: "/projects/oak-residence",
-    image: "/projects/oak-residence.png"
+    image: "/projects/oak-residence.png",
   },
   {
     id: "aurora-penthouse",
     title: "Aurora Penthouse",
     subtitle: "Luxury Apartment Lighting",
     link: "/projects/aurora-penthouse",
-    image: "/projects/aurora-penthouse.png"
+    image: "/projects/aurora-penthouse.png",
   },
   {
     id: "skyline-bedroom",
     title: "Skyline Bedroom",
     subtitle: "Bedroom Lighting Design",
     link: "/projects/skyline-bedroom",
-    image: "/projects/skyline-bedroom.png"
-    
+    image: "/projects/skyline-bedroom.png",
   },
 ];

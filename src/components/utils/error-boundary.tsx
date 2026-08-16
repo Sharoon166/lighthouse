@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, type ErrorInfo, type ReactNode } from "react";
 
 // Define the shape of the props the boundary expects
 interface ErrorBoundaryProps {
@@ -28,7 +28,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
-    
+
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
@@ -45,18 +45,18 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       const { error } = this.state;
 
       // Type guard: If fallback is a function execution pattern (Render Prop)
-      if (typeof fallback === 'function' && error) {
+      if (typeof fallback === "function" && error) {
         return fallback(error, this.handleReset);
       }
 
       // If fallback is just a standard React/JSX element node
-      if (fallback) {
+      if (fallback && typeof fallback !== "function") {
         return fallback;
       }
 
       // Hardcoded fallback UI fail-safe if prop is omitted entirely
       return (
-        <div style={{ padding: '24px', border: '1px solid red' }}>
+        <div style={{ padding: "24px", border: "1px solid red" }}>
           <h2>Something went wrong.</h2>
           <button onClick={this.handleReset}>Try again</button>
         </div>

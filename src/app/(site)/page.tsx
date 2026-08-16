@@ -1,14 +1,17 @@
-import LogoImage from "@/components/shared/logo-img";
-import HeroImage from "@/assets/hero-img.png";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { HugeiconsIcon } from "@hugeicons/react";
 import {
   ArrowRight02Icon,
   ArrowUpRight01FreeIcons,
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
+import SparklesIcon from "@hugeicons/core-free-icons/SparklesIcon";
+import { HugeiconsIcon } from "@hugeicons/react";
+import Image from "next/image";
+import Link from "next/link";
+import HeroImage from "@/assets/hero-img.png";
+import LogoImage from "@/components/shared/logo-img";
 import { Marquee } from "@/components/shared/marquee";
+import { SectionHeader } from "@/components/shared/section-header";
+import { Button } from "@/components/ui/button";
 import { For } from "@/components/utils/for";
 import {
   dummyCategories,
@@ -16,10 +19,7 @@ import {
   dummyProjects,
   marqueeText,
 } from "@/lib/constants";
-import SparklesIcon from "@hugeicons/core-free-icons/SparklesIcon";
-import { SectionHeader } from "@/components/shared/section-header";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 export default function Home() {
   return (
@@ -190,7 +190,6 @@ export default function Home() {
                     },
                   )}
                 >
-                  
                   <h3 className="text-xl text-primary">{title}</h3>
                   <div className="flex items-center gap-4 text-gold">
                     <p>{subtitle}</p>

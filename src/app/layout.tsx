@@ -4,13 +4,13 @@ import "./globals.css";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
-  subsets: ["latin"]
-})
+  subsets: ["latin"],
+});
 
 const karla = Karla({
   variable: "--font-karla",
-  subsets: ["latin"]
-})
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "Lighthouse - Brighten your house ",

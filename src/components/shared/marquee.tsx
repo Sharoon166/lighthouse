@@ -1,9 +1,10 @@
-import { cn } from '@/lib/utils';
-import React, { ReactNode } from 'react';
+import type React from "react";
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface MarqueeProps {
   children: ReactNode;
-  direction?: 'left' | 'right';
+  direction?: "left" | "right";
   duration?: string; // e.g., "10s", "30s"
   pauseOnHover?: boolean;
   className?: string;
@@ -11,22 +12,26 @@ interface MarqueeProps {
 
 export const Marquee: React.FC<MarqueeProps> = ({
   children,
-  direction = 'left',
-  duration = '20s',
+  direction = "left",
+  duration = "20s",
   pauseOnHover = true,
-  className = '',
+  className = "",
 }) => {
   // Set inline dynamic CSS variable for duration
-  const style = { '--duration': duration } as React.CSSProperties;
+  const style = { "--duration": duration } as React.CSSProperties;
 
   return (
-    <div 
-      className={cn(`overflow-hidden flex w-full select-none`, pauseOnHover && "pause-on-hover", className)}
+    <div
+      className={cn(
+        `overflow-hidden flex w-full select-none`,
+        pauseOnHover && "pause-on-hover",
+        className,
+      )}
       style={style}
     >
-      <div 
+      <div
         className={`flex min-w-full shrink-0 gap-8 justify-around items-center animate-marquee ${
-          direction === 'right' ? 'direction-reverse' : ''
+          direction === "right" ? "direction-reverse" : ""
         }`}
       >
         {/* Original Content */}

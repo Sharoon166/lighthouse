@@ -1,5 +1,5 @@
-import React from "react";
 import type { ReactNode } from "react";
+import React from "react";
 
 interface SwitchProps {
   fallback?: ReactNode;
@@ -12,12 +12,21 @@ interface MatchProps {
 }
 
 export const Match: React.FC<MatchProps> = ({ children }) => {
-  return typeof children === 'function' ? <>{(children as () => ReactNode)()}</> : <>{children}</>;
+  return typeof children === "function" ? (
+    <>{(children as () => ReactNode)()}</>
+  ) : (
+    <>{children}</>
+  );
 };
 
-export const Switch: React.FC<SwitchProps> = ({ children, fallback = null }) => {
-  const matchArray = React.Children.toArray(children) as React.ReactElement<MatchProps>[];
-  
+export const Switch: React.FC<SwitchProps> = ({
+  children,
+  fallback = null,
+}) => {
+  const matchArray = React.Children.toArray(
+    children,
+  ) as React.ReactElement<MatchProps>[];
+
   // Find the first Match child where 'when' is true
   const firstMatch = matchArray.find((child) => child.props.when);
 

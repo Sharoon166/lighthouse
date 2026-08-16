@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { type ReactNode } from "react";
 
 interface ForProps<T> {
   each: T[] | null | undefined;
@@ -17,18 +17,16 @@ export function For<T>({ each, fallback = null, by, children }: ForProps<T>) {
       {each.map((item, index) => {
         // 2. Resolve the unique key based on the 'by' prop configuration
         let itemKey: string | number = index;
-        
-        if (typeof by === 'function') {
+
+        if (typeof by === "function") {
           itemKey = by(item, index);
-        } else if (by && item && typeof item === 'object' && by in item) {
+        } else if (by && item && typeof item === "object" && by in item) {
           itemKey = String(item[by]);
         }
 
         // 3. Automatically inject the key into a React Fragment wrapper
         return (
-          <React.Fragment key={itemKey}>
-            {children(item, index)}
-          </React.Fragment>
+          <React.Fragment key={itemKey}>{children(item, index)}</React.Fragment>
         );
       })}
     </>

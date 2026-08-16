@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+import type React from "react";
+import type { ReactNode } from "react";
 
 interface ShowProps {
   when: boolean;
@@ -6,7 +7,15 @@ interface ShowProps {
   children: ReactNode | (() => ReactNode);
 }
 
-export const Show: React.FC<ShowProps> = ({ when, fallback = null, children }) => {
+export const Show: React.FC<ShowProps> = ({
+  when,
+  fallback = null,
+  children,
+}) => {
   if (!when) return <>{fallback}</>;
-  return typeof children === 'function' ? <>{(children as () => ReactNode)()}</> : <>{children}</>;
+  return typeof children === "function" ? (
+    <>{(children as () => ReactNode)()}</>
+  ) : (
+    <>{children}</>
+  );
 };

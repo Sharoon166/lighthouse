@@ -1,7 +1,7 @@
-import React from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
-import { cn } from "@/lib/utils"; // Adjust this path to match your project structure
+import { HugeiconsIcon } from "@hugeicons/react";
+import type React from "react";
+import { cn } from "@/lib/utils";
 import { Show } from "../utils/show";
 
 interface SectionHeaderProps {

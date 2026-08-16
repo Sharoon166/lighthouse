@@ -10,8 +10,17 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useCallback, useEffect, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import { Button } from "@/components/ui/button";
+import {
+  optimizeImage,
+  IMAGE_OPTIMIZATION_PRESETS,
+  type OptimizationConfig,
+} from "@/lib/image-optimizer";
 import { cn } from "@/lib/utils";
 
+/**
+ * Performs the crop operation without compression.
+ * Returns an uncompressed blob that will be passed to the shared optimizer.
+ */
 async function getCroppedBlob(
   imageSource: File | string,
   pixelCrop: Area,
@@ -75,14 +84,16 @@ async function getCroppedBlob(
 
     bitmap.close();
 
+    // Return PNG at max quality to avoid double compression
+    // The shared optimizer will handle final compression and format
     return new Promise((resolve, reject) => {
       cropCanvas.toBlob(
         (blob) => {
           if (blob) resolve(blob);
           else reject(new Error("Failed to create the cropped image."));
         },
-        "image/jpeg",
-        0.92,
+        "image/png",
+        1.0,
       );
     });
   } catch (error) {
@@ -101,6 +112,8 @@ interface ImageCropDialogProps {
   isProcessing?: boolean;
   queueInfo?: string;
   allowAspectChange?: boolean;
+  /** Optimization preset to apply after cropping. If not provided, no optimization is applied. */
+  optimizationPreset?: keyof typeof IMAGE_OPTIMIZATION_PRESETS;
 }
 
 const ASPECT_RATIOS = [
@@ -121,6 +134,7 @@ export function ImageCropDialog({
   isProcessing = false,
   queueInfo,
   allowAspectChange = true,
+  optimizationPreset,
 }: ImageCropDialogProps) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -167,15 +181,26 @@ export function ImageCropDialog({
     try {
       // Use File directly if available, otherwise use URL
       const imageSource = imageFile || imageUrl;
-      const blob = await getCroppedBlob(imageSource, croppedAreaPixels, rotation);
-      onConfirm(blob);
+      
+      // Step 1: Crop (uncompressed)
+      const croppedBlob = await getCroppedBlob(imageSource, croppedAreaPixels, rotation);
+      
+      // Step 2: Optimize (if preset provided)
+      let finalBlob = croppedBlob;
+      if (optimizationPreset) {
+        const config = IMAGE_OPTIMIZATION_PRESETS[optimizationPreset];
+        finalBlob = await optimizeImage(croppedBlob, config);
+      }
+      
+      onConfirm(finalBlob);
     } catch (error) {
-      console.error("Crop error:", error);
-      alert("Failed to crop image. Please try again.");
+      console.error("Crop/optimization error:", error);
+      const message = error instanceof Error ? error.message : "Failed to process image";
+      alert(`${message}. Please try again.`);
     } finally {
       setIsProcessingCrop(false);
     }
-  }, [imageFile, imageUrl, croppedAreaPixels, rotation, onConfirm, isProcessingCrop]);
+  }, [imageFile, imageUrl, croppedAreaPixels, rotation, optimizationPreset, onConfirm, isProcessingCrop]);
 
   if (!open || !imageUrl) return null;
 

@@ -17,9 +17,44 @@ cloudinary.config({
 
 export const CLOUDINARY_DEFAULT_FOLDER = "lighthouse/blog";
 
-export const HERO_IMAGE_TRANSFORMATION: TransformationOptions = [
-  { width: 1600, crop: "limit" },
-];
+/**
+ * Cloudinary delivery transformations.
+ * These are applied when serving images to the browser, not on upload.
+ * 
+ * Note: We store already-optimized images, so these transformations
+ * should primarily handle responsive delivery, not aggressive resizing.
+ */
+export const CLOUDINARY_TRANSFORMATIONS = {
+  hero: [
+    { width: 1200, crop: "limit" },
+    { quality: "auto" },
+    { fetch_format: "auto" },
+  ],
+  inline: [
+    { width: 1200, crop: "limit" },
+    { quality: "auto" },
+    { fetch_format: "auto" },
+  ],
+  gallery: [
+    { width: 800, crop: "limit" },
+    { quality: "auto" },
+    { fetch_format: "auto" },
+  ],
+  productDetail: [
+    { width: 1200, crop: "limit" },
+    { quality: "auto" },
+    { fetch_format: "auto" },
+  ],
+  productThumbnail: [
+    { width: 500, crop: "limit" },
+    { quality: "auto" },
+    { fetch_format: "auto" },
+  ],
+} as const;
+
+// Deprecated: Use CLOUDINARY_TRANSFORMATIONS instead
+export const HERO_IMAGE_TRANSFORMATION: TransformationOptions = 
+  CLOUDINARY_TRANSFORMATIONS.hero;
 
 export type CloudinaryImage = {
   url: string;
@@ -45,7 +80,9 @@ export async function uploadImage(
         {
           folder: options.folder ?? CLOUDINARY_DEFAULT_FOLDER,
           resource_type: "image",
-          transformation: options.transformation,
+          // Do NOT apply transformation on upload
+          // Images are already optimized client-side
+          transformation: undefined,
           upload_preset: undefined, // Use signed uploads with API key/secret
         },
         (error, callResult) => {
@@ -74,21 +111,55 @@ export async function deleteImage(publicId: string): Promise<void> {
   await cloudinary.uploader.destroy(publicId);
 }
 
+/**
+ * Generate an optimized Cloudinary URL with automatic format and quality.
+ * 
+ * @param publicId - Cloudinary public ID
+ * @param options - Transformation options
+ * @returns Optimized image URL
+ * 
+ * @example
+ * ```typescript
+ * const url = getOptimizedImageUrl(publicId, { width: 800, height: 600 });
+ * // Returns URL with q_auto, f_auto, and responsive sizing
+ * ```
+ */
 export function getOptimizedImageUrl(
   publicId: string,
   options: {
     width?: number;
     height?: number;
-    format?: string;
+    crop?: "fill" | "limit" | "scale" | "fit";
     quality?: string;
+    format?: string;
   } = {},
 ): string {
+  const transformation: Array<{
+    width?: number;
+    height?: number;
+    crop?: string;
+    quality?: string;
+    fetch_format?: string;
+  }> = [];
+
+  // Apply dimensions if provided
+  if (options.width || options.height) {
+    transformation.push({
+      width: options.width,
+      height: options.height,
+      crop: options.crop || "limit", // Default to limit to avoid unexpected cropping
+    });
+  }
+
+  // Always apply automatic optimization
+  transformation.push({
+    quality: options.quality || "auto",
+    fetch_format: options.format || "auto",
+  });
+
   return cloudinary.url(publicId, {
-    fetch_format: options.format ?? "auto",
-    quality: options.quality ?? "auto",
-    width: options.width,
-    height: options.height,
-    crop: options.width || options.height ? "fill" : undefined,
+    transformation,
+    secure: true,
   });
 }
 

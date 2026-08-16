@@ -6,7 +6,6 @@ import { z } from "zod";
 import {
   CLOUDINARY_DEFAULT_FOLDER,
   deleteImage,
-  HERO_IMAGE_TRANSFORMATION,
   uploadImage,
 } from "@/lib/cloudinary";
 import { connectToDatabase } from "@/lib/db";
@@ -478,7 +477,7 @@ export async function uploadBlogImage(
 
   try {
     const uploaded = await uploadImage(file, {
-      transformation: HERO_IMAGE_TRANSFORMATION,
+      folder: CLOUDINARY_DEFAULT_FOLDER,
     });
 
     if (previousId) {

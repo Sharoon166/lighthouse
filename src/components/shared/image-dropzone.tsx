@@ -266,6 +266,7 @@ export function ImageDropzone({
           open
           imageUrl={pendingUrl}
           aspectRatio={aspectRatio}
+          optimizationPreset="blogHero"
           onCancel={() => {
             setCropOpen(false);
             if (pendingUrlRef.current) {

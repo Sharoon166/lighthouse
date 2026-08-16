@@ -158,8 +158,17 @@ export function RichTextEditor({
       setIsUploading(true);
 
       try {
+        // Optimize image before uploading
+        const { optimizeImage, IMAGE_OPTIMIZATION_PRESETS } = await import("@/lib/image-optimizer");
+        const optimizedBlob = await optimizeImage(file, IMAGE_OPTIMIZATION_PRESETS.blogInline);
+        
+        // Convert back to File for upload
+        const optimizedFile = new File([optimizedBlob], file.name, {
+          type: optimizedBlob.type,
+        });
+
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", optimizedFile);
 
         const result = await uploadInlineImage(formData);
 
@@ -185,7 +194,8 @@ export function RichTextEditor({
         }
       } catch (error) {
         console.error("Image upload error:", error);
-        alert("Failed to upload image. Please try again.");
+        const message = error instanceof Error ? error.message : "Failed to upload image";
+        alert(`${message}. Please try again.`);
       } finally {
         setIsUploading(false);
       }

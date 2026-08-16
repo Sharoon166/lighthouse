@@ -270,6 +270,7 @@ export function GalleryManager({
           open={true}
           imageFile={currentCrop}
           aspectRatio={aspectRatio}
+          optimizationPreset="gallery"
           onConfirm={handleCroppedImage}
           onCancel={handleCancelCrop}
           isProcessing={isUploading}

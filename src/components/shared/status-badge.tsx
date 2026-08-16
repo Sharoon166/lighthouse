@@ -5,6 +5,8 @@ const STATUS_VARIANTS = {
   draft: "muted" as const,
   scheduled: "accent" as const,
   archived: "outline" as const,
+  ongoing: "default" as const,
+  completed: "success" as const,
 };
 
 export function StatusBadge({ status }: { status: string }) {

@@ -43,6 +43,7 @@ import {
   type BlogPostActionResult,
   type BlogPostDraftData,
   createBlogPost,
+  deleteBlogImage,
   updateBlogPost,
   uploadBlogImage,
 } from "../actions";
@@ -616,6 +617,7 @@ export function BlogPostForm({
                         clearFieldError("heroImage");
                       }}
                       upload={uploadBlogImage}
+                      deleteImage={deleteBlogImage}
                       emptyLabel="Cover image"
                       />
                   </div>

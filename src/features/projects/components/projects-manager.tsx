@@ -20,18 +20,18 @@ import { Pagination } from "@/components/ui/pagination";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 import {
-  type BlogPostListItem,
-  type BlogPostListResult,
-  deleteBlogPost,
-  listBlogPosts,
+  type ProjectListItem,
+  type ProjectListResult,
+  deleteProject,
+  listProjects,
 } from "../actions";
-import { BlogPostCards } from "./blog-post-cards";
-import { BlogTable } from "./blog-table";
+import { ProjectCards } from "./project-cards";
+import { ProjectTable } from "./project-table";
 
-type PostStatus = "all" | "draft" | "published";
+type ProjectStatus = "all" | "draft" | "published";
 type View = "table" | "cards";
 
-const STATUS_OPTIONS: { value: PostStatus; label: string }[] = [
+const STATUS_OPTIONS: { value: ProjectStatus; label: string }[] = [
   { value: "all", label: "All" },
   { value: "published", label: "Published" },
   { value: "draft", label: "Draft" },
@@ -60,18 +60,18 @@ function SkeletonGrid() {
   );
 }
 
-export function BlogPostsManager() {
+export function ProjectsManager() {
   const { confirm } = useConfirm();
   const [view, setView] = useLocalStorage<View>(
-    "lighthouse:blog-view",
-    "table",
+    "lighthouse:projects-view",
+    "cards",
   );
-  const [status, setStatus] = useState<PostStatus>("all");
+  const [status, setStatus] = useState<ProjectStatus>("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
-  const [data, setData] = useState<BlogPostListResult | null>(null);
+  const [pageSize, setPageSize] = useState(12);
+  const [data, setData] = useState<ProjectListResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -91,13 +91,13 @@ export function BlogPostsManager() {
     setIsLoading(true);
     setError(null);
 
-    listBlogPosts({ page, pageSize, search: debouncedSearch, status })
+    listProjects({ page, pageSize, search: debouncedSearch, status, category: "" })
       .then((result) => {
         if (!cancelled) setData(result);
       })
       .catch(() => {
         if (!cancelled)
-          setError("Could not load blog posts. Please try again.");
+          setError("Could not load projects. Please try again.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -108,38 +108,39 @@ export function BlogPostsManager() {
     };
   }, [page, pageSize, debouncedSearch, status]);
 
-  const handleDelete = async (post: BlogPostListItem) => {
+  const handleDelete = async (project: ProjectListItem) => {
     setActionError(null);
 
     const confirmed = await confirm({
-      title: "Move this post to trash?",
+      title: "Move this project to trash?",
       description: (
         <>
-          “{post.title}” will be moved to trash. You can restore it anytime or
+          "{project.title}" will be moved to trash. You can restore it anytime or
           delete it forever from the trash.
         </>
       ),
       confirmLabel: "Move to trash",
-      cancelLabel: "Keep post",
+      cancelLabel: "Keep project",
       danger: true,
     });
 
     if (!confirmed) return;
 
     setIsDeleting(true);
-    const result = await deleteBlogPost(post.slug);
+    const result = await deleteProject(project.slug);
     setIsDeleting(false);
 
     if (!result.ok) {
-      setActionError(result.message ?? "Could not move this post to trash.");
+      setActionError(result.message ?? "Could not move this project to trash.");
       return;
     }
 
-    const refreshed = await listBlogPosts({
+    const refreshed = await listProjects({
       page,
       pageSize,
       search: debouncedSearch,
       status,
+      category: "",
     });
     setData(refreshed);
   };
@@ -149,23 +150,23 @@ export function BlogPostsManager() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="font-heading text-2xl tracking-tight text-foreground md:text-3xl">
-            Blog posts
+            Projects
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Create, edit and manage your stories.
+            Create, edit and manage your project showcases.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link
-            href="/admin/blog/trash"
+            href="/admin/projects/trash"
             className={buttonVariants({ variant: "outline" })}
           >
             <HugeiconsIcon icon={Recycle02Icon} size={16} />
             Trash
           </Link>
-          <Link href="/admin/blog/new" className={buttonVariants()}>
+          <Link href="/admin/projects/new" className={buttonVariants()}>
             <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            New post
+            New project
           </Link>
         </div>
       </div>
@@ -177,7 +178,7 @@ export function BlogPostsManager() {
               <HugeiconsIcon icon={Search01Icon} size={16} />
             </InputGroupAddon>
             <InputGroupInput
-              placeholder="Search posts…"
+              placeholder="Search projects…"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               className="h-10"
@@ -222,14 +223,14 @@ export function BlogPostsManager() {
 
       {isLoading && !data ? (
         <SkeletonGrid />
-      ) : data && data.posts.length === 0 ? (
+      ) : data && data.projects.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
           <p className="text-sm text-muted-foreground">
-            No posts found. Try a different search, or write your first post.
+            No projects found. Try a different search, or create your first project.
           </p>
-          <Link href="/admin/blog/new" className={cn(buttonVariants(), "mt-4")}>
+          <Link href="/admin/projects/new" className={cn(buttonVariants(), "mt-4")}>
             <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            New post
+            New project
           </Link>
         </div>
       ) : (
@@ -237,13 +238,13 @@ export function BlogPostsManager() {
           <>
             <div className={cn(isLoading && "pointer-events-none opacity-60")}>
               {view === "table" ? (
-                <BlogTable
-                  posts={data.posts}
+                <ProjectTable
+                  projects={data.projects}
                   onDelete={isDeleting ? undefined : handleDelete}
                 />
               ) : (
-                <BlogPostCards
-                  posts={data.posts}
+                <ProjectCards
+                  projects={data.projects}
                   onDelete={isDeleting ? undefined : handleDelete}
                 />
               )}
@@ -253,7 +254,7 @@ export function BlogPostsManager() {
               totalPages={data.totalPages}
               totalItems={data.total}
               pageSize={data.pageSize}
-              pageSizeOptions={[8, 16, 32]}
+              pageSizeOptions={[12, 24, 48]}
               onPageSizeChange={(value) => {
                 setPageSize(value);
                 setPage(1);

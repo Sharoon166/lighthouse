@@ -32,6 +32,7 @@ interface ImageDropzoneProps {
   value?: UploadedImage | null;
   onChange: (image: UploadedImage | null) => void;
   upload: (formData: FormData) => Promise<UploadImageResult>;
+  deleteImage?: (publicId: string) => Promise<{ ok: boolean }>;
   aspectRatio?: number;
   maxSizeMB?: number;
   emptyLabel?: string;
@@ -43,6 +44,7 @@ export function ImageDropzone({
   value,
   onChange,
   upload,
+  deleteImage,
   aspectRatio = 16 / 9,
   maxSizeMB = MAX_SIZE_MB_DEFAULT,
   emptyLabel = "Cover image",
@@ -185,9 +187,21 @@ export function ImageDropzone({
                 variant="ghost"
                 size="sm"
                 disabled={isUploading}
-                onClick={() => {
+                onClick={async () => {
                   setError(null);
+                  
+                  // Optimistically update UI
                   onChange(null);
+                  
+                  // Delete from Cloudinary if deleteImage function is provided
+                  if (deleteImage && value.publicId) {
+                    try {
+                      await deleteImage(value.publicId);
+                    } catch (error) {
+                      console.error("Failed to delete image from cloud:", error);
+                      // Image is already removed from UI, so we don't revert
+                    }
+                  }
                 }}
               >
                 <HugeiconsIcon icon={Delete02Icon} size={15} />

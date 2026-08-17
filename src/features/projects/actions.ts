@@ -4,9 +4,9 @@ import type { QueryFilter } from "mongoose";
 import { revalidatePath, unstable_cache, updateTag } from "next/cache";
 import { z } from "zod";
 import {
+  CLOUDINARY_DEFAULT_FOLDER,
   deleteImage,
   uploadImage,
-  CLOUDINARY_DEFAULT_FOLDER,
 } from "@/lib/cloudinary";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
@@ -49,6 +49,7 @@ export type ProjectDraftData = {
   };
   status: "draft" | "published";
   publishedAt: string | null;
+  featured: boolean;
 };
 
 function flattenValidation(error: z.ZodError) {
@@ -80,7 +81,9 @@ function buildProjectData(data: z.infer<typeof projectInputSchema>) {
     testimonial: data.testimonial ?? null,
     projectStatus: data.projectStatus,
     seo: data.seo,
-    status: data.intent === "publish" ? ("published" as const) : ("draft" as const),
+    status:
+      data.intent === "publish" ? ("published" as const) : ("draft" as const),
+    featured: data.featured ?? false,
   };
 }
 
@@ -113,12 +116,37 @@ export async function createProject(
   try {
     await connectToDatabase();
 
-    const slug = await uniqueSlug(data.title);
+    if (data.featured) {
+      const count = await ProjectModel.countDocuments({
+        featured: true,
+        deletedAt: null,
+      });
+      if (count >= 3) {
+        return {
+          ok: false,
+          fieldErrors: {
+            featured: [
+              "Maximum 3 featured projects allowed. Unfeature another project first.",
+            ],
+          },
+          formErrors: [],
+        };
+      }
+    }
+
+    const slug = data.slug || (await uniqueSlug(data.title));
+
+    const publishedAt =
+      data.intent === "publish"
+        ? data.publishedAt
+          ? new Date(data.publishedAt)
+          : new Date()
+        : null;
 
     await ProjectModel.create({
       ...buildProjectData(data),
       slug,
-      publishedAt: data.intent === "publish" ? new Date() : null,
+      publishedAt,
     });
 
     revalidatePath("/admin/projects");
@@ -159,13 +187,38 @@ export async function updateProject(
       };
     }
 
-    const nextSlug = await uniqueSlug(data.title, String(existing._id));
+    if (data.featured && !existing.featured) {
+      const count = await ProjectModel.countDocuments({
+        featured: true,
+        deletedAt: null,
+      });
+      if (count >= 3) {
+        return {
+          ok: false,
+          fieldErrors: {
+            featured: [
+              "Maximum 3 featured projects allowed. Unfeature another project first.",
+            ],
+          },
+          formErrors: [],
+        };
+      }
+    }
+
+    const nextSlug =
+      data.slug || (await uniqueSlug(data.title, String(existing._id)));
+
+    const publishedAt =
+      data.intent === "publish"
+        ? data.publishedAt
+          ? new Date(data.publishedAt)
+          : (existing.publishedAt ?? new Date())
+        : null;
 
     existing.set({
       ...buildProjectData(data),
       slug: nextSlug,
-      publishedAt:
-        data.intent === "publish" ? (existing.publishedAt ?? new Date()) : null,
+      publishedAt,
     });
 
     await existing.save();
@@ -219,6 +272,7 @@ const cachedGetProject = unstable_cache(
       publishedAt: document.publishedAt
         ? document.publishedAt.toISOString()
         : null,
+      featured: document.featured,
     };
   },
   ["projects", "get-project"],
@@ -330,6 +384,7 @@ export type ProjectListItem = {
   categories: string[];
   projectStatus: "ongoing" | "completed";
   status: "draft" | "published";
+  featured: boolean;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -349,13 +404,17 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export async function listProjects(
-  input: unknown,
-): Promise<ProjectListResult> {
+export async function listProjects(input: unknown): Promise<ProjectListResult> {
   const parsed = listProjectsSchema.safeParse(input);
   const { page, pageSize, search, status, category } = parsed.success
     ? parsed.data
-    : { page: 1, pageSize: 12, search: "", status: "all" as const, category: "" };
+    : {
+        page: 1,
+        pageSize: 12,
+        search: "",
+        status: "all" as const,
+        category: "",
+      };
 
   const filter: QueryFilter<Project> = { deletedAt: null };
   if (status !== "all") {
@@ -389,6 +448,7 @@ export async function listProjects(
     categories: document.categories,
     projectStatus: document.projectStatus,
     status: document.status,
+    featured: document.featured,
     createdAt: document.createdAt.toISOString(),
     updatedAt: document.updatedAt.toISOString(),
     publishedAt: document.publishedAt
@@ -447,6 +507,7 @@ export async function listTrashedProjects(
     categories: document.categories,
     projectStatus: document.projectStatus,
     status: document.status,
+    featured: document.featured,
     createdAt: document.createdAt.toISOString(),
     updatedAt: document.updatedAt.toISOString(),
     publishedAt: document.publishedAt
@@ -466,6 +527,43 @@ export async function listTrashedProjects(
 }
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+export type ToggleFeaturedResult =
+  | { ok: true; featured: boolean }
+  | { ok: false; message: string };
+
+export async function toggleFeaturedProject(
+  slug: string,
+): Promise<ToggleFeaturedResult> {
+  await connectToDatabase();
+
+  const existing = await ProjectModel.findOne({ slug, deletedAt: null });
+  if (!existing) {
+    return { ok: false, message: "This project no longer exists." };
+  }
+
+  if (!existing.featured) {
+    const count = await ProjectModel.countDocuments({
+      featured: true,
+      deletedAt: null,
+    });
+    if (count >= 3) {
+      return {
+        ok: false,
+        message:
+          "Maximum 3 featured projects allowed. Unfeature another project first.",
+      };
+    }
+  }
+
+  existing.featured = !existing.featured;
+  await existing.save();
+
+  revalidatePath("/admin/projects");
+  updateTag("projects");
+
+  return { ok: true, featured: existing.featured };
+}
 
 export type UploadProjectImageResult =
   | { ok: true; image: ProjectImage }

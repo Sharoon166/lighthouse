@@ -50,6 +50,7 @@ export interface Project {
   };
   status: "draft" | "published";
   publishedAt: Date | null;
+  featured: boolean;
   deletedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -143,6 +144,7 @@ const projectSchema = new Schema<Project>(
     },
     status: { type: String, enum: ["draft", "published"], default: "draft" },
     publishedAt: { type: Date, default: null },
+    featured: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true },

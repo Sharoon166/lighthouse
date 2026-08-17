@@ -27,6 +27,7 @@ export interface BlogPost {
   author: BlogPostAuthor;
   status: "draft" | "published";
   publishedAt: Date | null;
+  featured: boolean;
   heroImage: BlogPostHeroImage | null;
   seo: BlogPostSEO;
   deletedAt: Date | null;
@@ -82,6 +83,7 @@ const blogPostSchema = new Schema<BlogPost>(
     author: { type: authorSchema, required: true },
     status: { type: String, enum: ["draft", "published"], default: "draft" },
     publishedAt: { type: Date, default: null },
+    featured: { type: Boolean, default: false },
     heroImage: { type: heroImageSchema, default: null },
     seo: { type: seoSchema, default: () => ({}) },
     deletedAt: { type: Date, default: null },

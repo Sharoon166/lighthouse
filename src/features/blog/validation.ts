@@ -3,6 +3,15 @@ import { z } from "zod";
 export const blogPostInputSchema = z
   .object({
     intent: z.enum(["draft", "publish"]),
+    slug: z
+      .string()
+      .trim()
+      .min(1, "Slug is required")
+      .max(100, "Slug must be 100 characters or fewer")
+      .regex(
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+        "Slug must contain only lowercase letters, numbers and hyphens",
+      ),
     title: z
       .string()
       .trim()
@@ -33,6 +42,8 @@ export const blogPostInputSchema = z
         .max(100, "Designation must be 100 characters or fewer"),
       bio: z.string().trim().max(500, "Bio must be 500 characters or fewer"),
     }),
+    featured: z.boolean().optional(),
+    publishedAt: z.string().nullable().optional(),
     seo: z
       .object({
         metaTitle: z

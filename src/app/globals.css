@@ -121,6 +121,107 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Dashboard Theme - High Contrast for Productivity */
+[data-theme="dashboard"] {
+  /* High contrast text for readability */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.2 0 0); /* Much darker text */
+  
+  /* Vibrant primary for clear CTAs */
+  --primary: oklch(0.55 0.22 264); /* Bold blue */
+  --primary-foreground: oklch(0.99 0 0);
+  
+  /* Clean secondary */
+  --secondary: oklch(0.92 0.01 264);
+  --secondary-foreground: oklch(0.2 0 0);
+  
+  /* Better muted contrast */
+  --muted: oklch(0.96 0 0);
+  --muted-foreground: oklch(0.45 0 0); /* Much more readable */
+  
+  /* Clear cards */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0 0);
+  
+  /* Popovers */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0 0);
+  
+  /* Accent color */
+  --accent: oklch(0.95 0.01 264);
+  --accent-foreground: oklch(0.2 0 0);
+  
+  /* Status colors - more vibrant */
+  --destructive: oklch(0.55 0.22 27); /* Clear red */
+  
+  /* Borders */
+  --border: oklch(0.90 0 0);
+  --input: oklch(0.90 0 0);
+  --ring: oklch(0.55 0.22 264);
+  
+  /* Chart colors - data visualization */
+  --chart-1: oklch(0.55 0.22 264); /* Blue */
+  --chart-2: oklch(0.60 0.18 142); /* Green */
+  --chart-3: oklch(0.65 0.20 60);  /* Orange */
+  --chart-4: oklch(0.55 0.18 330); /* Purple */
+  --chart-5: oklch(0.60 0.15 180); /* Cyan */
+  
+  /* Sidebar - clean and professional */
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.25 0 0);
+  --sidebar-primary: oklch(0.55 0.22 264);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.95 0 0);
+  --sidebar-accent-foreground: oklch(0.25 0 0);
+  --sidebar-border: oklch(0.90 0 0);
+  --sidebar-ring: oklch(0.55 0.22 264);
+}
+
+/* Dashboard Dark Mode - Optional high contrast dark theme */
+[data-theme="dashboard"].dark {
+  --background: oklch(0.15 0 0);
+  --foreground: oklch(0.95 0 0);
+  
+  --primary: oklch(0.60 0.20 264);
+  --primary-foreground: oklch(0.99 0 0);
+  
+  --secondary: oklch(0.25 0.01 264);
+  --secondary-foreground: oklch(0.95 0 0);
+  
+  --muted: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.65 0 0);
+  
+  --card: oklch(0.18 0 0);
+  --card-foreground: oklch(0.95 0 0);
+  
+  --popover: oklch(0.18 0 0);
+  --popover-foreground: oklch(0.95 0 0);
+  
+  --accent: oklch(0.25 0.01 264);
+  --accent-foreground: oklch(0.95 0 0);
+  
+  --destructive: oklch(0.60 0.20 27);
+  
+  --border: oklch(0.30 0 0);
+  --input: oklch(0.30 0 0);
+  --ring: oklch(0.60 0.20 264);
+  
+  --chart-1: oklch(0.65 0.20 264);
+  --chart-2: oklch(0.70 0.16 142);
+  --chart-3: oklch(0.75 0.18 60);
+  --chart-4: oklch(0.65 0.16 330);
+  --chart-5: oklch(0.70 0.13 180);
+  
+  --sidebar: oklch(0.18 0 0);
+  --sidebar-foreground: oklch(0.95 0 0);
+  --sidebar-primary: oklch(0.60 0.20 264);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.22 0 0);
+  --sidebar-accent-foreground: oklch(0.95 0 0);
+  --sidebar-border: oklch(0.30 0 0);
+  --sidebar-ring: oklch(0.60 0.20 264);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

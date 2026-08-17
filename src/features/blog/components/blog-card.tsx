@@ -38,6 +38,11 @@ export function BlogCard({ post }: { post: BlogPostListItem }) {
         {/* Tags */}
         {post.tags.length > 0 && (
           <div className="mb-3 flex flex-wrap gap-1.5">
+            {post.featured && (
+              <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs">
+                ★ Featured
+              </Badge>
+            )}
             {post.tags.slice(0, 2).map((tag) => (
               <Badge key={tag} variant="secondary" className="text-xs">
                 {tag}

@@ -9,8 +9,10 @@ export const metadata: Metadata = {
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <DashboardShell adminName="Sara Ahmed" adminEmail="sara@lighthouse.pk">
-      <ConfirmProvider>{children}</ConfirmProvider>
-    </DashboardShell>
+    <div data-theme="dashboard">
+      <DashboardShell adminName="Sara Ahmed" adminEmail="sara@lighthouse.pk">
+        <ConfirmProvider>{children}</ConfirmProvider>
+      </DashboardShell>
+    </div>
   );
 }

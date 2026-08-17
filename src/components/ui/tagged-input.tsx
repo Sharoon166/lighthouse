@@ -61,7 +61,7 @@ export function TaggedInput({
       {value.map((tag) => (
         <span
           key={tag}
-          className="inline-flex h-6 items-center gap-1 rounded-md bg-muted px-2 text-xs font-medium text-foreground"
+          className="inline-flex h-6 items-center gap-1 rounded-md bg-muted px-2 text-xs font-medium text-foreground "
         >
           {tag}
           <button

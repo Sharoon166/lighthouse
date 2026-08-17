@@ -3,11 +3,14 @@
 import {
   ArrowLeft02Icon,
   Cancel01Icon,
+  CancelCircleIcon,
   CheckIcon,
+  CheckmarkCircle02Icon,
   CodeXmlIcon,
   Edit02Icon,
   EyeIcon,
   FileCodeIcon,
+  Loading02Icon,
   Maximize02Icon,
   Rocket01Icon,
   SaveIcon,
@@ -20,6 +23,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { DateTimePicker } from "@/components/shared/date-time-picker";
 import { ImageDropzone } from "@/components/shared/image-dropzone";
 import { RichTextPreview } from "@/components/shared/rich-text-preview";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -37,6 +41,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TaggedInput } from "@/components/ui/tagged-input";
 import { Textarea } from "@/components/ui/textarea";
+import { useSlugValidation } from "@/hooks/use-slug-validation";
 import { cn, slugify } from "@/lib/utils";
 import type { BlogPostHeroImage } from "@/models/blog-post";
 import {
@@ -200,6 +205,14 @@ export function BlogPostForm({
   const [heroImage, setHeroImage] = useState<BlogPostHeroImage | null>(
     initialData?.heroImage ?? null,
   );
+  const [featured, setFeatured] = useState(initialData?.featured ?? false);
+  const [publishedAt, setPublishedAt] = useState<string>(() => {
+    if (initialData?.publishedAt) {
+      const d = new Date(initialData.publishedAt);
+      return d.toISOString().slice(0, 16);
+    }
+    return "";
+  });
 
   // SEO fields (optional overrides)
   const [seoMetaTitle, setSeoMetaTitle] = useState(
@@ -214,6 +227,21 @@ export function BlogPostForm({
   const [seoNoIndex, setSeoNoIndex] = useState(
     initialData?.seo?.noIndex ?? false,
   );
+
+  const {
+    slug,
+    error: slugError,
+    handleSlugChange,
+    handleBlur: handleSlugBlur,
+    isAvailable: isSlugAvailable,
+    isChecking: isSlugChecking,
+    isTaken: isSlugTaken,
+  } = useSlugValidation({
+    title,
+    initialSlug: initialData?.slug,
+    collection: "blog",
+    excludeSlug: isEdit ? initialData?.slug : undefined,
+  });
 
   const [view, setView] = useState<"edit" | "preview">("edit");
   const [showHtml, setShowHtml] = useState(isEdit);
@@ -242,6 +270,11 @@ export function BlogPostForm({
     setAuthorDesignation(initialData.author.designation);
     setAuthorBio(initialData.author.bio);
     setHeroImage(initialData.heroImage);
+    setFeatured(initialData.featured);
+    if (initialData.publishedAt) {
+      const d = new Date(initialData.publishedAt);
+      setPublishedAt(d.toISOString().slice(0, 16));
+    }
     setSeoMetaTitle(initialData.seo?.metaTitle ?? "");
     setSeoMetaDescription(initialData.seo?.metaDescription ?? "");
     setSeoFocusKeyword(initialData.seo?.focusKeyword ?? "");
@@ -323,6 +356,7 @@ export function BlogPostForm({
 
   const buildPayload = (intent: "draft" | "publish"): BlogPostInput => ({
     intent,
+    slug,
     title,
     summary,
     tags,
@@ -333,6 +367,8 @@ export function BlogPostForm({
       designation: authorDesignation,
       bio: authorBio,
     },
+    featured,
+    publishedAt: publishedAt || null,
     seo: {
       metaTitle: seoMetaTitle.trim(),
       metaDescription: seoMetaDescription.trim(),
@@ -619,7 +655,7 @@ export function BlogPostForm({
                       upload={uploadBlogImage}
                       deleteImage={deleteBlogImage}
                       emptyLabel="Cover image"
-                      />
+                    />
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-6">
@@ -645,9 +681,6 @@ export function BlogPostForm({
                           {title.length}/200
                         </p>
                       )}
-                      <p className="text-sm text-muted-foreground">
-                        Generated slug: {slugify(title)}
-                      </p>
                     </div>
 
                     <div className="space-y-2" data-field="tags">
@@ -672,6 +705,60 @@ export function BlogPostForm({
                         </p>
                       )}
                     </div>
+                  </div>
+
+                  <div className="space-y-2" data-field="slug">
+                    <Label htmlFor="slug">Slug</Label>
+                    <div className="flex items-center gap-2">
+                      <span className="shrink-0 text-sm text-muted-foreground">
+                        /blog/
+                      </span>
+                      <Input
+                        id="slug"
+                        value={slug}
+                        onChange={(event) => {
+                          handleSlugChange(slugify(event.target.value));
+                        }}
+                        onBlur={handleSlugBlur}
+                        placeholder="auto-generated-from-title"
+                        aria-invalid={
+                          Boolean(fieldError("slug")) || isSlugTaken
+                        }
+                        className="flex-1 font-mono text-sm"
+                      />
+                      <span className="flex size-5 shrink-0 items-center justify-center">
+                        {isSlugChecking && (
+                          <HugeiconsIcon
+                            icon={Loading02Icon}
+                            size={16}
+                            className="animate-spin text-muted-foreground"
+                          />
+                        )}
+                        {!isSlugChecking && isSlugTaken && (
+                          <HugeiconsIcon
+                            icon={CancelCircleIcon}
+                            size={16}
+                            className="text-destructive"
+                          />
+                        )}
+                        {!isSlugChecking && isSlugAvailable && slug && (
+                          <HugeiconsIcon
+                            icon={CheckmarkCircle02Icon}
+                            size={16}
+                            className="text-chart-2"
+                          />
+                        )}
+                      </span>
+                    </div>
+                    {fieldError("slug") || slugError ? (
+                      <p className="text-xs text-destructive">
+                        {fieldError("slug") || slugError}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        URL-friendly identifier. Auto-generated from title.
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2" data-field="summary">
@@ -831,13 +918,16 @@ export function BlogPostForm({
                       </p>
                     ) : (
                       <p className="text-xs text-muted-foreground">
-                        {seoMetaTitle.length}/60 · Leave empty to use blog title. Recommended: 50-60 characters
+                        {seoMetaTitle.length}/60 · Leave empty to use blog
+                        title. Recommended: 50-60 characters
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2" data-field="seo.metaDescription">
-                    <Label htmlFor="seo-meta-description">Meta Description</Label>
+                    <Label htmlFor="seo-meta-description">
+                      Meta Description
+                    </Label>
                     <Textarea
                       id="seo-meta-description"
                       rows={3}
@@ -858,7 +948,8 @@ export function BlogPostForm({
                       </p>
                     ) : (
                       <p className="text-xs text-muted-foreground">
-                        {seoMetaDescription.length}/160 · Leave empty to use summary. Recommended: 150-160 characters
+                        {seoMetaDescription.length}/160 · Leave empty to use
+                        summary. Recommended: 150-160 characters
                       </p>
                     )}
                   </div>
@@ -935,7 +1026,11 @@ export function BlogPostForm({
                     {tags.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             {tag}
                           </Badge>
                         ))}
@@ -1074,12 +1169,46 @@ export function BlogPostForm({
                 </div>
               )}
               <div className="space-y-2">
+                <DateTimePicker
+                  id="published-at"
+                  label="Publish date"
+                  value={publishedAt}
+                  onChange={setPublishedAt}
+                  description="Leave empty to use current date when publishing."
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="featured"
+                  checked={featured}
+                  onChange={(event) => setFeatured(event.target.checked)}
+                  className="size-4 rounded border-input accent-primary"
+                />
+                <Label
+                  htmlFor="featured"
+                  className="cursor-pointer font-normal"
+                >
+                  Featured
+                </Label>
+              </div>
+              {fieldError("featured") && (
+                <p className="text-xs text-destructive">
+                  {fieldError("featured")}
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {featured
+                  ? "This post is featured."
+                  : "Up to 3 posts can be featured."}
+              </p>
+              <div className="space-y-2">
                 <Button
                   type="button"
                   variant="outline"
                   className="w-full"
                   onClick={() => run("draft")}
-                  disabled={isPending}
+                  disabled={isPending || isSlugTaken}
                 >
                   <HugeiconsIcon icon={SaveIcon} size={16} />
                   {isPending ? "Saving…" : "Save draft"}
@@ -1088,7 +1217,7 @@ export function BlogPostForm({
                   type="button"
                   className="w-full"
                   onClick={() => run("publish")}
-                  disabled={isPending}
+                  disabled={isPending || isSlugTaken}
                 >
                   <HugeiconsIcon icon={Rocket01Icon} size={16} />
                   {isPending
@@ -1120,7 +1249,8 @@ export function BlogPostForm({
 
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
-                  Meta Description ({(seoMetaDescription || summary).length}/160)
+                  Meta Description ({(seoMetaDescription || summary).length}
+                  /160)
                 </div>
                 <div className="text-xs text-muted-foreground line-clamp-2">
                   {seoMetaDescription || summary || "No description provided"}
@@ -1157,8 +1287,7 @@ export function BlogPostForm({
                   Reading time
                 </span>
                 <span className="text-xs font-medium text-foreground">
-                  {Math.max(1, Math.ceil(countContentWords(content) / 200))}{" "}
-                  min
+                  {Math.max(1, Math.ceil(countContentWords(content) / 200))} min
                 </span>
               </div>
             </CardContent>

@@ -3,6 +3,15 @@ import { z } from "zod";
 export const projectInputSchema = z
   .object({
     intent: z.enum(["draft", "publish"]),
+    slug: z
+      .string()
+      .trim()
+      .min(1, "Slug is required")
+      .max(100, "Slug must be 100 characters or fewer")
+      .regex(
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+        "Slug must contain only lowercase letters, numbers and hyphens",
+      ),
     title: z
       .string()
       .trim()
@@ -41,7 +50,10 @@ export const projectInputSchema = z
       z.object({
         id: z.string(),
         title: z.string().trim().min(1, "Feature title is required"),
-        description: z.string().trim().min(1, "Feature description is required"),
+        description: z
+          .string()
+          .trim()
+          .min(1, "Feature description is required"),
       }),
     ),
     heroImage: z
@@ -68,6 +80,8 @@ export const projectInputSchema = z
       .nullable()
       .optional(),
     projectStatus: z.enum(["ongoing", "completed"]),
+    featured: z.boolean().optional(),
+    publishedAt: z.string().nullable().optional(),
     seo: z.object({
       metaTitle: z
         .string()

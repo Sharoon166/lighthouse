@@ -34,6 +34,7 @@ export type BlogPostDraftData = {
   };
   status: "draft" | "published";
   publishedAt: string | null;
+  featured: boolean;
   heroImage: BlogPostHeroImage | null;
   seo: {
     metaTitle?: string;
@@ -58,6 +59,7 @@ function buildPostData(data: z.infer<typeof blogPostInputSchema>): {
   tags: string[];
   author: { name: string; designation: string; bio: string };
   status: "draft" | "published";
+  featured: boolean;
   heroImage: BlogPostHeroImage | null;
   seo: {
     metaTitle: string;
@@ -77,6 +79,7 @@ function buildPostData(data: z.infer<typeof blogPostInputSchema>): {
       bio: data.author.bio,
     },
     status: data.intent === "publish" ? "published" : "draft",
+    featured: data.featured ?? false,
     heroImage: data.heroImage ?? null,
     seo: {
       metaTitle: data.seo?.metaTitle?.trim() || "",
@@ -116,12 +119,37 @@ export async function createBlogPost(
   try {
     await connectToDatabase();
 
-    const slug = await uniqueSlug(data.title);
+    if (data.featured) {
+      const count = await BlogPostModel.countDocuments({
+        featured: true,
+        deletedAt: null,
+      });
+      if (count >= 3) {
+        return {
+          ok: false,
+          fieldErrors: {
+            featured: [
+              "Maximum 3 featured posts allowed. Unfeature another post first.",
+            ],
+          },
+          formErrors: [],
+        };
+      }
+    }
+
+    const slug = data.slug || (await uniqueSlug(data.title));
+
+    const publishedAt =
+      data.intent === "publish"
+        ? data.publishedAt
+          ? new Date(data.publishedAt)
+          : new Date()
+        : null;
 
     await BlogPostModel.create({
       ...buildPostData(data),
       slug,
-      publishedAt: data.intent === "publish" ? new Date() : null,
+      publishedAt,
     });
 
     revalidatePath("/admin/blog");
@@ -162,13 +190,38 @@ export async function updateBlogPost(
       };
     }
 
-    const nextSlug = await uniqueSlug(data.title, String(existing._id));
+    if (data.featured && !existing.featured) {
+      const count = await BlogPostModel.countDocuments({
+        featured: true,
+        deletedAt: null,
+      });
+      if (count >= 3) {
+        return {
+          ok: false,
+          fieldErrors: {
+            featured: [
+              "Maximum 3 featured posts allowed. Unfeature another post first.",
+            ],
+          },
+          formErrors: [],
+        };
+      }
+    }
+
+    const nextSlug =
+      data.slug || (await uniqueSlug(data.title, String(existing._id)));
+
+    const publishedAt =
+      data.intent === "publish"
+        ? data.publishedAt
+          ? new Date(data.publishedAt)
+          : (existing.publishedAt ?? new Date())
+        : null;
 
     existing.set({
       ...buildPostData(data),
       slug: nextSlug,
-      publishedAt:
-        data.intent === "publish" ? (existing.publishedAt ?? new Date()) : null,
+      publishedAt,
     });
 
     await existing.save();
@@ -212,6 +265,7 @@ const cachedGetBlogPost = unstable_cache(
       publishedAt: document.publishedAt
         ? document.publishedAt.toISOString()
         : null,
+      featured: document.featured,
       heroImage: document.heroImage,
       seo: {
         metaTitle: document.seo?.metaTitle || "",
@@ -317,6 +371,7 @@ export type BlogPostListItem = {
   tags: string[];
   authorName: string;
   status: "draft" | "published";
+  featured: boolean;
   createdAt: string;
   updatedAt: string;
   publishedAt: string | null;
@@ -371,6 +426,7 @@ export async function listBlogPosts(
     tags: document.tags,
     authorName: document.author.name,
     status: document.status,
+    featured: document.featured,
     createdAt: document.createdAt.toISOString(),
     updatedAt: document.updatedAt.toISOString(),
     publishedAt: document.publishedAt
@@ -427,6 +483,7 @@ export async function listTrashedBlogPosts(
     tags: document.tags,
     authorName: document.author.name,
     status: document.status,
+    featured: document.featured,
     createdAt: document.createdAt.toISOString(),
     updatedAt: document.updatedAt.toISOString(),
     publishedAt: document.publishedAt
@@ -446,6 +503,43 @@ export async function listTrashedBlogPosts(
 }
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+export type ToggleFeaturedResult =
+  | { ok: true; featured: boolean }
+  | { ok: false; message: string };
+
+export async function toggleFeaturedBlogPost(
+  slug: string,
+): Promise<ToggleFeaturedResult> {
+  await connectToDatabase();
+
+  const existing = await BlogPostModel.findOne({ slug, deletedAt: null });
+  if (!existing) {
+    return { ok: false, message: "This post no longer exists." };
+  }
+
+  if (!existing.featured) {
+    const count = await BlogPostModel.countDocuments({
+      featured: true,
+      deletedAt: null,
+    });
+    if (count >= 3) {
+      return {
+        ok: false,
+        message:
+          "Maximum 3 featured posts allowed. Unfeature another post first.",
+      };
+    }
+  }
+
+  existing.featured = !existing.featured;
+  await existing.save();
+
+  revalidatePath("/admin/blog");
+  updateTag("blog-posts");
+
+  return { ok: true, featured: existing.featured };
+}
 
 export type UploadBlogImageResult =
   | { ok: true; image: BlogPostHeroImage }

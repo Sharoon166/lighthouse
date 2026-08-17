@@ -36,6 +36,11 @@ export function BlogPostCards({
         >
           <div className="flex items-start justify-between gap-3">
             <div className="flex flex-wrap gap-1.5">
+              {post.featured && (
+                <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                  ★ Featured
+                </Badge>
+              )}
               {post.tags.map((tag) => (
                 <Badge key={tag} variant="secondary">
                   {tag}

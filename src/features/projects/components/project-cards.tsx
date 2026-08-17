@@ -41,6 +41,11 @@ export function ProjectCards({
           <div className="flex flex-col gap-4 p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex flex-wrap gap-1.5">
+                {project.featured && (
+                  <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+                    ★ Featured
+                  </Badge>
+                )}
                 {project.categories.slice(0, 2).map((cat) => (
                   <Badge key={cat} variant="secondary">
                     {cat}

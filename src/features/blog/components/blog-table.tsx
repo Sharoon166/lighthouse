@@ -76,6 +76,17 @@ export function BlogTable({
         header: "Status",
         cell: (info) => <StatusBadge status={info.getValue()} />,
       }),
+      columnHelper.accessor("featured", {
+        header: "Featured",
+        cell: (info) =>
+          info.getValue() ? (
+            <Badge className="bg-amber-100 text-amber-800 border-amber-200">
+              ★ Featured
+            </Badge>
+          ) : (
+            <span className="text-muted-foreground">—</span>
+          ),
+      }),
       columnHelper.accessor("updatedAt", {
         header: "Updated",
         cell: (info) => formatDate(info.getValue()),

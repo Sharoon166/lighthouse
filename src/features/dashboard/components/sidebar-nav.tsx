@@ -42,7 +42,7 @@ function initials(name: string) {
 
 function itemClasses(collapsed: boolean, active: boolean) {
   return cn(
-    "group relative flex items-center gap-3 rounded-full py-2.5 text-sm font-medium text-muted-foreground transition-colors",
+    "group relative flex items-center gap-3 rounded-xl py-2.5 text-sm font-medium text-muted-foreground transition-colors",
     collapsed ? "justify-center px-0" : "px-3",
     active
       ? "bg-secondary text-secondary-foreground"

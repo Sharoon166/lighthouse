@@ -195,6 +195,26 @@ export function ProductForm({
     initialData?.seo?.metaDescription ?? "",
   );
 
+  const [contentMaterialsAndCare, setContentMaterialsAndCare] = useState(
+    initialData?.content?.materialsAndCare ?? "",
+  );
+  const [contentShippingAndReturns, setContentShippingAndReturns] = useState(
+    initialData?.content?.shippingAndReturns ?? "",
+  );
+  const [contentPayment, setContentPayment] = useState(
+    initialData?.content?.payment ?? "",
+  );
+  const [contentInstallationAndBulbs, setContentInstallationAndBulbs] =
+    useState(initialData?.content?.installationAndBulbs ?? "");
+  const [specifications, setSpecifications] = useState<
+    Array<{ key: string; value: string }>
+  >(
+    initialData?.specifications?.map((s) => ({
+      key: s.key,
+      value: s.value,
+    })) ?? [],
+  );
+
   const [attributes, setAttributes] = useState<ProductAttribute[]>(
     initialData?.variantAttributes?.length
       ? initialData.variantAttributes.map((attrName) => {
@@ -367,6 +387,16 @@ export function ProductForm({
       metaTitle: seoMetaTitle.trim() || undefined,
       metaDescription: seoMetaDescription.trim() || undefined,
     },
+    content: {
+      materialsAndCare: contentMaterialsAndCare.trim() || undefined,
+      shippingAndReturns: contentShippingAndReturns.trim() || undefined,
+      payment: contentPayment.trim() || undefined,
+      installationAndBulbs:
+        contentInstallationAndBulbs.trim() || undefined,
+    },
+    specifications: specifications.filter(
+      (s) => s.key.trim() && s.value.trim(),
+    ),
   });
 
   const run = (intent: "draft" | "publish" = "publish") => {
@@ -550,7 +580,7 @@ export function ProductForm({
       )}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-6 *:border-none *:p-0">
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>
@@ -1127,6 +1157,245 @@ export function ProductForm({
                 >
                   <HugeiconsIcon icon={Delete02Icon} size={16} />
                   Remove variant
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Content (Optional)</CardTitle>
+              <CardDescription>
+                Product information displayed on the storefront.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2" data-field="content.materialsAndCare">
+                <Label htmlFor="content-materials-care">
+                  Materials &amp; Care
+                </Label>
+                <InputGroup className="min-h-[5rem]">
+                  <InputGroupTextarea
+                    id="content-materials-care"
+                    value={contentMaterialsAndCare}
+                    onChange={(event) => {
+                      setContentMaterialsAndCare(event.target.value);
+                      clearFieldError("content.materialsAndCare");
+                    }}
+                    placeholder="e.g. Solid brass construction. Wipe clean with a soft, dry cloth."
+                    maxLength={FIELD_LIMITS.content.materialsAndCare}
+                    aria-invalid={Boolean(
+                      fieldError("content.materialsAndCare"),
+                    )}
+                  />
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
+                    <InputGroupText>
+                      {contentMaterialsAndCare.length}/
+                      {FIELD_LIMITS.content.materialsAndCare}
+                    </InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldError("content.materialsAndCare") && (
+                  <p className="text-xs text-destructive">
+                    {fieldError("content.materialsAndCare")}
+                  </p>
+                )}
+              </div>
+
+              <div
+                className="space-y-2"
+                data-field="content.shippingAndReturns"
+              >
+                <Label htmlFor="content-shipping-returns">
+                  Shipping &amp; Returns
+                </Label>
+                <InputGroup className="min-h-[5rem]">
+                  <InputGroupTextarea
+                    id="content-shipping-returns"
+                    value={contentShippingAndReturns}
+                    onChange={(event) => {
+                      setContentShippingAndReturns(event.target.value);
+                      clearFieldError("content.shippingAndReturns");
+                    }}
+                    placeholder="e.g. Free shipping on orders over $50. Returns accepted within 30 days."
+                    maxLength={FIELD_LIMITS.content.shippingAndReturns}
+                    aria-invalid={Boolean(
+                      fieldError("content.shippingAndReturns"),
+                    )}
+                  />
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
+                    <InputGroupText>
+                      {contentShippingAndReturns.length}/
+                      {FIELD_LIMITS.content.shippingAndReturns}
+                    </InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldError("content.shippingAndReturns") && (
+                  <p className="text-xs text-destructive">
+                    {fieldError("content.shippingAndReturns")}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2" data-field="content.payment">
+                <Label htmlFor="content-payment">Payment</Label>
+                <InputGroup className="min-h-[5rem]">
+                  <InputGroupTextarea
+                    id="content-payment"
+                    value={contentPayment}
+                    onChange={(event) => {
+                      setContentPayment(event.target.value);
+                      clearFieldError("content.payment");
+                    }}
+                    placeholder="e.g. We accept all major credit cards, PayPal, and bank transfers."
+                    maxLength={FIELD_LIMITS.content.payment}
+                    aria-invalid={Boolean(fieldError("content.payment"))}
+                  />
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
+                    <InputGroupText>
+                      {contentPayment.length}/{FIELD_LIMITS.content.payment}
+                    </InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldError("content.payment") && (
+                  <p className="text-xs text-destructive">
+                    {fieldError("content.payment")}
+                  </p>
+                )}
+              </div>
+
+              <div
+                className="space-y-2"
+                data-field="content.installationAndBulbs"
+              >
+                <Label htmlFor="content-installation-bulbs">
+                  Installation &amp; Bulbs
+                </Label>
+                <InputGroup className="min-h-[5rem]">
+                  <InputGroupTextarea
+                    id="content-installation-bulbs"
+                    value={contentInstallationAndBulbs}
+                    onChange={(event) => {
+                      setContentInstallationAndBulbs(event.target.value);
+                      clearFieldError("content.installationAndBulbs");
+                    }}
+                    placeholder="e.g. Hardwire installation. Uses 1x E27 bulb (not included). Max 10W."
+                    maxLength={FIELD_LIMITS.content.installationAndBulbs}
+                    aria-invalid={Boolean(
+                      fieldError("content.installationAndBulbs"),
+                    )}
+                  />
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
+                    <InputGroupText>
+                      {contentInstallationAndBulbs.length}/
+                      {FIELD_LIMITS.content.installationAndBulbs}
+                    </InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldError("content.installationAndBulbs") && (
+                  <p className="text-xs text-destructive">
+                    {fieldError("content.installationAndBulbs")}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Specifications (Optional)</CardTitle>
+                  <CardDescription>
+                    Technical details displayed as a key-value table.
+                  </CardDescription>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {specifications.length}/{FIELD_LIMITS.specification.maxCount}
+                </span>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {fieldError("specifications") && (
+                <p className="text-xs text-destructive">
+                  {fieldError("specifications")}
+                </p>
+              )}
+
+              {specifications.map((spec, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="grid flex-1 grid-cols-2 gap-2">
+                    <InputGroup>
+                      <InputGroupInput
+                        value={spec.key}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setSpecifications((prev) =>
+                            prev.map((s, i) =>
+                              i === index ? { ...s, key: value } : s,
+                            ),
+                          );
+                        }}
+                        placeholder="Name (e.g. Material)"
+                        maxLength={FIELD_LIMITS.specification.key}
+                      />
+                    </InputGroup>
+                    <InputGroup>
+                      <InputGroupInput
+                        value={spec.value}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          setSpecifications((prev) =>
+                            prev.map((s, i) =>
+                              i === index ? { ...s, value: value } : s,
+                            ),
+                          );
+                        }}
+                        placeholder="Value (e.g. Solid brass)"
+                        maxLength={FIELD_LIMITS.specification.value}
+                      />
+                    </InputGroup>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-0.5 shrink-0 text-muted-foreground hover:text-destructive"
+                    onClick={() =>
+                      setSpecifications((prev) =>
+                        prev.filter((_, i) => i !== index),
+                      )
+                    }
+                  >
+                    <HugeiconsIcon icon={Delete02Icon} size={14} />
+                  </Button>
+                </div>
+              ))}
+
+              {specifications.length < FIELD_LIMITS.specification.maxCount && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() =>
+                    setSpecifications((prev) => [...prev, { key: "", value: "" }])
+                  }
+                >
+                  <HugeiconsIcon icon={PlusSignIcon} size={14} className="me-1.5" />
+                  Add specification
                 </Button>
               )}
             </CardContent>

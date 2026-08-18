@@ -68,6 +68,16 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
     description: data.description,
     descriptionHtml: "",
     shortDescription: data.shortDescription || "",
+    content: {
+      materialsAndCare: data.content?.materialsAndCare?.trim() || "",
+      shippingAndReturns: data.content?.shippingAndReturns?.trim() || "",
+      payment: data.content?.payment?.trim() || "",
+      installationAndBulbs:
+        data.content?.installationAndBulbs?.trim() || "",
+    },
+    specifications: (data.specifications ?? [])
+      .filter((s) => s.key.trim() && s.value.trim())
+      .map((s) => ({ key: s.key.trim(), value: s.value.trim() })),
     category: {
       _id: categoryDoc._id,
       name: categoryDoc.name,

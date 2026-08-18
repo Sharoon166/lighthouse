@@ -105,6 +105,68 @@ export const productInputSchema = z
           .optional(),
       })
       .optional(),
+    content: z
+      .object({
+        materialsAndCare: z
+          .string()
+          .trim()
+          .max(
+            FIELD_LIMITS.content.materialsAndCare,
+            `Materials & Care must be ${FIELD_LIMITS.content.materialsAndCare} characters or fewer`,
+          )
+          .optional(),
+        shippingAndReturns: z
+          .string()
+          .trim()
+          .max(
+            FIELD_LIMITS.content.shippingAndReturns,
+            `Shipping & Returns must be ${FIELD_LIMITS.content.shippingAndReturns} characters or fewer`,
+          )
+          .optional(),
+        payment: z
+          .string()
+          .trim()
+          .max(
+            FIELD_LIMITS.content.payment,
+            `Payment must be ${FIELD_LIMITS.content.payment} characters or fewer`,
+          )
+          .optional(),
+        installationAndBulbs: z
+          .string()
+          .trim()
+          .max(
+            FIELD_LIMITS.content.installationAndBulbs,
+            `Installation & Bulbs must be ${FIELD_LIMITS.content.installationAndBulbs} characters or fewer`,
+          )
+          .optional(),
+      })
+      .optional(),
+    specifications: z
+      .array(
+        z.object({
+          key: z
+            .string()
+            .trim()
+            .min(1, "Specification name is required")
+            .max(
+              FIELD_LIMITS.specification.key,
+              `Name must be ${FIELD_LIMITS.specification.key} characters or fewer`,
+            ),
+          value: z
+            .string()
+            .trim()
+            .min(1, "Specification value is required")
+            .max(
+              FIELD_LIMITS.specification.value,
+              `Value must be ${FIELD_LIMITS.specification.value} characters or fewer`,
+            ),
+        }),
+      )
+      .max(
+        FIELD_LIMITS.specification.maxCount,
+        `Maximum ${FIELD_LIMITS.specification.maxCount} specifications allowed`,
+      )
+      .optional(),
   })
   .superRefine((data, context) => {
     const skus = data.variants.map((v) => v.sku);

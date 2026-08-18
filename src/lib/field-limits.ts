@@ -24,4 +24,15 @@ export const FIELD_LIMITS = {
     attributeName: 50,
     attributeValue: 100,
   },
+  content: {
+    materialsAndCare: 1000,
+    shippingAndReturns: 1000,
+    payment: 1000,
+    installationAndBulbs: 1000,
+  },
+  specification: {
+    key: 100,
+    value: 200,
+    maxCount: 20,
+  },
 } as const;

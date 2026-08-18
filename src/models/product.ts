@@ -29,6 +29,14 @@ export interface Product {
   slug: string;
   description: string;
   descriptionHtml: string;
+  shortDescription: string;
+  content: {
+    materialsAndCare: string;
+    shippingAndReturns: string;
+    payment: string;
+    installationAndBulbs: string;
+  };
+  specifications: Array<{ key: string; value: string }>;
   category: {
     _id: Types.ObjectId;
     name: string;
@@ -134,6 +142,24 @@ const seoSchema = new Schema(
   { _id: false },
 );
 
+const contentSchema = new Schema(
+  {
+    materialsAndCare: { type: String, default: "", trim: true },
+    shippingAndReturns: { type: String, default: "", trim: true },
+    payment: { type: String, default: "", trim: true },
+    installationAndBulbs: { type: String, default: "", trim: true },
+  },
+  { _id: false },
+);
+
+const specificationSchema = new Schema(
+  {
+    key: { type: String, required: true, trim: true },
+    value: { type: String, required: true, trim: true },
+  },
+  { _id: false },
+);
+
 const productSchema = new Schema<Product>(
   {
     name: { type: String, required: true, trim: true },
@@ -146,6 +172,9 @@ const productSchema = new Schema<Product>(
     },
     description: { type: String, default: "", trim: true },
     descriptionHtml: { type: String, default: "" },
+    shortDescription: { type: String, default: "", trim: true },
+    content: { type: contentSchema, default: () => ({}) },
+    specifications: { type: [specificationSchema], default: [] },
     category: { type: categoryRefSchema, required: true },
     brand: { type: brandRefSchema, required: true },
     variantAttributes: [{ type: String }],

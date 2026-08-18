@@ -10,6 +10,7 @@ import {
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
   Settings01Icon,
+  Store01Icon,
   TagsIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -23,9 +24,10 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard", icon: DashboardSquare03Icon },
   { href: "/admin/products", label: "Products", icon: PackageIcon },
+  { href: "/admin/categories", label: "Categories", icon: TagsIcon },
+  { href: "/admin/brands", label: "Brands", icon: Store01Icon },
   { href: "/admin/projects", label: "Projects", icon: Folder02Icon },
   { href: "/admin/blog", label: "Blog", icon: NewsIcon },
-  { href: "/admin/categories", label: "Categories", icon: TagsIcon },
   { href: "/admin/media", label: "Media", icon: Image01Icon },
 ];
 

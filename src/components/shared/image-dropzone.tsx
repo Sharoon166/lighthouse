@@ -148,7 +148,7 @@ export function ImageDropzone({
       />
 
       {value ? (
-        <div className="flex flex-wrap items-center gap-4 rounded-xl border border-border bg-background p-3">
+        <div className="flex flex-col flex-wrap items-center gap-4 rounded-xl border border-border bg-background p-3">
           <button
             type="button"
             onClick={() => setZoomOpen(true)}
@@ -184,7 +184,7 @@ export function ImageDropzone({
               </Button>
               <Button
                 type="button"
-                variant="ghost"
+                variant="destructive"
                 size="sm"
                 disabled={isUploading}
                 onClick={async () => {

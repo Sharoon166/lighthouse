@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { FIELD_LIMITS } from "@/lib/field-limits";
 
 export const blogPostInputSchema = z
   .object({
@@ -7,7 +8,7 @@ export const blogPostInputSchema = z
       .string()
       .trim()
       .min(1, "Slug is required")
-      .max(100, "Slug must be 100 characters or fewer")
+      .max(FIELD_LIMITS.slug, `Slug must be ${FIELD_LIMITS.slug} characters or fewer`)
       .regex(
         /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
         "Slug must contain only lowercase letters, numbers and hyphens",
@@ -16,16 +17,16 @@ export const blogPostInputSchema = z
       .string()
       .trim()
       .min(1, "Title is required")
-      .max(200, "Title must be 200 characters or fewer"),
+      .max(FIELD_LIMITS.name.medium, `Title must be ${FIELD_LIMITS.name.medium} characters or fewer`),
     summary: z
       .string()
       .trim()
-      .max(1000, "Summary must be 1000 characters or fewer"),
+      .max(FIELD_LIMITS.description.long, `Summary must be ${FIELD_LIMITS.description.long} characters or fewer`),
     tags: z
       .array(
-        z.string().trim().min(1).max(40, "Tags must be 40 characters or fewer"),
+        z.string().trim().min(1).max(FIELD_LIMITS.tag.name, `Tags must be ${FIELD_LIMITS.tag.name} characters or fewer`),
       )
-      .max(8, "Up to 8 tags allowed"),
+      .max(FIELD_LIMITS.tag.maxCount, `Up to ${FIELD_LIMITS.tag.maxCount} tags allowed`),
     content: z.record(z.string(), z.unknown()),
     heroImage: z
       .object({
@@ -39,8 +40,8 @@ export const blogPostInputSchema = z
       designation: z
         .string()
         .trim()
-        .max(100, "Designation must be 100 characters or fewer"),
-      bio: z.string().trim().max(500, "Bio must be 500 characters or fewer"),
+        .max(FIELD_LIMITS.name.short, `Designation must be ${FIELD_LIMITS.name.short} characters or fewer`),
+      bio: z.string().trim().max(FIELD_LIMITS.description.medium, `Bio must be ${FIELD_LIMITS.description.medium} characters or fewer`),
     }),
     featured: z.boolean().optional(),
     publishedAt: z.string().nullable().optional(),
@@ -49,17 +50,17 @@ export const blogPostInputSchema = z
         metaTitle: z
           .string()
           .trim()
-          .max(60, "Meta title must be 60 characters or fewer")
+          .max(FIELD_LIMITS.seo.metaTitle, `Meta title must be ${FIELD_LIMITS.seo.metaTitle} characters or fewer`)
           .optional(),
         metaDescription: z
           .string()
           .trim()
-          .max(160, "Meta description must be 160 characters or fewer")
+          .max(FIELD_LIMITS.seo.metaDescription, `Meta description must be ${FIELD_LIMITS.seo.metaDescription} characters or fewer`)
           .optional(),
         focusKeyword: z
           .string()
           .trim()
-          .max(100, "Focus keyword must be 100 characters or fewer")
+          .max(FIELD_LIMITS.seo.focusKeyword, `Focus keyword must be ${FIELD_LIMITS.seo.focusKeyword} characters or fewer`)
           .optional(),
         noIndex: z.boolean().optional(),
       })

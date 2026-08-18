@@ -35,11 +35,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupTextarea,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { TaggedInput } from "@/components/ui/tagged-input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSlugValidation } from "@/hooks/use-slug-validation";
 import { cn, slugify } from "@/lib/utils";
+import { FIELD_LIMITS } from "@/lib/field-limits";
 import type { ProjectImage } from "@/models/project";
 import {
   createProject,
@@ -500,46 +508,50 @@ export function ProjectForm({
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div className="space-y-2" data-field="title">
                     <Label htmlFor="title">Title</Label>
-                    <Input
-                      id="title"
-                      value={title}
-                      onChange={(event) => {
-                        setTitle(event.target.value);
-                        clearFieldError("title");
-                      }}
-                      placeholder="e.g. Aurora Penthouse"
-                      aria-invalid={Boolean(fieldError("title"))}
-                    />
-                    {fieldError("title") ? (
+                    <InputGroup>
+                      <InputGroupInput
+                        id="title"
+                        value={title}
+                        onChange={(event) => {
+                          setTitle(event.target.value);
+                          clearFieldError("title");
+                        }}
+                        placeholder="e.g. Aurora Penthouse"
+                        maxLength={FIELD_LIMITS.name.medium}
+                        aria-invalid={Boolean(fieldError("title"))}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>{title.length}/{FIELD_LIMITS.name.medium}</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("title") && (
                       <p className="text-xs text-destructive">
                         {fieldError("title")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {title.length}/200
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2" data-field="subtitle">
                     <Label htmlFor="subtitle">Subtitle</Label>
-                    <Input
-                      id="subtitle"
-                      value={subtitle}
-                      onChange={(event) => {
-                        setSubtitle(event.target.value);
-                        clearFieldError("subtitle");
-                      }}
-                      placeholder="e.g. Modern Minimalist Design"
-                      aria-invalid={Boolean(fieldError("subtitle"))}
-                    />
-                    {fieldError("subtitle") ? (
+                    <InputGroup>
+                      <InputGroupInput
+                        id="subtitle"
+                        value={subtitle}
+                        onChange={(event) => {
+                          setSubtitle(event.target.value);
+                          clearFieldError("subtitle");
+                        }}
+                        placeholder="e.g. Modern Minimalist Design"
+                        maxLength={FIELD_LIMITS.name.long}
+                        aria-invalid={Boolean(fieldError("subtitle"))}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>{subtitle.length}/{FIELD_LIMITS.name.long}</InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("subtitle") && (
                       <p className="text-xs text-destructive">
                         {fieldError("subtitle")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {subtitle.length}/300
                       </p>
                     )}
                   </div>
@@ -635,7 +647,7 @@ export function ProjectForm({
                     </p>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Press Enter or comma to add. {categories.length}/8
+                      Press Enter or comma to add. {categories.length}/{FIELD_LIMITS.tag.maxCount}
                     </p>
                   )}
                 </div>
@@ -967,25 +979,27 @@ export function ProjectForm({
                 <CardContent className="space-y-6">
                   <div className="space-y-2" data-field="seo.metaTitle">
                     <Label htmlFor="seo-meta-title">Meta Title</Label>
-                    <Input
-                      id="seo-meta-title"
-                      value={seoMetaTitle}
-                      onChange={(event) => {
-                        setSeoMetaTitle(event.target.value);
-                        clearFieldError("seo.metaTitle");
-                      }}
-                      placeholder={title || "Auto-generated from title"}
-                      maxLength={60}
-                      aria-invalid={Boolean(fieldError("seo.metaTitle"))}
-                    />
-                    {fieldError("seo.metaTitle") ? (
+                    <InputGroup>
+                      <InputGroupInput
+                        id="seo-meta-title"
+                        value={seoMetaTitle}
+                        onChange={(event) => {
+                          setSeoMetaTitle(event.target.value);
+                          clearFieldError("seo.metaTitle");
+                        }}
+                        placeholder={title || "Auto-generated from title"}
+                        maxLength={FIELD_LIMITS.seo.metaTitle}
+                        aria-invalid={Boolean(fieldError("seo.metaTitle"))}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>
+                          {seoMetaTitle.length}/{FIELD_LIMITS.seo.metaTitle}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("seo.metaTitle") && (
                       <p className="text-xs text-destructive">
                         {fieldError("seo.metaTitle")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {seoMetaTitle.length}/60 · Leave empty to use project
-                        title. Recommended: 50-60 characters
                       </p>
                     )}
                   </div>
@@ -994,45 +1008,54 @@ export function ProjectForm({
                     <Label htmlFor="seo-meta-description">
                       Meta Description
                     </Label>
-                    <Textarea
-                      id="seo-meta-description"
-                      rows={3}
-                      value={seoMetaDescription}
-                      onChange={(event) => {
-                        setSeoMetaDescription(event.target.value);
-                        clearFieldError("seo.metaDescription");
-                      }}
-                      placeholder={
-                        description.slice(0, 155) ||
-                        "Auto-generated from description"
-                      }
-                      maxLength={160}
-                      aria-invalid={Boolean(fieldError("seo.metaDescription"))}
-                    />
-                    {fieldError("seo.metaDescription") ? (
+                    <InputGroup className="min-h-[5rem]">
+                      <InputGroupTextarea
+                        id="seo-meta-description"
+                        value={seoMetaDescription}
+                        onChange={(event) => {
+                          setSeoMetaDescription(event.target.value);
+                          clearFieldError("seo.metaDescription");
+                        }}
+                        placeholder={
+                          description.slice(0, 155) ||
+                          "Auto-generated from description"
+                        }
+                        maxLength={FIELD_LIMITS.seo.metaDescription}
+                        aria-invalid={Boolean(fieldError("seo.metaDescription"))}
+                      />
+                      <InputGroupAddon align="block-end" className="border-t border-border">
+                        <InputGroupText>
+                          {seoMetaDescription.length}/{FIELD_LIMITS.seo.metaDescription}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("seo.metaDescription") && (
                       <p className="text-xs text-destructive">
                         {fieldError("seo.metaDescription")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {seoMetaDescription.length}/160 · Leave empty to use
-                        description. Recommended: 150-160 characters
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2" data-field="seo.focusKeyword">
                     <Label htmlFor="seo-focus-keyword">Focus Keyword</Label>
-                    <Input
-                      id="seo-focus-keyword"
-                      value={seoFocusKeyword}
-                      onChange={(event) => {
-                        setSeoFocusKeyword(event.target.value);
-                        clearFieldError("seo.focusKeyword");
-                      }}
-                      placeholder="e.g. modern lighting design"
-                      aria-invalid={Boolean(fieldError("seo.focusKeyword"))}
-                    />
+                    <InputGroup>
+                      <InputGroupInput
+                        id="seo-focus-keyword"
+                        value={seoFocusKeyword}
+                        onChange={(event) => {
+                          setSeoFocusKeyword(event.target.value);
+                          clearFieldError("seo.focusKeyword");
+                        }}
+                        placeholder="e.g. modern lighting design"
+                        maxLength={FIELD_LIMITS.seo.focusKeyword}
+                        aria-invalid={Boolean(fieldError("seo.focusKeyword"))}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>
+                          {seoFocusKeyword.length}/{FIELD_LIMITS.seo.focusKeyword}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
                     {fieldError("seo.focusKeyword") ? (
                       <p className="text-xs text-destructive">
                         {fieldError("seo.focusKeyword")}

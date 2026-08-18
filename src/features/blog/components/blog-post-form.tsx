@@ -38,11 +38,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupTextarea,
+  InputGroupText,
+} from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { TaggedInput } from "@/components/ui/tagged-input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSlugValidation } from "@/hooks/use-slug-validation";
 import { cn, slugify } from "@/lib/utils";
+import { FIELD_LIMITS } from "@/lib/field-limits";
 import type { BlogPostHeroImage } from "@/models/blog-post";
 import {
   type BlogPostActionResult,
@@ -661,24 +669,28 @@ export function BlogPostForm({
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2" data-field="title">
                       <Label htmlFor="title">Title</Label>
-                      <Input
-                        id="title"
-                        value={title}
-                        onChange={(event) => {
-                          setTitle(event.target.value);
-                          clearFieldError("title");
-                        }}
-                        onBlur={() => validateField("title")}
-                        placeholder="An evening of golden light"
-                        aria-invalid={Boolean(fieldError("title"))}
-                      />
-                      {fieldError("title") ? (
+                      <InputGroup>
+                        <InputGroupInput
+                          id="title"
+                          value={title}
+                          onChange={(event) => {
+                            setTitle(event.target.value);
+                            clearFieldError("title");
+                          }}
+                          onBlur={() => validateField("title")}
+                          placeholder="An evening of golden light"
+                          aria-invalid={Boolean(fieldError("title"))}
+                          maxLength={FIELD_LIMITS.name.medium}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupText>
+                            {title.length}/{FIELD_LIMITS.name.medium}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
+                      {fieldError("title") && (
                         <p className="text-xs text-destructive">
                           {fieldError("title")}
-                        </p>
-                      ) : (
-                        <p className="text-xs text-muted-foreground">
-                          {title.length}/200
                         </p>
                       )}
                     </div>
@@ -701,7 +713,7 @@ export function BlogPostForm({
                         </p>
                       ) : (
                         <p className="text-xs text-muted-foreground">
-                          Press Enter or comma to add a tag. {tags.length}/8
+                          Press Enter or comma to add a tag. {tags.length}/{FIELD_LIMITS.tag.maxCount}
                         </p>
                       )}
                     </div>
@@ -763,25 +775,28 @@ export function BlogPostForm({
 
                   <div className="space-y-2" data-field="summary">
                     <Label htmlFor="summary">Summary</Label>
-                    <Textarea
-                      id="summary"
-                      rows={3}
-                      value={summary}
-                      onChange={(event) => {
-                        setSummary(event.target.value);
-                        clearFieldError("summary");
-                      }}
-                      onBlur={() => validateField("summary")}
-                      placeholder="A short paragraph that appears in post cards, search and previews."
-                      aria-invalid={Boolean(fieldError("summary"))}
-                    />
-                    {fieldError("summary") ? (
+                    <InputGroup className="min-h-[5rem]">
+                      <InputGroupTextarea
+                        id="summary"
+                        value={summary}
+                        onChange={(event) => {
+                          setSummary(event.target.value);
+                          clearFieldError("summary");
+                        }}
+                        onBlur={() => validateField("summary")}
+                        placeholder="A short paragraph that appears in post cards, search and previews."
+                        aria-invalid={Boolean(fieldError("summary"))}
+                        maxLength={FIELD_LIMITS.description.long}
+                      />
+                      <InputGroupAddon align="block-end" className="border-t border-border">
+                        <InputGroupText>
+                          {summary.length}/{FIELD_LIMITS.description.long}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("summary") && (
                       <p className="text-xs text-destructive">
                         {fieldError("summary")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {summary.length}/1000
                       </p>
                     )}
                   </div>
@@ -828,17 +843,25 @@ export function BlogPostForm({
                   <div className="grid sm:grid-cols-2 gap-6">
                     <div className="space-y-2" data-field="author.name">
                       <Label htmlFor="author-name">Name</Label>
-                      <Input
-                        id="author-name"
-                        value={authorName}
-                        onChange={(event) => {
-                          setAuthorName(event.target.value);
-                          clearFieldError("author.name");
-                        }}
-                        onBlur={() => validateField("author.name")}
-                        placeholder="e.g. Sara Ahmed"
-                        aria-invalid={Boolean(fieldError("author.name"))}
-                      />
+                      <InputGroup>
+                        <InputGroupInput
+                          id="author-name"
+                          value={authorName}
+                          onChange={(event) => {
+                            setAuthorName(event.target.value);
+                            clearFieldError("author.name");
+                          }}
+                          onBlur={() => validateField("author.name")}
+                          placeholder="e.g. Sara Ahmed"
+                          aria-invalid={Boolean(fieldError("author.name"))}
+                          maxLength={FIELD_LIMITS.name.short}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupText>
+                            {authorName.length}/{FIELD_LIMITS.name.short}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
                       {fieldError("author.name") && (
                         <p className="text-xs text-destructive">
                           {fieldError("author.name")}
@@ -848,17 +871,25 @@ export function BlogPostForm({
 
                     <div className="space-y-2" data-field="author.designation">
                       <Label htmlFor="author-designation">Designation</Label>
-                      <Input
-                        id="author-designation"
-                        value={authorDesignation}
-                        onChange={(event) => {
-                          setAuthorDesignation(event.target.value);
-                          clearFieldError("author.designation");
-                        }}
-                        onBlur={() => validateField("author.designation")}
-                        placeholder="e.g. Lead Product Designer"
-                        aria-invalid={Boolean(fieldError("author.designation"))}
-                      />
+                      <InputGroup>
+                        <InputGroupInput
+                          id="author-designation"
+                          value={authorDesignation}
+                          onChange={(event) => {
+                            setAuthorDesignation(event.target.value);
+                            clearFieldError("author.designation");
+                          }}
+                          onBlur={() => validateField("author.designation")}
+                          placeholder="e.g. Lead Product Designer"
+                          aria-invalid={Boolean(fieldError("author.designation"))}
+                          maxLength={FIELD_LIMITS.name.short}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupText>
+                            {authorDesignation.length}/{FIELD_LIMITS.name.short}
+                          </InputGroupText>
+                        </InputGroupAddon>
+                      </InputGroup>
                       {fieldError("author.designation") && (
                         <p className="text-xs text-destructive">
                           {fieldError("author.designation")}
@@ -869,18 +900,25 @@ export function BlogPostForm({
 
                   <div className="space-y-2" data-field="author.bio">
                     <Label htmlFor="author-bio">Short bio</Label>
-                    <Textarea
-                      id="author-bio"
-                      rows={3}
-                      value={authorBio}
-                      onChange={(event) => {
-                        setAuthorBio(event.target.value);
-                        clearFieldError("author.bio");
-                      }}
-                      onBlur={() => validateField("author.bio")}
-                      placeholder="One or two sentences about the author."
-                      aria-invalid={Boolean(fieldError("author.bio"))}
-                    />
+                    <InputGroup className="min-h-[5rem]">
+                      <InputGroupTextarea
+                        id="author-bio"
+                        value={authorBio}
+                        onChange={(event) => {
+                          setAuthorBio(event.target.value);
+                          clearFieldError("author.bio");
+                        }}
+                        onBlur={() => validateField("author.bio")}
+                        placeholder="One or two sentences about the author."
+                        aria-invalid={Boolean(fieldError("author.bio"))}
+                        maxLength={FIELD_LIMITS.description.medium}
+                      />
+                      <InputGroupAddon align="block-end" className="border-t border-border">
+                        <InputGroupText>
+                          {authorBio.length}/{FIELD_LIMITS.description.medium}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
                     {fieldError("author.bio") && (
                       <p className="text-xs text-destructive">
                         {fieldError("author.bio")}
@@ -901,25 +939,27 @@ export function BlogPostForm({
                 <CardContent className="space-y-6">
                   <div className="space-y-2" data-field="seo.metaTitle">
                     <Label htmlFor="seo-meta-title">Meta Title</Label>
-                    <Input
-                      id="seo-meta-title"
-                      value={seoMetaTitle}
-                      onChange={(event) => {
-                        setSeoMetaTitle(event.target.value);
-                        clearFieldError("seo.metaTitle");
-                      }}
-                      placeholder={title || "Auto-generated from title"}
-                      maxLength={60}
-                      aria-invalid={Boolean(fieldError("seo.metaTitle"))}
-                    />
-                    {fieldError("seo.metaTitle") ? (
+                    <InputGroup>
+                      <InputGroupInput
+                        id="seo-meta-title"
+                        value={seoMetaTitle}
+                        onChange={(event) => {
+                          setSeoMetaTitle(event.target.value);
+                          clearFieldError("seo.metaTitle");
+                        }}
+                        placeholder={title || "Auto-generated from title"}
+                        maxLength={FIELD_LIMITS.seo.metaTitle}
+                        aria-invalid={Boolean(fieldError("seo.metaTitle"))}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>
+                          {seoMetaTitle.length}/{FIELD_LIMITS.seo.metaTitle}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("seo.metaTitle") && (
                       <p className="text-xs text-destructive">
                         {fieldError("seo.metaTitle")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {seoMetaTitle.length}/60 · Leave empty to use blog
-                        title. Recommended: 50-60 characters
                       </p>
                     )}
                   </div>
@@ -928,52 +968,56 @@ export function BlogPostForm({
                     <Label htmlFor="seo-meta-description">
                       Meta Description
                     </Label>
-                    <Textarea
-                      id="seo-meta-description"
-                      rows={3}
-                      value={seoMetaDescription}
-                      onChange={(event) => {
-                        setSeoMetaDescription(event.target.value);
-                        clearFieldError("seo.metaDescription");
-                      }}
-                      placeholder={
-                        summary.slice(0, 155) || "Auto-generated from summary"
-                      }
-                      maxLength={160}
-                      aria-invalid={Boolean(fieldError("seo.metaDescription"))}
-                    />
-                    {fieldError("seo.metaDescription") ? (
+                    <InputGroup className="min-h-[5rem]">
+                      <InputGroupTextarea
+                        id="seo-meta-description"
+                        value={seoMetaDescription}
+                        onChange={(event) => {
+                          setSeoMetaDescription(event.target.value);
+                          clearFieldError("seo.metaDescription");
+                        }}
+                        placeholder={
+                          summary.slice(0, 155) || "Auto-generated from summary"
+                        }
+                        maxLength={FIELD_LIMITS.seo.metaDescription}
+                        aria-invalid={Boolean(fieldError("seo.metaDescription"))}
+                      />
+                      <InputGroupAddon align="block-end" className="border-t border-border">
+                        <InputGroupText>
+                          {seoMetaDescription.length}/{FIELD_LIMITS.seo.metaDescription}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("seo.metaDescription") && (
                       <p className="text-xs text-destructive">
                         {fieldError("seo.metaDescription")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {seoMetaDescription.length}/160 · Leave empty to use
-                        summary. Recommended: 150-160 characters
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2" data-field="seo.focusKeyword">
                     <Label htmlFor="seo-focus-keyword">Focus Keyword</Label>
-                    <Input
-                      id="seo-focus-keyword"
-                      value={seoFocusKeyword}
-                      onChange={(event) => {
-                        setSeoFocusKeyword(event.target.value);
-                        clearFieldError("seo.focusKeyword");
-                      }}
-                      placeholder="e.g. modern lighting design"
-                      maxLength={100}
-                      aria-invalid={Boolean(fieldError("seo.focusKeyword"))}
-                    />
-                    {fieldError("seo.focusKeyword") ? (
+                    <InputGroup>
+                      <InputGroupInput
+                        id="seo-focus-keyword"
+                        value={seoFocusKeyword}
+                        onChange={(event) => {
+                          setSeoFocusKeyword(event.target.value);
+                          clearFieldError("seo.focusKeyword");
+                        }}
+                        placeholder="e.g. modern lighting design"
+                        maxLength={FIELD_LIMITS.seo.focusKeyword}
+                        aria-invalid={Boolean(fieldError("seo.focusKeyword"))}
+                      />
+                      <InputGroupAddon align="inline-end">
+                        <InputGroupText>
+                          {seoFocusKeyword.length}/{FIELD_LIMITS.seo.focusKeyword}
+                        </InputGroupText>
+                      </InputGroupAddon>
+                    </InputGroup>
+                    {fieldError("seo.focusKeyword") && (
                       <p className="text-xs text-destructive">
                         {fieldError("seo.focusKeyword")}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        Primary keyword you're targeting with this post
                       </p>
                     )}
                   </div>
@@ -1240,7 +1284,7 @@ export function BlogPostForm({
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
-                  Meta Title ({(seoMetaTitle || title).length}/60)
+                  Meta Title ({(seoMetaTitle || title).length}/{FIELD_LIMITS.seo.metaTitle})
                 </div>
                 <div className="text-sm font-medium text-blue-600">
                   {seoMetaTitle || title || "Untitled Post"}
@@ -1250,7 +1294,7 @@ export function BlogPostForm({
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
                   Meta Description ({(seoMetaDescription || summary).length}
-                  /160)
+                  /{FIELD_LIMITS.seo.metaDescription})
                 </div>
                 <div className="text-xs text-muted-foreground line-clamp-2">
                   {seoMetaDescription || summary || "No description provided"}

@@ -1,5 +1,12 @@
 import { type Model, model, models, Schema, type Types } from "mongoose";
 
+export interface CategoryAttributeAssignment {
+  attributeId: Types.ObjectId;
+  required: boolean;
+  isVariant: boolean;
+  sortOrder: number;
+}
+
 export interface Category {
   name: string;
   slug: string;
@@ -11,6 +18,7 @@ export interface Category {
   level: number;
   isActive: boolean;
   sortOrder: number;
+  attributes: CategoryAttributeAssignment[];
   seo: {
     metaTitle: string;
     metaDescription: string;
@@ -29,6 +37,20 @@ const seoSchema = new Schema(
       trim: true,
       maxlength: 160,
     },
+  },
+  { _id: false },
+);
+
+const categoryAttributeAssignmentSchema = new Schema(
+  {
+    attributeId: {
+      type: Schema.Types.ObjectId,
+      ref: "AttributeDefinition",
+      required: true,
+    },
+    required: { type: Boolean, default: false },
+    isVariant: { type: Boolean, default: false },
+    sortOrder: { type: Number, default: 0 },
   },
   { _id: false },
 );
@@ -56,10 +78,13 @@ const categorySchema = new Schema<Category>(
     level: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true, index: true },
     sortOrder: { type: Number, default: 0 },
+    attributes: { type: [categoryAttributeAssignmentSchema], default: [] },
     seo: { type: seoSchema, default: () => ({}) },
     productCount: { type: Number, default: 0 },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
 categorySchema.index({ parent: 1, isActive: 1, sortOrder: 1 });

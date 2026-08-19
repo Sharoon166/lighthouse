@@ -17,5 +17,7 @@ export default async function EditBrandPage({ params }: EditBrandPageProps) {
 
   if (!brand) notFound();
 
-  return <BrandForm mode="edit" id={id} initialData={brand as never} />;
+  const serializedBrand = JSON.parse(JSON.stringify(brand));
+
+  return <BrandForm mode="edit" id={id} initialData={serializedBrand as never} />;
 }

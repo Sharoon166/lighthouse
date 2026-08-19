@@ -46,7 +46,9 @@ const brandSchema = new Schema<Brand>(
     seo: { type: seoSchema, default: () => ({}) },
     productCount: { type: Number, default: 0 },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
 export const BrandModel: Model<Brand> =

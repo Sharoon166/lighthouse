@@ -22,8 +22,8 @@ interface Particle {
 }
 
 function useEmberParticles(
-  canvasRef: React.RefObject<HTMLCanvasElement>,
-  targetRef: React.RefObject<HTMLElement>,
+  canvasRef: React.RefObject<HTMLCanvasElement | null>,
+  targetRef: React.RefObject<HTMLElement | null>,
 ) {
   useEffect(() => {
     const canvas = canvasRef.current;

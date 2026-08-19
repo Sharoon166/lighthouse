@@ -3,6 +3,8 @@
 import {
   ArrowLeft02Icon,
   CheckIcon,
+  Delete02Icon,
+  PlusSignIcon,
   SaveIcon,
   Warning,
 } from "@hugeicons/core-free-icons";
@@ -53,6 +55,20 @@ import {
   type CategoryInput,
   categoryInputSchema,
 } from "../validation/category";
+import {
+  AddAttributeDialog,
+  type AttributeLibraryItem,
+} from "./add-attribute-dialog";
+import {
+  createAttributeDefinition,
+} from "../actions/attribute-definition-actions";
+
+interface CategoryAttributeAssignmentUI {
+  attributeId: string;
+  required: boolean;
+  isVariant: boolean;
+  sortOrder: number;
+}
 
 interface CategoryFormProps {
   mode?: "create" | "edit";
@@ -64,6 +80,14 @@ interface CategoryFormProps {
     slug: string;
     level: number;
     parent: string | null;
+  }>;
+  allAttributes?: Array<{
+    id: string;
+    key: string;
+    name: string;
+    type: string;
+    options: string[];
+    isActive?: boolean;
   }>;
 }
 
@@ -87,6 +111,7 @@ export function CategoryForm({
   id,
   initialData = null,
   allCategories = [],
+  allAttributes = [],
 }: CategoryFormProps) {
   const isEdit = mode === "edit";
   const router = useRouter();
@@ -111,12 +136,24 @@ export function CategoryForm({
   const [sortOrder, setSortOrder] = useState(initialData?.sortOrder ?? 0);
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
 
+  const [categoryAttributes, setCategoryAttributes] = useState<
+    CategoryAttributeAssignmentUI[]
+  >(
+    (initialData?.attributes ?? []).map((a) => ({
+      attributeId: String(a.attributeId),
+      required: a.required,
+      isVariant: a.isVariant,
+      sortOrder: a.sortOrder,
+    })),
+  );
+
   const [seoMetaTitle, setSeoMetaTitle] = useState(
     initialData?.seo?.metaTitle ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
     initialData?.seo?.metaDescription ?? "",
   );
+  const [showParentChangeWarning, setShowParentChangeWarning] = useState(false);
 
   const [fieldErrors, setFieldErrors] = useState<{
     [key: string]: string[] | undefined;
@@ -164,6 +201,61 @@ export function CategoryForm({
     (c) => !excludedIds.includes(c.id),
   );
 
+  const [addAttrDialogOpen, setAddAttrDialogOpen] = useState(false);
+
+  const existingAttrNames = new Set(
+    categoryAttributes.map((a) => {
+      const def = allAttributes.find((d) => d.id === a.attributeId);
+      return def?.name ?? "";
+    }),
+  );
+
+  const handleAddAttrFromLibrary = (attr: AttributeLibraryItem) => {
+    setCategoryAttributes((prev) => [
+      ...prev,
+      {
+        attributeId: attr.id,
+        required: false,
+        isVariant: false,
+        sortOrder: prev.length,
+      },
+    ]);
+  };
+
+  const handleCreateNewAttr = async (name: string) => {
+    const result = await createAttributeDefinition({
+      name,
+      type: "text",
+      isActive: true,
+      options: [],
+      sortOrder: 0,
+    });
+    if (result.ok) {
+      setCategoryAttributes((prev) => [
+        ...prev,
+        {
+          attributeId: result.id,
+          required: false,
+          isVariant: false,
+          sortOrder: prev.length,
+        },
+      ]);
+    }
+  };
+
+  const removeAttribute = (index: number) => {
+    setCategoryAttributes((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateAttribute = (
+    index: number,
+    patch: Partial<CategoryAttributeAssignmentUI>,
+  ) => {
+    setCategoryAttributes((prev) =>
+      prev.map((a, i) => (i === index ? { ...a, ...patch } : a)),
+    );
+  };
+
   const buildPayload = (): CategoryInput => ({
     name,
     slug,
@@ -172,6 +264,12 @@ export function CategoryForm({
     parent: parent || null,
     sortOrder,
     isActive,
+    attributes: categoryAttributes.map((a) => ({
+      attributeId: a.attributeId,
+      required: a.required,
+      isVariant: a.isVariant,
+      sortOrder: a.sortOrder,
+    })),
     seo: {
       metaTitle: seoMetaTitle.trim() || undefined,
       metaDescription: seoMetaDescription.trim() || undefined,
@@ -411,7 +509,13 @@ export function CategoryForm({
                 <Select
                   value={parent ?? ""}
                   onValueChange={(value) => {
-                    setParent((value as string) || null);
+                    const newParent = (value as string) || null;
+                    if (isEdit && newParent !== parent) {
+                      setShowParentChangeWarning(true);
+                    } else {
+                      setShowParentChangeWarning(false);
+                    }
+                    setParent(newParent);
                     clearFieldError("parent");
                   }}
                   items={[
@@ -440,6 +544,12 @@ export function CategoryForm({
                   <p className="text-xs text-destructive">
                     {fieldError("parent")}
                   </p>
+                )}
+                {showParentChangeWarning && (
+                  <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
+                    <HugeiconsIcon icon={Warning} size={14} className="mt-0.5 shrink-0" />
+                    <p>Changing the parent will move this category and all its children in the hierarchy. Ancestor paths will be updated.</p>
+                  </div>
                 )}
                 <p className="text-xs text-muted-foreground">
                   Leave empty for a top-level category.
@@ -483,6 +593,117 @@ export function CategoryForm({
               </div>
             </CardContent>
           </Card>
+
+          {allAttributes.length > 0 && (
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Attributes</CardTitle>
+                    <CardDescription>
+                      Assign product attributes. Mark as variant to use for SKU
+                      generation.
+                    </CardDescription>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setAddAttrDialogOpen(true)}
+                  >
+                    <HugeiconsIcon icon={PlusSignIcon} size={14} />
+                    Add
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {categoryAttributes.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No attributes assigned. Click &ldquo;Add&rdquo; to assign
+                    product attributes to this category.
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {categoryAttributes.map((catAttr, index) => {
+                      const attrDef = allAttributes.find(
+                        (a) => a.id === catAttr.attributeId,
+                      );
+                      return (
+                        <div
+                          key={`${catAttr.attributeId}-${index}`}
+                          className="flex items-center gap-3 not-last:border-b pb-2"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <Select
+                              value={catAttr.attributeId}
+                              onValueChange={(value) =>
+                                updateAttribute(index, {
+                                  attributeId: value as string,
+                                })
+                              }
+                              items={allAttributes.map((a) => ({
+                                value: a.id,
+                                label: `${a.name} (${a.type})${a.isActive === false ? " — Inactive" : ""}`,
+                              }))}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select attribute" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {allAttributes.map((a) => (
+                                  <SelectItem key={a.id} value={a.id}>
+                                    {a.name} ({a.type})
+                                    {a.isActive === false && (
+                                      <span className="ml-1.5 text-xs text-muted-foreground">
+                                        — Inactive
+                                      </span>
+                                    )}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <Switch
+                              checked={catAttr.required}
+                              onCheckedChange={(checked) =>
+                                updateAttribute(index, { required: checked })
+                              }
+                            />
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              Required
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <Switch
+                              checked={catAttr.isVariant}
+                              onCheckedChange={(checked) =>
+                                updateAttribute(index, { isVariant: checked })
+                              }
+                            />
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">
+                              Variant
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => removeAttribute(index)}
+                            className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                            aria-label={`Remove ${attrDef?.name ?? "attribute"}`}
+                          >
+                            <HugeiconsIcon icon={Delete02Icon} size={14} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <div className="min-w-0 space-y-6 lg:sticky lg:top-8 lg:self-start">
@@ -558,6 +779,15 @@ export function CategoryForm({
           </Card>
         </div>
       </div>
+
+      <AddAttributeDialog
+        open={addAttrDialogOpen}
+        onOpenChange={setAddAttrDialogOpen}
+        title="Add attribute"
+        existingNames={existingAttrNames}
+        onAdd={handleAddAttrFromLibrary}
+        onCreateNew={handleCreateNewAttr}
+      />
     </div>
   );
 }

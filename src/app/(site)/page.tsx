@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 export default function Home() {
   return (
     <main>
-      <section className="relative h-[90dvh] overflow-hidden flex justify-center items-center">
+      <section className="relative h-[90dvh] overflow-hidden flex justify-center items-center px-6">
         <Image
           src={HeroImage}
           alt="hero image"

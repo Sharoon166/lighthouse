@@ -1,14 +1,19 @@
 "use server";
 
 import type { QueryFilter } from "mongoose";
+import { Types } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { type Category, CategoryModel } from "@/models/category";
+import { AttributeDefinitionModel } from "@/models/attribute-definition";
+import { ProductModel } from "@/models/product";
 
 export type { Category };
 import { categoryInputSchema } from "../validation/category";
+
+const MAX_CATEGORY_DEPTH = 4;
 
 async function cascadeDescendants(
   categoryId: string,
@@ -23,7 +28,7 @@ async function cascadeDescendants(
       ...newAncestors.map((a) => a as unknown as Category["ancestors"][0]),
       categoryId as unknown as Category["ancestors"][0],
     ];
-    child.ancestorSlugs = [...newAncestorSlugs, child.slug];
+    child.ancestorSlugs = [...newAncestorSlugs, slugify(child.name)];
     child.level = newLevel + 1;
     await child.save();
 
@@ -34,6 +39,17 @@ async function cascadeDescendants(
       child.level,
     );
   }
+}
+
+function getAncestorChain(categoryId: string, allCategories: Map<string, { parent: string | null }>): string[] {
+  const chain: string[] = [];
+  let currentId: string | null = categoryId;
+  while (currentId) {
+    chain.push(currentId);
+    const cat = allCategories.get(currentId);
+    currentId = cat?.parent ?? null;
+  }
+  return chain;
 }
 
 export type CategoryActionResult =
@@ -106,6 +122,15 @@ export async function createCategory(
           formErrors: [],
         };
       }
+
+      const parentDoc = await CategoryModel.findById(data.parent).select("level").lean();
+      if (parentDoc && parentDoc.level + 1 >= MAX_CATEGORY_DEPTH) {
+        return {
+          ok: false,
+          fieldErrors: { parent: [`Categories cannot exceed ${MAX_CATEGORY_DEPTH} levels deep.`] },
+          formErrors: [],
+        };
+      }
     }
 
     const slug = data.slug || (await uniqueSlug(data.name));
@@ -118,6 +143,12 @@ export async function createCategory(
       parent: data.parent || null,
       sortOrder: data.sortOrder,
       isActive: data.isActive,
+      attributes: (data.attributes ?? []).map((a) => ({
+        attributeId: a.attributeId as unknown as Category["attributes"][0]["attributeId"],
+        required: a.required,
+        isVariant: a.isVariant,
+        sortOrder: a.sortOrder,
+      })),
       seo: {
         metaTitle: data.seo?.metaTitle?.trim() || "",
         metaDescription: data.seo?.metaDescription?.trim() || "",
@@ -178,6 +209,33 @@ export async function updateCategory(
           formErrors: [],
         };
       }
+
+      const allCats = await CategoryModel.find({}, { parent: 1 }).lean();
+      const catMap = new Map(allCats.map((c) => [String(c._id), { parent: c.parent ? String(c.parent) : null }]));
+      const descendantChain = getAncestorChain(data.parent, catMap);
+      if (descendantChain.includes(id)) {
+        return {
+          ok: false,
+          fieldErrors: { parent: ["Cannot set a descendant as parent (circular reference)."] },
+          formErrors: [],
+        };
+      }
+
+      const parentDoc = await CategoryModel.findById(data.parent).select("level").lean();
+      const currentMaxDepth = Math.max(existing.level, ...allCats.filter((c) => {
+        const chain = getAncestorChain(String(c._id), catMap);
+        return chain.includes(id);
+      }).map((c) => {
+        const chain = getAncestorChain(String(c._id), catMap);
+        return chain.length;
+      }));
+      if (parentDoc && parentDoc.level + currentMaxDepth >= MAX_CATEGORY_DEPTH) {
+        return {
+          ok: false,
+          fieldErrors: { parent: [`Moving here would exceed the maximum depth of ${MAX_CATEGORY_DEPTH} levels.`] },
+          formErrors: [],
+        };
+      }
     }
 
     const parentChanged =
@@ -194,6 +252,12 @@ export async function updateCategory(
       parent: data.parent || null,
       sortOrder: data.sortOrder,
       isActive: data.isActive,
+      attributes: (data.attributes ?? []).map((a) => ({
+        attributeId: a.attributeId as unknown as Category["attributes"][0]["attributeId"],
+        required: a.required,
+        isVariant: a.isVariant,
+        sortOrder: a.sortOrder,
+      })),
       seo: {
         metaTitle: data.seo?.metaTitle?.trim() || "",
         metaDescription: data.seo?.metaDescription?.trim() || "",
@@ -212,7 +276,6 @@ export async function updateCategory(
     }
 
     revalidatePath("/admin/categories");
-    revalidatePath("/admin/brands");
     revalidatePath("/admin/products");
 
     return { ok: true, slug: nextSlug };
@@ -242,6 +305,14 @@ export async function deleteCategory(
       ok: false,
       message:
         "Cannot delete a category that has subcategories. Remove or reassign them first.",
+    };
+  }
+
+  const productCount = await ProductModel.countDocuments({ "category._id": id });
+  if (productCount > 0) {
+    return {
+      ok: false,
+      message: `Cannot delete this category because ${productCount} product${productCount !== 1 ? "s are" : " is"} assigned to it. Reassign or remove them first.`,
     };
   }
 
@@ -312,14 +383,20 @@ export async function listCategories(
   ]);
 
   const categoryIds = documents.map((d) => String(d._id));
-  const childCounts = await CategoryModel.aggregate([
-    { $match: { parent: { $in: categoryIds.map((id) => ({ $oid: id })) } } },
-    { $group: { _id: "$parent", count: { $sum: 1 } } },
-  ]);
 
-  const childCountMap = new Map<string, number>();
-  for (const row of childCounts) {
-    childCountMap.set(String(row._id), row.count);
+  let childCountMap = new Map<string, number>();
+  if (categoryIds.length > 0) {
+    const parentObjectIds = categoryIds
+      .filter((id) => id)
+      .map((id) => new Types.ObjectId(id));
+    const childCounts = await CategoryModel.aggregate([
+      { $match: { parent: { $in: parentObjectIds } } },
+      { $group: { _id: "$parent", count: { $sum: 1 } } },
+    ]);
+
+    for (const row of childCounts) {
+      childCountMap.set(String(row._id), row.count);
+    }
   }
 
   const categories: CategoryListItem[] = documents.map((document) => ({
@@ -350,7 +427,7 @@ export async function listCategories(
 export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
   await connectToDatabase();
 
-  const all = await CategoryModel.find({ isActive: true })
+  const all = await CategoryModel.find()
     .sort({ level: 1, sortOrder: 1, name: 1 })
     .lean();
 
@@ -418,13 +495,26 @@ export async function getCategoryById(
 }
 
 export async function getAllCategoriesAdmin(): Promise<
-  { id: string; name: string; slug: string; level: number; ancestors: string[]; parent: string | null }[]
+  {
+    id: string;
+    name: string;
+    slug: string;
+    level: number;
+    ancestors: string[];
+    parent: string | null;
+    attributes: {
+      attributeId: string;
+      required: boolean;
+      isVariant: boolean;
+      sortOrder: number;
+    }[];
+  }[]
 > {
   await connectToDatabase();
 
   const categories = await CategoryModel.find()
     .sort({ level: 1, sortOrder: 1, name: 1 })
-    .select("name slug level parent ancestors")
+    .select("name slug level parent ancestors attributes")
     .lean();
 
   return categories.map((c) => ({
@@ -434,5 +524,66 @@ export async function getAllCategoriesAdmin(): Promise<
     level: c.level,
     ancestors: c.ancestors.map((a) => String(a)),
     parent: c.parent ? String(c.parent) : null,
+    attributes: (c.attributes ?? []).map((a) => ({
+      attributeId: String(a.attributeId),
+      required: a.required,
+      isVariant: a.isVariant,
+      sortOrder: a.sortOrder,
+    })),
   }));
+}
+
+export async function getCategoryAttributes(
+  categoryId: string,
+): Promise<
+  {
+    attributeId: string;
+    key: string;
+    name: string;
+    type: string;
+    options: string[];
+    required: boolean;
+    isVariant: boolean;
+    sortOrder: number;
+  }[]
+> {
+  await connectToDatabase();
+
+  const category = await CategoryModel.findById(categoryId)
+    .select("attributes")
+    .lean();
+
+  if (!category || !category.attributes?.length) return [];
+
+  const attributeIds = category.attributes.map((a) => String(a.attributeId));
+
+  const definitions = await AttributeDefinitionModel.find({
+    _id: {
+      $in: attributeIds.map((id) => new Types.ObjectId(id)),
+    },
+    isActive: true,
+  })
+    .select("key name type options")
+    .lean();
+
+  const definitionMap = new Map(
+    definitions.map((d) => [String(d._id), d]),
+  );
+
+  return category.attributes
+    .filter((a) => definitionMap.has(String(a.attributeId)))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((a) => {
+      const def = definitionMap.get(String(a.attributeId))!;
+      return {
+        attributeId: String(a.attributeId),
+        key: def.key,
+        name: def.name,
+        type: def.type,
+        options: def.options,
+        required: a.required,
+        isVariant: a.isVariant,
+        sortOrder: a.sortOrder,
+      };
+    });
 }

@@ -1,6 +1,13 @@
 import { z } from "zod";
 import { FIELD_LIMITS } from "@/lib/field-limits";
 
+export const categoryAttributeAssignmentSchema = z.object({
+  attributeId: z.string().trim().min(1, "Attribute is required"),
+  required: z.boolean().default(false),
+  isVariant: z.boolean().default(false),
+  sortOrder: z.number().int().min(0).default(0),
+});
+
 export const categoryInputSchema = z.object({
   name: z
     .string()
@@ -24,6 +31,21 @@ export const categoryInputSchema = z.object({
   parent: z.string().trim().nullable().optional(),
   sortOrder: z.number().int().min(0),
   isActive: z.boolean(),
+  attributes: z
+    .array(categoryAttributeAssignmentSchema)
+    .optional()
+    .superRefine((attrs, context) => {
+      if (!attrs) return;
+      const ids = attrs.map((a) => a.attributeId);
+      const uniqueIds = new Set(ids);
+      if (uniqueIds.size !== ids.length) {
+        context.addIssue({
+          code: "custom",
+          path: ["attributes"],
+          message: "Each attribute can only be assigned once",
+        });
+      }
+    }),
   seo: z
     .object({
       metaTitle: z

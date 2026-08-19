@@ -11,6 +11,7 @@ export interface ProductVariant {
   title: string;
   price: number;
   salePrice: number;
+  costPrice: number;
   currency: string;
   stock: number;
   lowStockThreshold: number;
@@ -37,6 +38,7 @@ export interface Product {
     installationAndBulbs: string;
   };
   specifications: Array<{ key: string; value: string }>;
+  specificationsDescription: string;
   category: {
     _id: Types.ObjectId;
     name: string;
@@ -51,6 +53,7 @@ export interface Product {
   };
   variantAttributes: string[];
   baseAttributes: Map<string, string>;
+  isFeatured: boolean;
   images: string[];
   variants: ProductVariant[];
   priceRange: {
@@ -84,6 +87,7 @@ const variantSchema = new Schema<ProductVariant>(
     title: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     salePrice: { type: Number, min: 0 },
+    costPrice: { type: Number, min: 0, default: 0 },
     currency: { type: String, default: "PKR" },
     stock: { type: Number, default: 0, min: 0 },
     lowStockThreshold: { type: Number, default: 5 },
@@ -175,11 +179,13 @@ const productSchema = new Schema<Product>(
     shortDescription: { type: String, default: "", trim: true },
     content: { type: contentSchema, default: () => ({}) },
     specifications: { type: [specificationSchema], default: [] },
+    specificationsDescription: { type: String, default: "", trim: true },
     category: { type: categoryRefSchema, required: true },
     brand: { type: brandRefSchema, required: true },
     variantAttributes: [{ type: String }],
     baseAttributes: { type: Map, of: String, default: () => new Map() },
     images: [{ type: String }],
+    isFeatured: { type: Boolean, default: false },
     variants: {
       type: [variantSchema],
       validate: {
@@ -203,7 +209,9 @@ const productSchema = new Schema<Product>(
     },
     seo: { type: seoSchema, default: () => ({}) },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 );
 
 productSchema.index({ "category._id": 1, status: 1, "priceRange.min": 1 });
@@ -221,17 +229,24 @@ productSchema.pre("save", function () {
   if (this.isModified("variants")) {
     const activeVariants = this.variants.filter((v) => v.isActive);
 
-    const prices = activeVariants.map((v) => v.salePrice ?? v.price);
-    this.priceRange = {
-      min: Math.min(...prices),
-      max: Math.max(...prices),
-    };
+    if (activeVariants.length > 0) {
+      const prices = activeVariants.map((v) => v.salePrice ?? v.price);
+      this.priceRange = {
+        min: Math.min(...prices),
+        max: Math.max(...prices),
+      };
 
-    this.totalStock = activeVariants.reduce((sum, v) => sum + v.stock, 0);
-    this.inStock = this.totalStock > 0;
+      this.totalStock = activeVariants.reduce((sum, v) => sum + v.stock, 0);
+      this.inStock = this.totalStock > 0;
 
-    const def = activeVariants.find((v) => v.isDefault) || activeVariants[0];
-    this.defaultVariantSku = def?.sku ?? "";
+      const def = activeVariants.find((v) => v.isDefault) || activeVariants[0];
+      this.defaultVariantSku = def?.sku ?? "";
+    } else {
+      this.priceRange = { min: 0, max: 0 };
+      this.totalStock = 0;
+      this.inStock = false;
+      this.defaultVariantSku = "";
+    }
 
     this.variants.forEach((v) => {
       if (!v.slug) {

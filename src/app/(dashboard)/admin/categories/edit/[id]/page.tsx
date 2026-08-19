@@ -5,6 +5,7 @@ import {
   getCategoryById,
   getAllCategoriesAdmin,
 } from "@/features/shop/actions/category-actions";
+import { getAllAttributeDefinitions } from "@/features/shop/actions/attribute-definition-actions";
 
 export const metadata: Metadata = {
   title: "Edit category · Lighthouse",
@@ -18,19 +19,23 @@ export default async function EditCategoryPage({
   params,
 }: EditCategoryPageProps) {
   const { id } = await params;
-  const [category, allCategories] = await Promise.all([
+  const [category, allCategories, allAttributes] = await Promise.all([
     getCategoryById(id),
     getAllCategoriesAdmin(),
+    getAllAttributeDefinitions(),
   ]);
 
   if (!category) notFound();
+
+  const serializedCategory = JSON.parse(JSON.stringify(category));
 
   return (
     <CategoryForm
       mode="edit"
       id={id}
-      initialData={category as never}
+      initialData={serializedCategory as never}
       allCategories={allCategories}
+      allAttributes={allAttributes}
     />
   );
 }

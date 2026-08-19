@@ -10,6 +10,7 @@ import {
   PanelLeftCloseIcon,
   PanelLeftOpenIcon,
   Settings01Icon,
+  Settings04Icon,
   Store01Icon,
   TagsIcon,
 } from "@hugeicons/core-free-icons";
@@ -26,6 +27,7 @@ const NAV_ITEMS = [
   { href: "/admin/products", label: "Products", icon: PackageIcon },
   { href: "/admin/categories", label: "Categories", icon: TagsIcon },
   { href: "/admin/brands", label: "Brands", icon: Store01Icon },
+  { href: "/admin/attributes", label: "Attributes", icon: Settings04Icon },
   { href: "/admin/projects", label: "Projects", icon: Folder02Icon },
   { href: "/admin/blog", label: "Blog", icon: NewsIcon },
   { href: "/admin/media", label: "Media", icon: Image01Icon },

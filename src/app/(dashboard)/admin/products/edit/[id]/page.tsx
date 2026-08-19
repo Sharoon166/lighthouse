@@ -25,13 +25,15 @@ export default async function EditProductPage({
 
   if (!product) notFound();
 
+  const serializedProduct = JSON.parse(JSON.stringify(product));
+
   return (
-    <ProductForm
-      mode="edit"
-      id={id}
-      initialData={product}
-      categories={categories}
-      brands={brands}
-    />
+      <ProductForm
+        mode="edit"
+        id={id}
+        initialData={serializedProduct}
+        categories={categories}
+        brands={brands}
+      />
   );
 }

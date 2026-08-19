@@ -56,11 +56,21 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
     throw new Error("Brand not found");
   }
 
-  const variantAttributes = (data.attributes ?? []).map((a) => a.name);
+  const variantAttributes = [...new Set([
+    ...(data.variantDimensions ?? []),
+    ...(data.attributes ?? []).map((a) => a.name),
+  ])];
 
   const baseAttributes = new Map<string, string>();
+  for (const spec of data.specifications ?? []) {
+    if (spec.key.trim() && spec.value.trim()) {
+      baseAttributes.set(spec.key.trim(), spec.value.trim());
+    }
+  }
   for (const attr of data.attributes ?? []) {
-    baseAttributes.set(attr.name, attr.values.join(","));
+    if (attr.name.trim()) {
+      baseAttributes.set(attr.name.trim(), attr.values.join(","));
+    }
   }
 
   return {
@@ -78,6 +88,7 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
     specifications: (data.specifications ?? [])
       .filter((s) => s.key.trim() && s.value.trim())
       .map((s) => ({ key: s.key.trim(), value: s.value.trim() })),
+    specificationsDescription: data.specificationsDescription?.trim() || "",
     category: {
       _id: categoryDoc._id,
       name: categoryDoc.name,
@@ -93,6 +104,7 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
     variantAttributes,
     baseAttributes,
     images: data.images,
+    isFeatured: data.isFeatured,
     variants: data.variants.map((v, index) => ({
       sku: v.sku,
       slug: slugify(v.name),
@@ -101,7 +113,8 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
       attributes: new Map(Object.entries(v.attributes)),
       title: v.name,
       price: v.price,
-      salePrice: v.salePrice ?? undefined,
+      salePrice: v.salePrice != null ? v.salePrice : undefined,
+      costPrice: v.costPrice != null ? v.costPrice : 0,
       currency: "PKR",
       stock: v.stock,
       lowStockThreshold: 5,
@@ -157,10 +170,13 @@ export async function createProduct(
     return { ok: true, slug };
   } catch (error) {
     console.error("Failed to create product:", error);
+    const message = (error as { code?: number }).code === 11000
+      ? "A product with this slug or a variant with this SKU already exists. Please use unique values."
+      : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }
@@ -206,10 +222,13 @@ export async function updateProduct(
     return { ok: true, slug: nextSlug };
   } catch (error) {
     console.error("Failed to update product:", error);
+    const message = (error as { code?: number }).code === 11000
+      ? "A product with this slug or a variant with this SKU already exists. Please use unique values."
+      : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }
@@ -340,7 +359,7 @@ export async function listProducts(input: unknown): Promise<ProductListResult> {
   const sortMap: Record<string, Record<string, 1 | -1>> = {
     newest: { createdAt: -1 },
     price_asc: { "priceRange.min": 1 },
-    price_desc: { "priceRange.min": -1 },
+    price_desc: { "priceRange.max": -1 },
     name: { name: 1 },
   };
 

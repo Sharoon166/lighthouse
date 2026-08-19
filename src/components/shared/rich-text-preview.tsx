@@ -44,7 +44,7 @@ function addHeadingIds(content: JSONContent | null): JSONContent {
 }
 
 export function RichTextPreview({ content, className }: RichTextPreviewProps) {
-  const contentWithIds = useMemo(() => addHeadingIds(content), [content]);
+  const contentWithIds = useMemo(() => addHeadingIds(content ?? null), [content]);
 
   const html = useMemo(
     () =>

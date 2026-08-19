@@ -34,5 +34,11 @@ export const FIELD_LIMITS = {
     key: 100,
     value: 200,
     maxCount: 20,
+    description: 50000,
+  },
+  attributeDefinition: {
+    name: 100,
+    optionValue: 100,
+    maxOptions: 50,
   },
 } as const;

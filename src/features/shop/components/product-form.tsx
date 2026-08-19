@@ -6,14 +6,18 @@ import {
   Delete02Icon,
   Loading02Icon,
   PlusSignIcon,
+  Refresh01Icon,
   Rocket01Icon,
   SaveIcon,
+  SparklesIcon,
   Warning,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { RichTextEditor } from "@/components/shared/rich-text-editor";
+import { ColorPicker, ColorSwatch } from "@/components/shared/color-picker";
 import { ImageDropzone } from "@/components/shared/image-dropzone";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
@@ -24,13 +28,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Dialog } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  InputGroupText,
   InputGroupTextarea,
+  InputGroupText,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import {
@@ -44,6 +49,7 @@ import { Switch } from "@/components/ui/switch";
 import { FIELD_LIMITS } from "@/lib/field-limits";
 import { slugify } from "@/lib/utils";
 import { deleteShopImage, uploadShopImage } from "../actions/image-actions";
+import { getCategoryAttributes } from "../actions/category-actions";
 import {
   createProduct,
   type Product,
@@ -51,24 +57,32 @@ import {
   updateProduct,
 } from "../actions/product-actions";
 import { type ProductInput, productInputSchema } from "../validation/product";
+import { VariantTable, type VariantRow } from "./variant-table";
+import { SpecsEditor, type SpecEntry } from "./specs-editor";
+import {
+  AddAttributeDialog,
+  type AttributeLibraryItem,
+} from "./add-attribute-dialog";
 
-interface ProductAttribute {
+// ── Types ──────────────────────────────────────────────────────
+
+interface OptionDraft {
+  attributeId?: string;
   name: string;
   values: string[];
-  isColor: boolean;
+  type?: string;
+  isColor?: boolean;
 }
 
-interface ProductVariant {
-  _id?: string;
-  sku: string;
+interface CategoryAttribute {
+  attributeId: string;
+  key: string;
   name: string;
-  attributes: Record<string, string>;
-  price: number;
-  salePrice?: number;
-  costPrice?: number;
-  stock: number;
-  images: Array<{ url: string; publicId: string }>;
-  isActive: boolean;
+  type: string;
+  options: string[];
+  required: boolean;
+  isVariant: boolean;
+  sortOrder: number;
 }
 
 interface ProductFormProps {
@@ -89,9 +103,9 @@ interface ProductFormProps {
   }>;
 }
 
-function scrollToFirstError(fieldErrors: {
-  [key: string]: string[] | undefined;
-}) {
+// ── Helpers ────────────────────────────────────────────────────
+
+function scrollToFirstError(fieldErrors: Record<string, string[] | undefined>) {
   const first = Object.keys(fieldErrors).find(
     (field) => fieldErrors[field]?.length,
   );
@@ -106,53 +120,212 @@ function scrollToFirstError(fieldErrors: {
     ?.focus({ preventScroll: true });
 }
 
-function EmptyVariant(): ProductVariant {
-  return {
-    sku: "",
-    name: "",
-    attributes: {},
-    price: 0,
-    salePrice: undefined,
-    costPrice: undefined,
-    stock: 0,
-    images: [],
-    isActive: true,
-  };
+function cartesianProduct(arrays: string[][]): string[][] {
+  if (arrays.length === 0) return [[]];
+  return arrays.reduce<string[][]>(
+    (combinations, current) =>
+      combinations.flatMap((combo) => current.map((item) => [...combo, item])),
+    [[]],
+  );
 }
 
-function validateVariant(
-  variant: ProductVariant,
-  attributes: ProductAttribute[],
-): string[] {
-  const errors: string[] = [];
-  if (!variant.sku.trim()) errors.push("SKU is required");
-  if (!variant.name.trim()) errors.push("Variant name is required");
-  if (variant.price < 0) errors.push("Price must be 0 or greater");
-  for (const attr of attributes) {
-    if (!variant.attributes[attr.name]) {
-      errors.push(`${attr.name} is required`);
+function optionKey(attrs: Record<string, string>, keys: string[]): string {
+  return keys.map((k) => attrs[k] ?? "").join("||");
+}
+
+function buildVariantName(attrs: Record<string, string>): string {
+  return Object.values(attrs).filter(Boolean).join(" / ");
+}
+
+function readBaseAttr(
+  base: Map<string, string> | Record<string, string> | undefined,
+  key: string,
+): string {
+  if (!base) return "";
+  if (base instanceof Map) return base.get(key) ?? "";
+  return base[key] ?? "";
+}
+
+// ── Option Value Input ─────────────────────────────────────────
+
+function OptionValueInput({
+  onAdd,
+  placeholder,
+}: {
+  onAdd: (value: string) => void;
+  placeholder: string;
+}) {
+  const [value, setValue] = useState("");
+  return (
+    <div className="flex gap-2">
+      <Input
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && value.trim()) {
+            event.preventDefault();
+            onAdd(value.trim());
+            setValue("");
+          }
+        }}
+        placeholder={placeholder}
+        className="h-8 text-sm"
+      />
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        className="h-8"
+        onClick={() => {
+          if (value.trim()) {
+            onAdd(value.trim());
+            setValue("");
+          }
+        }}
+        disabled={!value.trim()}
+      >
+        Add
+      </Button>
+    </div>
+  );
+}
+
+// ── Add Attribute Dialog ───────────────────────────────────────
+
+// ── Add Option Value Dialog ────────────────────────────────────
+
+function AddOptionValueDialog({
+  open,
+  onOpenChange,
+  predefinedValues,
+  existingValues,
+  onAddValues,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  predefinedValues: string[];
+  existingValues: string[];
+  onAddValues: (values: string[]) => void;
+}) {
+  const [selected, setSelected] = useState<Set<string>>(
+    new Set(existingValues),
+  );
+  const [customValue, setCustomValue] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      setSelected(new Set(existingValues));
+      setCustomValue("");
     }
-  }
-  return errors;
+  }, [open, existingValues]);
+
+  const toggleValue = (value: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(value)) next.delete(value);
+      else next.add(value);
+      return next;
+    });
+  };
+
+  const handleAdd = () => {
+    onAddValues([...selected]);
+    onOpenChange(false);
+  };
+
+  const unselectedPredefined = predefinedValues.filter(
+    (v) => !selected.has(v),
+  );
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Add values"
+      maxWidth="max-w-md"
+    >
+      <div className="space-y-4">
+        {predefinedValues.length > 0 && (
+          <div className="space-y-2">
+            <Label className="text-xs text-muted-foreground">
+              Predefined values
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {predefinedValues.map((value) => {
+                const isSelected = selected.has(value);
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => toggleValue(value)}
+                    className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      isSelected
+                        ? "border-foreground bg-foreground text-background"
+                        : "border-border bg-background text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {isSelected ? "✓ " : ""}
+                    {value}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">
+            Custom value
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              value={customValue}
+              onChange={(event) => setCustomValue(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && customValue.trim()) {
+                  event.preventDefault();
+                  toggleValue(customValue.trim());
+                  setCustomValue("");
+                }
+              }}
+              placeholder="Enter a value"
+              className="h-9 text-sm"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={!customValue.trim()}
+              onClick={() => {
+                if (customValue.trim()) {
+                  toggleValue(customValue.trim());
+                  setCustomValue("");
+                }
+              }}
+            >
+              Add
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 border-t border-border pt-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
+            Cancel
+          </Button>
+          <Button type="button" onClick={handleAdd}>
+            Apply ({selected.size} selected)
+          </Button>
+        </div>
+      </div>
+    </Dialog>
+  );
 }
 
-const PRESET_COLORS = [
-  "#FFFFFF",
-  "#000000",
-  "#FF0000",
-  "#00FF00",
-  "#0000FF",
-  "#FFFF00",
-  "#FF00FF",
-  "#00FFFF",
-  "#FFA500",
-  "#800080",
-  "#FFC0CB",
-  "#A52A2A",
-  "#808080",
-  "#FFD700",
-  "#4B0082",
-];
+// ── Main Form ──────────────────────────────────────────────────
 
 export function ProductForm({
   mode = "create",
@@ -164,11 +337,15 @@ export function ProductForm({
   const isEdit = mode === "edit";
   const router = useRouter();
 
+  // ── Basic product fields ──
   const [name, setName] = useState(initialData?.name ?? "");
   const [slug, setSlug] = useState(initialData?.slug ?? "");
   const [isSlugEdited, setIsSlugEdited] = useState(isEdit);
   const [description, setDescription] = useState(
     initialData?.description ?? "",
+  );
+  const [shortDescription, setShortDescription] = useState(
+    initialData?.shortDescription ?? "",
   );
   const [category, setCategory] = useState<string | null>(
     initialData?.category?._id ? String(initialData.category._id) : null,
@@ -187,14 +364,15 @@ export function ProductForm({
   const [isActive, setIsActive] = useState(
     initialData ? initialData.status === "active" : true,
   );
-  const [isFeatured, setIsFeatured] = useState(false);
+  const [isFeatured, setIsFeatured] = useState(
+    initialData ? initialData.isFeatured === true : false,
+  );
   const [seoMetaTitle, setSeoMetaTitle] = useState(
     initialData?.seo?.metaTitle ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
     initialData?.seo?.metaDescription ?? "",
   );
-
   const [contentMaterialsAndCare, setContentMaterialsAndCare] = useState(
     initialData?.content?.materialsAndCare ?? "",
   );
@@ -206,65 +384,90 @@ export function ProductForm({
   );
   const [contentInstallationAndBulbs, setContentInstallationAndBulbs] =
     useState(initialData?.content?.installationAndBulbs ?? "");
-  const [specifications, setSpecifications] = useState<
-    Array<{ key: string; value: string }>
-  >(
-    initialData?.specifications?.map((s) => ({
+
+  // ── Options (variant-generating attributes) ──
+  const [options, setOptions] = useState<OptionDraft[]>(() => {
+    if (!initialData?.variantAttributes?.length) return [];
+    return initialData.variantAttributes.map((attrName) => {
+      const baseVal = readBaseAttr(initialData.baseAttributes, String(attrName));
+      return {
+        name: String(attrName),
+        values: baseVal ? baseVal.split(",").map((v) => v.trim()) : [],
+      };
+    });
+  });
+  const previousOptionsRef = useRef<string[]>(options.map((o) => o.name));
+
+  // ── Specifications (non-variant attributes) ──
+  const [specifications, setSpecifications] = useState<SpecEntry[]>(() => {
+    if (!initialData?.specifications) return [];
+    return initialData.specifications.map((s) => ({
       key: s.key,
       value: s.value,
-    })) ?? [],
+    }));
+  });
+
+  // ── Specifications description (rich text) ──
+  const [specificationsDescription, setSpecificationsDescription] = useState(
+    initialData?.specificationsDescription ?? "",
   );
 
-  const [attributes, setAttributes] = useState<ProductAttribute[]>(
-    initialData?.variantAttributes?.length
-      ? initialData.variantAttributes.map((attrName) => {
-          const baseVal = initialData.baseAttributes?.get?.(attrName) ?? "";
-          return {
-            name: String(attrName),
-            values: baseVal ? baseVal.split(",").map((v) => v.trim()) : [],
-            isColor: /color|colour|farb/i.test(String(attrName)),
-          };
-        })
-      : [],
+  // ── Variants ──
+  const [variants, setVariants] = useState<VariantRow[]>(() => {
+    if (initialData?.variants) {
+      return initialData.variants.map((v) => {
+        const attrs: Record<string, string> =
+          v.attributes instanceof Map
+            ? Object.fromEntries(v.attributes.entries())
+            : typeof v.attributes === "object" && v.attributes !== null
+              ? (v.attributes as Record<string, string>)
+              : {};
+        return {
+          _id: v._id ? String(v._id) : undefined,
+          sku: v.sku,
+          name: v.title ?? "",
+          attributes: attrs,
+          price: v.price,
+          salePrice: v.salePrice ?? undefined,
+          costPrice: v.costPrice ?? undefined,
+          stock: v.stock,
+          images: (v.images ?? []).map((img) => ({ url: img, publicId: img })),
+          isActive: v.isActive ?? true,
+        };
+      });
+    }
+    return [];
+  });
+  const [hasGeneratedVariants, setHasGeneratedVariants] = useState(
+    () => (initialData?.variants?.length ?? 0) > 0,
   );
-  const [newAttrName, setNewAttrName] = useState("");
-  const [newAttrValue, setNewAttrValue] = useState("");
-  const [editingAttrIndex, setEditingAttrIndex] = useState<number | null>(null);
 
-  const [variants, setVariants] = useState<ProductVariant[]>(
-    initialData?.variants?.map((v) => ({
-      _id: v._id ? String(v._id) : undefined,
-      sku: v.sku,
-      name: v.title ?? "",
-      attributes: Object.fromEntries(
-        v.attributes instanceof Map
-          ? v.attributes.entries()
-          : typeof v.attributes === "object" && v.attributes !== null
-            ? Object.entries(v.attributes as Record<string, string>)
-            : [],
-      ),
-      price: v.price,
-      salePrice: v.salePrice ?? undefined,
-      costPrice: undefined,
-      stock: v.stock,
-      images: (v.images ?? []).map((img) => ({
-        url: img,
-        publicId: img,
-      })),
-      isActive: v.isActive ?? true,
-    })) ?? [EmptyVariant()],
+  // ── Category attributes (fetched) ──
+  const [categoryAttributes, setCategoryAttributes] = useState<
+    CategoryAttribute[]
+  >([]);
+  const [isLoadingAttributes, setIsLoadingAttributes] = useState(false);
+
+  // ── Add option/spec dialogs ──
+  const [addOptionDialogOpen, setAddOptionDialogOpen] = useState(false);
+  const [addSpecDialogOpen, setAddSpecDialogOpen] = useState(false);
+  const [addValueDialogIndex, setAddValueDialogIndex] = useState<number | null>(
+    null,
   );
-  const [variantIndex, setVariantIndex] = useState(0);
 
-  const [fieldErrors, setFieldErrors] = useState<{
-    [key: string]: string[] | undefined;
-  }>({});
+  // ── UI state ──
+  const [fieldErrors, setFieldErrors] = useState<
+    Record<string, string[] | undefined>
+  >({});
   const [formErrors, setFormErrors] = useState<string[]>([]);
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
-
   const [isPending, startTransition] = useTransition();
   const savedNoticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const categoryFetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const editId = id ?? "";
+
+  // ── Slug generation ──
   useEffect(() => {
     if (!isSlugEdited) {
       setSlug(slugify(name));
@@ -274,9 +477,154 @@ export function ProductForm({
   useEffect(() => {
     return () => {
       if (savedNoticeTimer.current) clearTimeout(savedNoticeTimer.current);
+      if (categoryFetchTimer.current) clearTimeout(categoryFetchTimer.current);
     };
   }, []);
 
+  // ── Fetch category attributes ──
+  const fetchCategoryAttributes = useCallback(
+    (categoryId: string) => {
+      setIsLoadingAttributes(true);
+      if (categoryFetchTimer.current) clearTimeout(categoryFetchTimer.current);
+
+      categoryFetchTimer.current = setTimeout(() => {
+        getCategoryAttributes(categoryId)
+          .then((attrs) => {
+            setCategoryAttributes(attrs);
+          })
+          .catch(() => {
+            setCategoryAttributes([]);
+          })
+          .finally(() => {
+            setIsLoadingAttributes(false);
+          });
+      }, 300);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!category) {
+      setCategoryAttributes([]);
+      return;
+    }
+    fetchCategoryAttributes(category);
+    return () => {
+      if (categoryFetchTimer.current) clearTimeout(categoryFetchTimer.current);
+    };
+  }, [category, fetchCategoryAttributes]);
+
+  // ── Auto-generate variants from options ──
+  const generatedCombinations = useMemo(() => {
+    const optionsWithValues = options.filter((o) => o.values.length > 0);
+    if (optionsWithValues.length === 0) return [];
+
+    const arrays = optionsWithValues.map((o) => o.values);
+    return cartesianProduct(arrays).map((combo) => {
+      const attrs: Record<string, string> = {};
+      optionsWithValues.forEach((o, i) => {
+        attrs[o.name] = combo[i];
+      });
+      return attrs;
+    });
+  }, [options]);
+
+  // ── Generate variants on button click ──
+  const generateVariants = () => {
+    if (generatedCombinations.length === 0) return;
+
+    const optionNames = options
+      .filter((o) => o.values.length > 0)
+      .map((o) => o.name);
+
+    setVariants((prev) => {
+      const newVariants: VariantRow[] = generatedCombinations.map((attrs) => {
+        const key = optionKey(attrs, optionNames);
+        const existing = prev.find(
+          (v) => optionKey(v.attributes, optionNames) === key,
+        );
+        if (existing) {
+          return { ...existing, name: buildVariantName(attrs) };
+        }
+        return {
+          sku: "",
+          name: buildVariantName(attrs),
+          attributes: attrs,
+          price: 0,
+          salePrice: undefined,
+          costPrice: undefined,
+          stock: 0,
+          images: [],
+          isActive: true,
+        };
+      });
+      return newVariants;
+    });
+    setHasGeneratedVariants(true);
+  };
+
+  // ── Option management ──
+  const addOptionFromLibrary = (attr: AttributeLibraryItem) => {
+    if (options.some((o) => o.name === attr.name)) return;
+    setOptions((prev) => [
+      ...prev,
+      {
+        attributeId: attr.id,
+        name: attr.name,
+        values: [...attr.options],
+        type: attr.type,
+        isColor: attr.type === "color",
+      },
+    ]);
+  };
+
+  const addCustomOption = (name: string) => {
+    if (options.some((o) => o.name === name)) return;
+    setOptions((prev) => [...prev, { name, values: [] }]);
+  };
+
+  const removeOption = (index: number) => {
+    setOptions((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateOptionValues = (index: number, values: string[]) => {
+    setOptions((prev) =>
+      prev.map((o, i) => (i === index ? { ...o, values } : o)),
+    );
+  };
+
+  const addValueToOption = (index: number, value: string) => {
+    setOptions((prev) =>
+      prev.map((o, i) =>
+        i === index && !o.values.includes(value)
+          ? { ...o, values: [...o.values, value] }
+          : o,
+      ),
+    );
+  };
+
+  const removeValueFromOption = (index: number, valueIndex: number) => {
+    setOptions((prev) =>
+      prev.map((o, i) =>
+        i === index
+          ? { ...o, values: o.values.filter((_, vi) => vi !== valueIndex) }
+          : o,
+      ),
+    );
+  };
+
+  // ── Specification management ──
+  const addSpecFromLibrary = (attr: AttributeLibraryItem) => {
+    if (specifications.some((s) => s.key === attr.name)) return;
+    setSpecifications((prev) => [...prev, { key: attr.name, value: "" }]);
+  };
+
+  const addCustomSpec = (name: string) => {
+    if (specifications.some((s) => s.key === name)) return;
+    setSpecifications((prev) => [...prev, { key: name, value: "" }]);
+  };
+
+  // ── Error helpers ──
   const clearFieldError = (field: string) => {
     setFieldErrors((previous) => {
       if (!previous[field]) return previous;
@@ -288,72 +636,7 @@ export function ProductForm({
 
   const fieldError = (field: string) => fieldErrors[field]?.[0];
 
-  const editId = id ?? "";
-
-  const currentVariantErrors = useMemo(
-    () =>
-      variants[variantIndex]
-        ? validateVariant(variants[variantIndex], attributes)
-        : [],
-    [variantIndex, variants, attributes],
-  );
-
-  const canAddVariant =
-    currentVariantErrors.length === 0 && variants[variantIndex];
-
-  const addAttribute = () => {
-    if (!newAttrName.trim()) return;
-    if (attributes.some((a) => a.name === newAttrName.trim())) return;
-    setAttributes((prev) => [
-      ...prev,
-      {
-        name: newAttrName.trim(),
-        values: [],
-        isColor: /color|colour|farb/i.test(newAttrName),
-      },
-    ]);
-    setNewAttrName("");
-    setEditingAttrIndex(attributes.length);
-  };
-
-  const addValueToAttribute = (attrIndex: number) => {
-    if (!newAttrValue.trim()) return;
-    setAttributes((prev) =>
-      prev.map((attr, i) =>
-        i === attrIndex && !attr.values.includes(newAttrValue.trim())
-          ? { ...attr, values: [...attr.values, newAttrValue.trim()] }
-          : attr,
-      ),
-    );
-    setNewAttrValue("");
-  };
-
-  const removeAttribute = (attrIndex: number) => {
-    const attrName = attributes[attrIndex]?.name;
-    setAttributes((prev) => prev.filter((_, i) => i !== attrIndex));
-    setVariants((prev) =>
-      prev.map((v) => {
-        const next = { ...v.attributes };
-        delete next[attrName];
-        return { ...v, attributes: next };
-      }),
-    );
-    if (editingAttrIndex === attrIndex) setEditingAttrIndex(null);
-  };
-
-  const removeValueFromAttribute = (attrIndex: number, valueIndex: number) => {
-    setAttributes((prev) =>
-      prev.map((attr, i) =>
-        i === attrIndex
-          ? {
-              ...attr,
-              values: attr.values.filter((_, vi) => vi !== valueIndex),
-            }
-          : attr,
-      ),
-    );
-  };
-
+  // ── Build payload ──
   const buildPayload = (
     intent: "draft" | "publish" = "publish",
   ): ProductInput => ({
@@ -361,15 +644,22 @@ export function ProductForm({
     name,
     slug,
     description,
-    shortDescription: undefined,
+    shortDescription: shortDescription.trim() || undefined,
     category: category || "",
     brand: brand || "",
     images: images.map((img) => img.url),
-    attributes: attributes.map((a) => ({
-      name: a.name,
-      values: a.values,
-      isColor: a.isColor,
+    attributes: options.map((o) => ({
+      name: o.name,
+      values: o.values,
+      isColor: o.isColor ?? false,
     })),
+    specifications: specifications
+      .filter((s) => s.key.trim() && s.value.trim())
+      .map((s) => ({ key: s.key.trim(), value: s.value.trim() })),
+    specificationsDescription: specificationsDescription || "",
+    variantDimensions: options
+      .filter((o) => o.values.length > 0)
+      .map((o) => o.name),
     isActive,
     isFeatured,
     variants: variants.map((v) => ({
@@ -391,35 +681,30 @@ export function ProductForm({
       materialsAndCare: contentMaterialsAndCare.trim() || undefined,
       shippingAndReturns: contentShippingAndReturns.trim() || undefined,
       payment: contentPayment.trim() || undefined,
-      installationAndBulbs:
-        contentInstallationAndBulbs.trim() || undefined,
+      installationAndBulbs: contentInstallationAndBulbs.trim() || undefined,
     },
-    specifications: specifications.filter(
-      (s) => s.key.trim() && s.value.trim(),
-    ),
   });
 
+  // ── Submit ──
   const run = (intent: "draft" | "publish" = "publish") => {
-    const result = productInputSchema.safeParse(buildPayload(intent));
+    const payload = buildPayload(intent);
+    const result = productInputSchema.safeParse(payload);
     if (!result.success) {
       const flattened = result.error.flatten();
       setFieldErrors(
-        flattened.fieldErrors as { [key: string]: string[] | undefined },
+        flattened.fieldErrors as Record<string, string[] | undefined>,
       );
       setFormErrors(flattened.formErrors);
       scrollToFirstError(
-        flattened.fieldErrors as { [key: string]: string[] | undefined },
+        flattened.fieldErrors as Record<string, string[] | undefined>,
       );
       return;
     }
 
     startTransition(async () => {
-      const payload = JSON.parse(
-        JSON.stringify(buildPayload(intent)),
-      ) as unknown;
       const response: ProductActionResult = isEdit
-        ? await updateProduct(editId, payload)
-        : await createProduct(payload);
+        ? await updateProduct(editId, payload as unknown)
+        : await createProduct(payload as unknown);
 
       if (!response.ok) {
         setFieldErrors(response.fieldErrors);
@@ -445,52 +730,91 @@ export function ProductForm({
     });
   };
 
-  const updateVariant = (
-    index: number,
-    field: keyof ProductVariant,
-    value:
-      | string
-      | number
-      | boolean
-      | Record<string, string>
-      | Array<{ url: string; publicId: string }>
-      | undefined,
-  ) => {
-    setVariants((previous) =>
-      previous.map((variant, i) =>
-        i === index ? { ...variant, [field]: value } : variant,
-      ),
+  // ── Suggested attributes from category ──
+  const suggestedVariantAttrs = useMemo(() => {
+    const activeNames = new Set(options.map((o) => o.name));
+    return categoryAttributes.filter(
+      (a) => a.isVariant && !activeNames.has(a.name),
     );
-  };
+  }, [categoryAttributes, options]);
 
-  const setVariantAttribute = (
-    variantIdx: number,
-    attrName: string,
-    value: string,
-  ) => {
-    setVariants((previous) =>
-      previous.map((variant, i) =>
-        i === variantIdx
-          ? {
-              ...variant,
-              attributes: { ...variant.attributes, [attrName]: value },
-            }
-          : variant,
-      ),
+  const suggestedSpecAttrs = useMemo(() => {
+    const activeNames = new Set(specifications.map((s) => s.key));
+    return categoryAttributes.filter(
+      (a) => !a.isVariant && !activeNames.has(a.name),
     );
+  }, [categoryAttributes, specifications]);
+
+  const addSuggestedOption = (attr: CategoryAttribute) => {
+    if (options.some((o) => o.name === attr.name)) return;
+    setOptions((prev) => [
+      ...prev,
+      {
+        attributeId: attr.attributeId,
+        name: attr.name,
+        values: [...attr.options],
+        type: attr.type,
+        isColor: attr.type === "color",
+      },
+    ]);
   };
 
-  const addVariant = () => {
-    if (!canAddVariant) return;
-    setVariants((previous) => [...previous, EmptyVariant()]);
-    setVariantIndex(variants.length);
+  const addAllSuggestedOptions = () => {
+    const newOptions: OptionDraft[] = suggestedVariantAttrs.map((a) => ({
+      attributeId: a.attributeId,
+      name: a.name,
+      values: [...a.options],
+      type: a.type,
+      isColor: a.type === "color",
+    }));
+    if (newOptions.length > 0) {
+      setOptions((prev) => [...prev, ...newOptions]);
+    }
   };
 
-  const removeVariant = (index: number) => {
-    if (variants.length <= 1) return;
-    setVariants((previous) => previous.filter((_, i) => i !== index));
-    setVariantIndex(Math.max(0, index - 1));
+  const addSuggestedSpec = (attr: CategoryAttribute) => {
+    if (specifications.some((s) => s.key === attr.name)) return;
+    setSpecifications((prev) => [...prev, { key: attr.name, value: "" }]);
   };
+
+  const addAllSuggestedSpecs = () => {
+    const newSpecs: SpecEntry[] = suggestedSpecAttrs.map((a) => ({
+      key: a.name,
+      value: "",
+    }));
+    if (newSpecs.length > 0) {
+      setSpecifications((prev) => [...prev, ...newSpecs]);
+    }
+  };
+
+  const existingOptionNames = useMemo(
+    () => new Set(options.map((o) => o.name)),
+    [options],
+  );
+  const existingSpecNames = useMemo(
+    () => new Set(specifications.map((s) => s.key)),
+    [specifications],
+  );
+
+  const optionKeys = options
+    .filter((o) => o.values.length > 0)
+    .map((o) => o.name);
+  const optionLabels: Record<string, string> = Object.fromEntries(
+    options.map((o) => [o.name, o.name]),
+  );
+  const optionValues: Record<string, string[]> = Object.fromEntries(
+    options.map((o) => [o.name, o.values]),
+  );
+
+  const colorOptions = useMemo(() => {
+    const colors = new Set<string>();
+    for (const option of options) {
+      if (option.isColor) {
+        colors.add(option.name);
+      }
+    }
+    return colors;
+  }, [options]);
 
   const hasFieldErrors = Object.values(fieldErrors).some(
     (errors) => errors && errors.length > 0,
@@ -499,6 +823,7 @@ export function ProductForm({
 
   return (
     <div className="space-y-8">
+      {/* ── Header ── */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
           <Link
@@ -581,9 +906,54 @@ export function ProductForm({
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6 *:border-none *:p-0">
+          {/* ── 1. Category ── */}
           <Card>
             <CardHeader>
-              <CardTitle>Details</CardTitle>
+              <CardTitle>Category</CardTitle>
+              <CardDescription>
+                Select a category to load suggested options and specifications.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2" data-field="category">
+                <Label>Category</Label>
+                <Select
+                  value={category ?? ""}
+                  onValueChange={(value) => {
+                    setCategory((value as string) || null);
+                    clearFieldError("category");
+                  }}
+                  items={categories.map((cat) => ({
+                    value: cat.id,
+                    label: cat.name,
+                  }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {"\u00A0\u00A0".repeat(cat.level)}
+                        {cat.level > 0 ? "\u2514 " : ""}
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldError("category") && (
+                  <p className="text-xs text-destructive">
+                    {fieldError("category")}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* ── 2. Product Information ── */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Information</CardTitle>
               <CardDescription>
                 Basic information about this product.
               </CardDescription>
@@ -618,22 +988,37 @@ export function ProductForm({
 
               <div className="space-y-2" data-field="slug">
                 <Label htmlFor="slug">Slug</Label>
-                <InputGroup>
-                  <InputGroupAddon align="inline-start">
-                    <InputGroupText>/products/</InputGroupText>
-                  </InputGroupAddon>
-                  <InputGroupInput
-                    id="slug"
-                    value={slug}
-                    onChange={(event) => {
-                      setIsSlugEdited(true);
-                      setSlug(slugify(event.target.value));
+                <div className="flex gap-2">
+                  <InputGroup className="flex-1">
+                    <InputGroupAddon align="inline-start">
+                      <InputGroupText>/products/</InputGroupText>
+                    </InputGroupAddon>
+                    <InputGroupInput
+                      id="slug"
+                      value={slug}
+                      onChange={(event) => {
+                        setIsSlugEdited(true);
+                        setSlug(slugify(event.target.value));
+                      }}
+                      placeholder="auto-generated-from-name"
+                      aria-invalid={Boolean(fieldError("slug"))}
+                      className="font-mono text-sm"
+                    />
+                  </InputGroup>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={() => {
+                      setSlug(slugify(name));
+                      setIsSlugEdited(false);
                     }}
-                    placeholder="auto-generated-from-name"
-                    aria-invalid={Boolean(fieldError("slug"))}
-                    className="font-mono text-sm"
-                  />
-                </InputGroup>
+                    title="Regenerate slug from name"
+                  >
+                    <HugeiconsIcon icon={Refresh01Icon} size={16} />
+                  </Button>
+                </div>
                 {fieldError("slug") ? (
                   <p className="text-xs text-destructive">
                     {fieldError("slug")}
@@ -665,18 +1050,34 @@ export function ProductForm({
                   </p>
                 )}
               </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Images</CardTitle>
-              <CardDescription>
-                Upload product images. The first image is the primary fallback
-                for variants without their own images.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+              <div className="space-y-2" data-field="shortDescription">
+                <Label htmlFor="short-description">Short description</Label>
+                <InputGroup>
+                  <InputGroupInput
+                    id="short-description"
+                    value={shortDescription}
+                    onChange={(event) => {
+                      setShortDescription(event.target.value);
+                      clearFieldError("shortDescription");
+                    }}
+                    placeholder="Brief summary for listings..."
+                    aria-invalid={Boolean(fieldError("shortDescription"))}
+                    maxLength={FIELD_LIMITS.description.short}
+                  />
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>
+                      {shortDescription.length}/{FIELD_LIMITS.description.short}
+                    </InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldError("shortDescription") && (
+                  <p className="text-xs text-destructive">
+                    {fieldError("shortDescription")}
+                  </p>
+                )}
+              </div>
+
               <div className="space-y-2" data-field="images">
                 <Label>Product images</Label>
                 <ImageDropzone
@@ -706,462 +1107,327 @@ export function ProductForm({
             </CardContent>
           </Card>
 
+          {/* ── 3. Variant Options ── */}
           <Card>
             <CardHeader>
-              <CardTitle>Attributes</CardTitle>
-              <CardDescription>
-                Define product attributes like Color, Wattage, etc. These
-                determine the variant combinations.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {attributes.map((attr, attrIndex) => (
-                <div
-                  key={attr.name}
-                  className="rounded-lg border p-4 space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {attr.isColor && (
-                        <span className="size-4 rounded-full border bg-gray-200" />
-                      )}
-                      <span className="font-medium text-sm">{attr.name}</span>
-                      {attr.isColor && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
-                          Color
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          setEditingAttrIndex(
-                            editingAttrIndex === attrIndex ? null : attrIndex,
-                          )
-                        }
-                      >
-                        {editingAttrIndex === attrIndex
-                          ? "Done"
-                          : "Edit values"}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => removeAttribute(attrIndex)}
-                      >
-                        <HugeiconsIcon icon={Delete02Icon} size={14} />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {editingAttrIndex === attrIndex ? (
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap gap-1.5">
-                        {attr.values.map((value, vi) => (
-                          <span
-                            key={value}
-                            className="inline-flex items-center gap-1 rounded-full border bg-muted px-2.5 py-0.5 text-xs"
-                          >
-                            {attr.isColor && (
-                              <span
-                                className="size-3 rounded-full border"
-                                style={{ backgroundColor: value }}
-                              />
-                            )}
-                            {value}
-                            <button
-                              type="button"
-                              onClick={() =>
-                                removeValueFromAttribute(attrIndex, vi)
-                              }
-                              className="ml-0.5 text-muted-foreground hover:text-destructive"
-                            >
-                              x
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex gap-2">
-                        <Input
-                          value={newAttrValue}
-                          onChange={(event) =>
-                            setNewAttrValue(event.target.value)
-                          }
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              addValueToAttribute(attrIndex);
-                            }
-                          }}
-                          placeholder={
-                            attr.isColor
-                              ? "Enter color name or hex"
-                              : `Add value to ${attr.name}`
-                          }
-                          className="h-8 text-sm"
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Variant Options</CardTitle>
+                  <CardDescription>
+                    Options determine the different variants of this product.
+                    {isLoadingAttributes && (
+                      <span className="ml-1 inline-flex items-center gap-1 text-xs">
+                        <HugeiconsIcon
+                          icon={Loading02Icon}
+                          size={12}
+                          className="animate-spin"
                         />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => addValueToAttribute(attrIndex)}
-                        >
-                          Add
-                        </Button>
-                      </div>
-                      {attr.isColor && (
-                        <div className="flex flex-wrap gap-1.5">
-                          {PRESET_COLORS.map((color) => (
-                            <button
-                              key={color}
-                              type="button"
-                              title={color}
-                              onClick={() => {
-                                setAttributes((prev) =>
-                                  prev.map((a, i) =>
-                                    i === attrIndex && !a.values.includes(color)
-                                      ? { ...a, values: [...a.values, color] }
-                                      : a,
-                                  ),
-                                );
-                              }}
-                              className="size-6 rounded-full border-2 border-border hover:scale-110 transition-transform"
-                              style={{ backgroundColor: color }}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex flex-wrap gap-1.5">
-                      {attr.values.length === 0 ? (
-                        <span className="text-xs text-muted-foreground">
-                          No values defined. Click edit to add.
-                        </span>
-                      ) : (
-                        attr.values.map((value) => (
-                          <span
-                            key={value}
-                            className="inline-flex items-center gap-1 rounded-full border bg-muted px-2 py-0.5 text-xs"
-                          >
-                            {attr.isColor && (
-                              <span
-                                className="size-2.5 rounded-full border"
-                                style={{ backgroundColor: value }}
-                              />
-                            )}
-                            {value}
-                          </span>
-                        ))
-                      )}
-                    </div>
-                  )}
+                        Loading...
+                      </span>
+                    )}
+                  </CardDescription>
                 </div>
-              ))}
-
-              <div className="flex gap-2">
-                <Input
-                  value={newAttrName}
-                  onChange={(event) => setNewAttrName(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") {
-                      event.preventDefault();
-                      addAttribute();
-                    }
-                  }}
-                  placeholder="New attribute name (e.g. Color)"
-                  className="h-9 text-sm"
-                />
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={addAttribute}
-                  disabled={!newAttrName.trim()}
+                  size="sm"
+                  onClick={() => setAddOptionDialogOpen(true)}
                 >
                   <HugeiconsIcon icon={PlusSignIcon} size={14} />
-                  Add
+                  Add option
                 </Button>
               </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {suggestedVariantAttrs.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Suggested from category
+                    </p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={addAllSuggestedOptions}
+                    >
+                      <HugeiconsIcon icon={PlusSignIcon} size={12} />
+                      Add all
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {suggestedVariantAttrs.map((attr) => (
+                      <button
+                        key={attr.attributeId}
+                        type="button"
+                        onClick={() => addSuggestedOption(attr)}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+                      >
+                        <HugeiconsIcon icon={PlusSignIcon} size={10} />
+                        {attr.name}
+                        <span className="text-[10px] opacity-60 capitalize">{attr.type}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {options.length === 0 && suggestedVariantAttrs.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-border p-8 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    No options yet.{" "}
+                    {category
+                      ? "Add options to define product variants."
+                      : "Select a category first, or add options manually."}
+                  </p>
+                </div>
+              ) : options.length === 0 ? null : (
+                options.map((option, index) => (
+                  <div
+                    key={`${option.name}-${index}`}
+                    className="rounded-lg border border-border p-4 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-2 font-medium text-sm">
+                        {option.name}
+                        {option.isColor && (
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                            Color
+                          </span>
+                        )}
+                        {option.type && !option.isColor && (
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground capitalize">
+                            {option.type}
+                          </span>
+                        )}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setAddValueDialogIndex(index)}
+                        >
+                          <HugeiconsIcon icon={PlusSignIcon} size={14} />
+                          Add value
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => removeOption(index)}
+                        >
+                          <HugeiconsIcon icon={Delete02Icon} size={14} />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {option.isColor ? (
+                      <div className="space-y-3">
+                        <ColorPicker
+                          value=""
+                          onChange={(hex) => {
+                            if (hex && !option.values.includes(hex)) {
+                              addValueToOption(index, hex);
+                            }
+                          }}
+                        />
+                        {option.values.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {option.values.map((value, vi) => (
+                              <span
+                                key={value}
+                                className="inline-flex items-center gap-1.5 rounded-full border bg-muted pl-1 pr-2.5 py-0.5 text-xs"
+                              >
+                                <ColorSwatch color={value} size="xs" />
+                                {value}
+                                <button
+                                  type="button"
+                                  onClick={() => removeValueFromOption(index, vi)}
+                                  className="ml-0.5 text-muted-foreground hover:text-destructive"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <>
+                        {option.values.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {option.values.map((value, vi) => (
+                              <span
+                                key={value}
+                                className="inline-flex items-center gap-1 rounded-full border bg-muted px-2.5 py-0.5 text-xs"
+                              >
+                                {value}
+                                <button
+                                  type="button"
+                                  onClick={() => removeValueFromOption(index, vi)}
+                                  className="ml-0.5 text-muted-foreground hover:text-destructive"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <OptionValueInput
+                          onAdd={(value) => addValueToOption(index, value)}
+                          placeholder={`Add ${option.name.toLowerCase()} value`}
+                        />
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
+
+              {options.length > 0 && (
+                <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3">
+                  <div>
+                    {generatedCombinations.length > 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-medium text-foreground">
+                          {generatedCombinations.length}
+                        </span>{" "}
+                        variant{generatedCombinations.length !== 1 ? "s" : ""}{" "}
+                        will be generated.
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Add values to options to define variants.
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={generateVariants}
+                    disabled={generatedCombinations.length === 0}
+                  >
+                    <HugeiconsIcon icon={SparklesIcon} size={14} />
+                    Generate variants
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
+          {/* ── 4. Variants ── */}
           <Card>
             <CardHeader>
               <CardTitle>Variants</CardTitle>
               <CardDescription>
-                Define variations of this product. Fill in all attributes, SKU,
-                price and stock for each variant.
+                {hasGeneratedVariants
+                  ? "Edit SKU, price, stock and images for each variant."
+                  : "Generate variants from options above to configure SKU, price and stock."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-                {variants.map((variant, index) => {
-                  const errors = validateVariant(variant, attributes);
-                  return (
-                    <button
-                      key={`variant-${index}`}
-                      type="button"
-                      onClick={() => setVariantIndex(index)}
-                      className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors ${
-                        index === variantIndex
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : errors.length > 0
-                            ? "border-destructive/50 bg-destructive/5 text-foreground"
-                            : "border-border bg-background hover:bg-muted"
-                      }`}
-                    >
-                      {variant.name || `Variant ${index + 1}`}
-                      {errors.length > 0 && (
-                        <span className="size-1.5 rounded-full bg-destructive" />
-                      )}
-                    </button>
-                  );
-                })}
-                <button
+            <CardContent>
+              <VariantTable
+                variants={variants}
+                optionKeys={optionKeys}
+                optionLabels={optionLabels}
+                optionValues={optionValues}
+                colorOptions={colorOptions}
+                onChange={setVariants}
+                upload={uploadShopImage}
+                deleteImage={deleteShopImage}
+              />
+            </CardContent>
+          </Card>
+
+          {/* ── 5. Specifications ── */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Specifications</CardTitle>
+                  <CardDescription>
+                    Describe product attributes that don't generate variants.
+                  </CardDescription>
+                </div>
+                <Button
                   type="button"
-                  onClick={addVariant}
-                  disabled={!canAddVariant}
-                  className="flex items-center gap-1 rounded-md border border-dashed border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAddSpecDialogOpen(true)}
                 >
                   <HugeiconsIcon icon={PlusSignIcon} size={14} />
-                  Add
-                </button>
+                  Add specification
+                </Button>
               </div>
-
-              {!canAddVariant && variants.length > 1 && (
-                <p className="text-xs text-muted-foreground">
-                  Complete the current variant before adding another.
-                </p>
-              )}
-
-              {variants[variantIndex] && (
-                <div className="rounded-lg border p-4 space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <div
-                      className="space-y-2"
-                      data-field={`variants.${variantIndex}.name`}
-                    >
-                      <Label>Variant name</Label>
-                      <Input
-                        value={variants[variantIndex].name}
-                        onChange={(event) =>
-                          updateVariant(
-                            variantIndex,
-                            "name",
-                            event.target.value,
-                          )
-                        }
-                        placeholder="e.g. Cool White 10W"
-                      />
-                    </div>
-
-                    <div
-                      className="space-y-2"
-                      data-field={`variants.${variantIndex}.sku`}
-                    >
-                      <Label>SKU</Label>
-                      <Input
-                        value={variants[variantIndex].sku}
-                        onChange={(event) =>
-                          updateVariant(variantIndex, "sku", event.target.value)
-                        }
-                        placeholder="e.g. LED-10W-CW"
-                        className="font-mono text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  {attributes.length > 0 && (
-                    <div className="space-y-2">
-                      <Label className="text-muted-foreground">
-                        Attributes
-                      </Label>
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        {attributes.map((attr) => (
-                          <div key={attr.name} className="space-y-1">
-                            <Label className="text-xs text-muted-foreground">
-                              {attr.name}
-                              {attr.isColor && " (Color)"}
-                            </Label>
-                            {attr.isColor ? (
-                              <div className="flex flex-wrap gap-1.5">
-                                {attr.values.map((value) => (
-                                  <button
-                                    key={value}
-                                    type="button"
-                                    title={value}
-                                    onClick={() =>
-                                      setVariantAttribute(
-                                        variantIndex,
-                                        attr.name,
-                                        value,
-                                      )
-                                    }
-                                    className={`size-8 rounded-full border-2 transition-transform hover:scale-110 ${
-                                      variants[variantIndex].attributes[
-                                        attr.name
-                                      ] === value
-                                        ? "border-primary ring-2 ring-primary/30 scale-110"
-                                        : "border-border"
-                                    }`}
-                                    style={{ backgroundColor: value }}
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <Select
-                                value={
-                                  variants[variantIndex].attributes[
-                                    attr.name
-                                  ] ?? ""
-                                }
-                                onValueChange={(value) =>
-                                  setVariantAttribute(
-                                    variantIndex,
-                                    attr.name,
-                                    value as string,
-                                  )
-                                }
-                              >
-                                <SelectTrigger className="h-9">
-                                  <SelectValue
-                                    placeholder={`Select ${attr.name}`}
-                                  />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {attr.values.map((value) => (
-                                    <SelectItem key={value} value={value}>
-                                      {value}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid gap-4 sm:grid-cols-3">
-                    <div
-                      className="space-y-2"
-                      data-field={`variants.${variantIndex}.price`}
-                    >
-                      <Label>Price</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        step={0.01}
-                        value={variants[variantIndex].price}
-                        onChange={(event) =>
-                          updateVariant(
-                            variantIndex,
-                            "price",
-                            Number(event.target.value),
-                          )
-                        }
-                      />
-                    </div>
-
-                    <div
-                      className="space-y-2"
-                      data-field={`variants.${variantIndex}.salePrice`}
-                    >
-                      <Label>Sale price</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        step={0.01}
-                        value={variants[variantIndex].salePrice ?? ""}
-                        onChange={(event) =>
-                          updateVariant(
-                            variantIndex,
-                            "salePrice",
-                            event.target.value
-                              ? Number(event.target.value)
-                              : undefined,
-                          )
-                        }
-                        placeholder="Optional"
-                      />
-                    </div>
-
-                    <div
-                      className="space-y-2"
-                      data-field={`variants.${variantIndex}.stock`}
-                    >
-                      <Label>Stock</Label>
-                      <Input
-                        type="number"
-                        min={0}
-                        value={variants[variantIndex].stock}
-                        onChange={(event) =>
-                          updateVariant(
-                            variantIndex,
-                            "stock",
-                            Number(event.target.value),
-                          )
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Variant images (optional)</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Falls back to the primary product image if empty.
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {suggestedSpecAttrs.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Suggested from category
                     </p>
-                    <ImageDropzone
-                      value={variants[variantIndex].images[0] ?? null}
-                      onChange={(img) => {
-                        if (img) {
-                          updateVariant(variantIndex, "images", [
-                            img,
-                            ...variants[variantIndex].images.slice(1),
-                          ]);
-                        } else {
-                          updateVariant(variantIndex, "images", []);
-                        }
-                      }}
-                      upload={uploadShopImage}
-                      deleteImage={deleteShopImage}
-                      emptyLabel="Variant image"
-                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={addAllSuggestedSpecs}
+                    >
+                      <HugeiconsIcon icon={PlusSignIcon} size={12} />
+                      Add all
+                    </Button>
                   </div>
-
-                  <div className="flex items-center gap-3">
-                    <Switch
-                      checked={variants[variantIndex].isActive}
-                      onCheckedChange={(checked) =>
-                        updateVariant(variantIndex, "isActive", checked)
-                      }
-                    />
-                    <Label className="cursor-pointer">Active</Label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {suggestedSpecAttrs.map((attr) => (
+                      <button
+                        key={attr.attributeId}
+                        type="button"
+                        onClick={() => addSuggestedSpec(attr)}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+                      >
+                        <HugeiconsIcon icon={PlusSignIcon} size={10} />
+                        {attr.name}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
 
-              {variants.length > 1 && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive"
-                  onClick={() => removeVariant(variantIndex)}
-                >
-                  <HugeiconsIcon icon={Delete02Icon} size={16} />
-                  Remove variant
-                </Button>
-              )}
+              <SpecsEditor
+                value={specifications}
+                onChange={setSpecifications}
+                suggestedSpecs={categoryAttributes
+                  .filter((a) => !a.isVariant)
+                  .map((a) => ({ key: a.name, name: a.name, type: a.type }))}
+              />
+
+              <div className="space-y-2">
+                <Label>Specifications Description</Label>
+                <p className="text-xs text-muted-foreground">
+                  Rich text description for the specifications section.
+                </p>
+                <RichTextEditor
+                  value={specificationsDescription ? (() => {
+                    try {
+                      return JSON.parse(specificationsDescription);
+                    } catch {
+                      return specificationsDescription;
+                    }
+                  })() : undefined}
+                  onChange={(json) => {
+                    setSpecificationsDescription(JSON.stringify(json));
+                  }}
+                  placeholder="Add a detailed specifications description..."
+                  editorClassName="max-h-60"
+                />
+              </div>
             </CardContent>
           </Card>
 
+          {/* ── 6. Content ── */}
           <Card>
             <CardHeader>
               <CardTitle>Content (Optional)</CardTitle>
@@ -1312,136 +1578,16 @@ export function ProductForm({
               </div>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Specifications (Optional)</CardTitle>
-                  <CardDescription>
-                    Technical details displayed as a key-value table.
-                  </CardDescription>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  {specifications.length}/{FIELD_LIMITS.specification.maxCount}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {fieldError("specifications") && (
-                <p className="text-xs text-destructive">
-                  {fieldError("specifications")}
-                </p>
-              )}
-
-              {specifications.map((spec, index) => (
-                <div key={index} className="flex items-start gap-2">
-                  <div className="grid flex-1 grid-cols-2 gap-2">
-                    <InputGroup>
-                      <InputGroupInput
-                        value={spec.key}
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          setSpecifications((prev) =>
-                            prev.map((s, i) =>
-                              i === index ? { ...s, key: value } : s,
-                            ),
-                          );
-                        }}
-                        placeholder="Name (e.g. Material)"
-                        maxLength={FIELD_LIMITS.specification.key}
-                      />
-                    </InputGroup>
-                    <InputGroup>
-                      <InputGroupInput
-                        value={spec.value}
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          setSpecifications((prev) =>
-                            prev.map((s, i) =>
-                              i === index ? { ...s, value: value } : s,
-                            ),
-                          );
-                        }}
-                        placeholder="Value (e.g. Solid brass)"
-                        maxLength={FIELD_LIMITS.specification.value}
-                      />
-                    </InputGroup>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="mt-0.5 shrink-0 text-muted-foreground hover:text-destructive"
-                    onClick={() =>
-                      setSpecifications((prev) =>
-                        prev.filter((_, i) => i !== index),
-                      )
-                    }
-                  >
-                    <HugeiconsIcon icon={Delete02Icon} size={14} />
-                  </Button>
-                </div>
-              ))}
-
-              {specifications.length < FIELD_LIMITS.specification.maxCount && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() =>
-                    setSpecifications((prev) => [...prev, { key: "", value: "" }])
-                  }
-                >
-                  <HugeiconsIcon icon={PlusSignIcon} size={14} className="me-1.5" />
-                  Add specification
-                </Button>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
+        {/* ── Sidebar ── */}
         <div className="min-w-0 space-y-6 lg:sticky lg:top-8 lg:self-start">
           <Card>
             <CardHeader>
               <CardTitle>Organization</CardTitle>
-              <CardDescription>Assign categories and brands.</CardDescription>
+              <CardDescription>Assign a brand.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2" data-field="category">
-                <Label>Category</Label>
-                <Select
-                  value={category ?? ""}
-                  onValueChange={(value) => {
-                    setCategory((value as string) || null);
-                    clearFieldError("category");
-                  }}
-                  items={categories.map((cat) => ({
-                    value: cat.id,
-                    label: cat.name,
-                  }))}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {"\u00A0\u00A0".repeat(cat.level)}
-                        {cat.level > 0 ? "\u2514 " : ""}
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldError("category") && (
-                  <p className="text-xs text-destructive">
-                    {fieldError("category")}
-                  </p>
-                )}
-              </div>
-
               <div className="space-y-2" data-field="brand">
                 <Label>Brand</Label>
                 <Select
@@ -1541,7 +1687,9 @@ export function ProductForm({
               </div>
 
               <div className="space-y-2" data-field="seo.metaDescription">
-                <Label htmlFor="seo-meta-description">Meta Description</Label>
+                <Label htmlFor="seo-meta-description">
+                  Meta Description
+                </Label>
                 <InputGroup className="min-h-[5rem]">
                   <InputGroupTextarea
                     id="seo-meta-description"
@@ -1577,6 +1725,56 @@ export function ProductForm({
           </Card>
         </div>
       </div>
+
+      {/* ── Dialogs ── */}
+
+      <AddAttributeDialog
+        open={addOptionDialogOpen}
+        onOpenChange={setAddOptionDialogOpen}
+        title="Add option"
+        existingNames={existingOptionNames}
+        onAdd={addOptionFromLibrary}
+        onCreateNew={addCustomOption}
+      />
+
+      <AddAttributeDialog
+        open={addSpecDialogOpen}
+        onOpenChange={setAddSpecDialogOpen}
+        title="Add specification"
+        existingNames={existingSpecNames}
+        onAdd={addSpecFromLibrary}
+        onCreateNew={addCustomSpec}
+      />
+
+      {addValueDialogIndex !== null && (
+        <AddOptionValueDialog
+          open={addValueDialogIndex !== null}
+          onOpenChange={(open) => {
+            if (!open) setAddValueDialogIndex(null);
+          }}
+          predefinedValues={
+            options[addValueDialogIndex]
+              ? (() => {
+                  const catAttr = categoryAttributes.find(
+                    (a) =>
+                      a.name === options[addValueDialogIndex].name &&
+                      a.isVariant,
+                  );
+                  return catAttr?.options ?? [];
+                })()
+              : []
+          }
+          existingValues={options[addValueDialogIndex]?.values ?? []}
+          onAddValues={(values) => {
+            if (addValueDialogIndex !== null) {
+              const existing = options[addValueDialogIndex].values;
+              const newValues = values.filter((v) => !existing.includes(v));
+              updateOptionValues(addValueDialogIndex, values);
+            }
+          }}
+        />
+      )}
+
     </div>
   );
 }

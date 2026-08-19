@@ -6,6 +6,7 @@ import { z } from "zod";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { type Brand, BrandModel } from "@/models/brand";
+import { ProductModel } from "@/models/product";
 
 export type { Brand };
 import { brandInputSchema } from "../validation/brand";
@@ -146,6 +147,14 @@ export async function deleteBrand(
   const existing = await BrandModel.findById(id);
   if (!existing) {
     return { ok: false, message: "This brand no longer exists." };
+  }
+
+  const productCount = await ProductModel.countDocuments({ "brand._id": id });
+  if (productCount > 0) {
+    return {
+      ok: false,
+      message: `Cannot delete this brand because ${productCount} product${productCount !== 1 ? "s are" : " is"} assigned to it. Reassign or remove them first.`,
+    };
   }
 
   await existing.deleteOne();

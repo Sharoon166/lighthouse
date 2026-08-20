@@ -894,6 +894,16 @@ export function ProductForm({
           <div>
             {formErrors.length > 0 ? (
               formErrors.map((message) => <p key={message}>{message}</p>)
+            ) : hasFieldErrors ? (
+              <ul className="list-inside list-disc space-y-0.5">
+                {Object.entries(fieldErrors)
+                  .filter(([, errors]) => errors && errors.length > 0)
+                  .map(([field, errors]) =>
+                    errors!.map((msg, i) => (
+                      <li key={`${field}-${i}`}>{msg}</li>
+                    )),
+                  )}
+              </ul>
             ) : (
               <p>
                 Could not save your product. Please check the highlighted
@@ -906,51 +916,7 @@ export function ProductForm({
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-6 *:border-none *:p-0">
-          {/* ── 1. Category ── */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Category</CardTitle>
-              <CardDescription>
-                Select a category to load suggested options and specifications.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2" data-field="category">
-                <Label>Category</Label>
-                <Select
-                  value={category ?? ""}
-                  onValueChange={(value) => {
-                    setCategory((value as string) || null);
-                    clearFieldError("category");
-                  }}
-                  items={categories.map((cat) => ({
-                    value: cat.id,
-                    label: cat.name,
-                  }))}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {"\u00A0\u00A0".repeat(cat.level)}
-                        {cat.level > 0 ? "\u2514 " : ""}
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldError("category") && (
-                  <p className="text-xs text-destructive">
-                    {fieldError("category")}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* ── 2. Product Information ── */}
+          {/* ── 1. Product Information ── */}
           <Card>
             <CardHeader>
               <CardTitle>Product Information</CardTitle>
@@ -959,6 +925,72 @@ export function ProductForm({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2" data-field="category">
+                  <Label>Category</Label>
+                  <Select
+                    value={category ?? ""}
+                    onValueChange={(value) => {
+                      setCategory((value as string) || null);
+                      clearFieldError("category");
+                    }}
+                    items={categories.map((cat) => ({
+                      value: cat.id,
+                      label: cat.name,
+                    }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {"\u00A0\u00A0".repeat(cat.level)}
+                          {cat.level > 0 ? "\u2514 " : ""}
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldError("category") && (
+                    <p className="text-xs text-destructive">
+                      {fieldError("category")}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2" data-field="brand">
+                  <Label>Brand</Label>
+                  <Select
+                    value={brand ?? ""}
+                    onValueChange={(value) => {
+                      setBrand((value as string) || null);
+                      clearFieldError("brand");
+                    }}
+                    items={brands.map((b) => ({
+                      value: b.id,
+                      label: b.name,
+                    }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {brands.map((b) => (
+                        <SelectItem key={b.id} value={b.id}>
+                          {b.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldError("brand") && (
+                    <p className="text-xs text-destructive">
+                      {fieldError("brand")}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               <div className="space-y-2" data-field="name">
                 <Label htmlFor="name">Name</Label>
                 <InputGroup>
@@ -1103,6 +1135,27 @@ export function ProductForm({
                     {fieldError("images")}
                   </p>
                 )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-6 rounded-lg border border-border bg-muted/30 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <Switch checked={isActive} onCheckedChange={setIsActive} />
+                  <div>
+                    <Label className="cursor-pointer font-medium">Active</Label>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Inactive products are hidden from the storefront.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
+                  <div>
+                    <Label className="cursor-pointer font-medium">Featured</Label>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Featured products are highlighted on the storefront.
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -1289,13 +1342,23 @@ export function ProductForm({
               {options.length > 0 && (
                 <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3">
                   <div>
-                    {generatedCombinations.length > 0 ? (
+                    {generatedCombinations.length > 0 && variants.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         <span className="font-medium text-foreground">
                           {generatedCombinations.length}
                         </span>{" "}
                         variant{generatedCombinations.length !== 1 ? "s" : ""}{" "}
                         will be generated.
+                      </p>
+                    ) : variants.length > 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        <span className="font-medium text-foreground">
+                          {variants.length}
+                        </span>{" "}
+                        variant{variants.length !== 1 ? "s" : ""} defined.{" "}
+                        {generatedCombinations.length > 0 && (
+                          <>Click generate to re-sync with options.</>
+                        )}
                       </p>
                     ) : (
                       <p className="text-sm text-muted-foreground">
@@ -1307,7 +1370,12 @@ export function ProductForm({
                     type="button"
                     size="sm"
                     onClick={generateVariants}
-                    disabled={generatedCombinations.length === 0}
+                    disabled={generatedCombinations.length === 0 || variants.length > 0}
+                    title={
+                      variants.length > 0
+                        ? "Remove existing variants before generating new ones"
+                        : undefined
+                    }
                   >
                     <HugeiconsIcon icon={SparklesIcon} size={14} />
                     Generate variants
@@ -1324,7 +1392,11 @@ export function ProductForm({
               <CardDescription>
                 {hasGeneratedVariants
                   ? "Edit SKU, price, stock and images for each variant."
-                  : "Generate variants from options above to configure SKU, price and stock."}
+                  : variants.length > 0
+                    ? "Edit SKU, price, stock and images for each variant."
+                    : options.length > 0
+                      ? "Add variants manually or generate them from options above."
+                      : "Add a base variant with SKU, price and stock."}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1337,6 +1409,7 @@ export function ProductForm({
                 onChange={setVariants}
                 upload={uploadShopImage}
                 deleteImage={deleteShopImage}
+                fieldErrors={fieldErrors}
               />
             </CardContent>
           </Card>
@@ -1582,75 +1655,6 @@ export function ProductForm({
 
         {/* ── Sidebar ── */}
         <div className="min-w-0 space-y-6 lg:sticky lg:top-8 lg:self-start">
-          <Card>
-            <CardHeader>
-              <CardTitle>Organization</CardTitle>
-              <CardDescription>Assign a brand.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2" data-field="brand">
-                <Label>Brand</Label>
-                <Select
-                  value={brand ?? ""}
-                  onValueChange={(value) => {
-                    setBrand((value as string) || null);
-                    clearFieldError("brand");
-                  }}
-                  items={brands.map((b) => ({
-                    value: b.id,
-                    label: b.name,
-                  }))}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a brand" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {brands.map((b) => (
-                      <SelectItem key={b.id} value={b.id}>
-                        {b.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldError("brand") && (
-                  <p className="text-xs text-destructive">
-                    {fieldError("brand")}
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Status</CardTitle>
-              <CardDescription>
-                Visibility and display settings.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3">
-                <Switch checked={isActive} onCheckedChange={setIsActive} />
-                <div className="flex-1">
-                  <Label className="cursor-pointer font-medium">Active</Label>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Inactive products are hidden from the storefront.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
-                <div className="flex-1">
-                  <Label className="cursor-pointer font-medium">Featured</Label>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Featured products are highlighted on the storefront.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           <Card>
             <CardHeader>
               <CardTitle>SEO (Optional)</CardTitle>

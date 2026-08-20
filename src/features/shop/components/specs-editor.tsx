@@ -165,22 +165,6 @@ export function SpecsEditor({
           Add
         </Button>
       </div>
-
-      {unusedSuggested.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
-          {unusedSuggested.map((s) => (
-            <button
-              key={s.key}
-              type="button"
-              onClick={() => addFromSuggested(s)}
-              className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-            >
-              <HugeiconsIcon icon={PlusSignIcon} size={10} />
-              {s.name}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

@@ -156,7 +156,7 @@ export async function createProduct(
   try {
     await connectToDatabase();
 
-    const slug = data.slug || (await uniqueSlug(data.name));
+    const slug = await uniqueSlug(data.slug || data.name);
 
     const productData = await buildProductData(data);
 
@@ -206,7 +206,7 @@ export async function updateProduct(
     }
 
     const nextSlug =
-      data.slug || (await uniqueSlug(data.name, String(existing._id)));
+      await uniqueSlug(data.slug || data.name, String(existing._id));
 
     const productData = await buildProductData(data);
 

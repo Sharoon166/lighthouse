@@ -78,10 +78,14 @@ export async function createAttributeDefinition(
     return { ok: true, key, id: String(created._id) };
   } catch (error) {
     console.error("Failed to create attribute definition:", error);
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "An attribute with this name already exists."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }
@@ -126,10 +130,14 @@ export async function updateAttributeDefinition(
     return { ok: true, key: existing.key, id: String(existing._id) };
   } catch (error) {
     console.error("Failed to update attribute definition:", error);
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "An attribute with this name already exists."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }

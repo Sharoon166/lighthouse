@@ -133,7 +133,7 @@ export async function createCategory(
       }
     }
 
-    const slug = data.slug || (await uniqueSlug(data.name));
+    const slug = await uniqueSlug(data.slug || data.name);
 
     await CategoryModel.create({
       name: data.name,
@@ -160,10 +160,14 @@ export async function createCategory(
     return { ok: true, slug };
   } catch (error) {
     console.error("Failed to create category:", error);
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "A category with this name or slug already exists."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }
@@ -242,7 +246,7 @@ export async function updateCategory(
       String(existing.parent ?? "") !== (data.parent || "");
 
     const nextSlug =
-      data.slug || (await uniqueSlug(data.name, String(existing._id)));
+      await uniqueSlug(data.slug || data.name, String(existing._id));
 
     existing.set({
       name: data.name,
@@ -281,10 +285,14 @@ export async function updateCategory(
     return { ok: true, slug: nextSlug };
   } catch (error) {
     console.error("Failed to update category:", error);
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "A category with this name or slug already exists."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }
@@ -550,16 +558,34 @@ export async function getCategoryAttributes(
   await connectToDatabase();
 
   const category = await CategoryModel.findById(categoryId)
+    .select("attributes ancestors")
+    .lean();
+
+  if (!category) return [];
+
+  const categoryIds = [
+    ...category.ancestors.map((a) => String(a)),
+    String(category._id),
+  ];
+
+  const allCats = await CategoryModel.find({
+    _id: { $in: categoryIds.map((id) => new Types.ObjectId(id)) },
+  })
     .select("attributes")
     .lean();
 
-  if (!category || !category.attributes?.length) return [];
+  const allAttributeIds = new Set<string>();
+  for (const cat of allCats) {
+    for (const a of cat.attributes ?? []) {
+      allAttributeIds.add(String(a.attributeId));
+    }
+  }
 
-  const attributeIds = category.attributes.map((a) => String(a.attributeId));
+  if (allAttributeIds.size === 0) return [];
 
   const definitions = await AttributeDefinitionModel.find({
     _id: {
-      $in: attributeIds.map((id) => new Types.ObjectId(id)),
+      $in: [...allAttributeIds].map((id) => new Types.ObjectId(id)),
     },
     isActive: true,
   })
@@ -570,13 +596,30 @@ export async function getCategoryAttributes(
     definitions.map((d) => [String(d._id), d]),
   );
 
-  return category.attributes
-    .filter((a) => definitionMap.has(String(a.attributeId)))
-    .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map((a) => {
-      const def = definitionMap.get(String(a.attributeId))!;
-      return {
-        attributeId: String(a.attributeId),
+  const result: {
+    attributeId: string;
+    key: string;
+    name: string;
+    type: string;
+    options: string[];
+    required: boolean;
+    isVariant: boolean;
+    sortOrder: number;
+  }[] = [];
+
+  const seen = new Set<string>();
+
+  for (const cat of allCats) {
+    for (const a of cat.attributes ?? []) {
+      const id = String(a.attributeId);
+      if (seen.has(id)) continue;
+      seen.add(id);
+
+      const def = definitionMap.get(id);
+      if (!def) continue;
+
+      result.push({
+        attributeId: id,
         key: def.key,
         name: def.name,
         type: def.type,
@@ -584,6 +627,9 @@ export async function getCategoryAttributes(
         required: a.required,
         isVariant: a.isVariant,
         sortOrder: a.sortOrder,
-      };
-    });
+      });
+    }
+  }
+
+  return result.sort((a, b) => a.sortOrder - b.sortOrder);
 }

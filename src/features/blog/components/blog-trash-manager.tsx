@@ -9,7 +9,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -31,17 +31,18 @@ import {
 
 const SKELETON_KEYS = ["one", "two", "three", "four", "five"];
 
-export function BlogTrashManager() {
+export function BlogTrashManager({ initialData }: { initialData?: BlogPostListResult }) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
-  const [data, setData] = useState<BlogPostListResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<BlogPostListResult | null>(initialData ?? null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
+  const skipInitialFetch = useRef(Boolean(initialData));
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -52,6 +53,11 @@ export function BlogTrashManager() {
   }, [search]);
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return;
+    }
+
     let cancelled = false;
 
     setIsLoading(true);

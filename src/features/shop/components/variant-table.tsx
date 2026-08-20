@@ -5,6 +5,7 @@ import {
   Delete02Icon,
   ExpandIcon,
   MinusSignIcon,
+  PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useMemo, useState, useCallback } from "react";
@@ -48,6 +49,7 @@ interface VariantTableProps {
   onRemoveManual?: () => void;
   upload?: (formData: FormData) => Promise<UploadImageResult>;
   deleteImage?: (publicId: string) => Promise<{ ok: boolean }>;
+  fieldErrors?: Record<string, string[] | undefined>;
 }
 
 export function VariantTable({
@@ -59,6 +61,7 @@ export function VariantTable({
   onChange,
   upload,
   deleteImage,
+  fieldErrors,
 }: VariantTableProps) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
@@ -117,6 +120,21 @@ export function VariantTable({
     }
   };
 
+  const addVariant = () => {
+    const newVariant: VariantRow = {
+      sku: "",
+      name: "",
+      attributes: {},
+      price: 0,
+      salePrice: undefined,
+      costPrice: undefined,
+      stock: 0,
+      images: [],
+      isActive: true,
+    };
+    onChange([...variants, newVariant]);
+  };
+
   const applyBulk = () => {
     const indices = [...selected];
     const next = variants.map((v, i) => {
@@ -143,8 +161,23 @@ export function VariantTable({
 
   if (variants.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-        Add option values above to generate variants.
+      <div className="space-y-4">
+        <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          {optionKeys.length > 0
+            ? "No variants yet. Add variants manually or generate them from options above."
+            : "No variants yet. Add a base variant for this product."}
+        </div>
+        <div className="flex justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addVariant}
+          >
+            <HugeiconsIcon icon={PlusSignIcon} size={14} />
+            {optionKeys.length > 0 ? "Add variant" : "Add base variant"}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -156,6 +189,15 @@ export function VariantTable({
           {variants.length} variant{variants.length !== 1 ? "s" : ""}
         </p>
         <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addVariant}
+          >
+            <HugeiconsIcon icon={PlusSignIcon} size={14} />
+            Add variant
+          </Button>
           {selected.size > 0 && (
             <Badge variant="secondary">
               {selected.size} selected
@@ -281,13 +323,10 @@ export function VariantTable({
                   onUpdate={(field, value) =>
                     updateVariant(index, field, value)
                   }
-                  onRemove={
-                    variants.length > 1
-                      ? () => removeVariant(index)
-                      : undefined
-                  }
+                  onRemove={() => removeVariant(index)}
                   upload={upload}
                   deleteImage={deleteImage}
+                  fieldErrors={fieldErrors}
                 />
               );
             })}
@@ -312,6 +351,7 @@ function VariantRow({
   onRemove,
   upload,
   deleteImage,
+  fieldErrors,
 }: {
   variant: VariantRow;
   index: number;
@@ -326,7 +366,10 @@ function VariantRow({
   onRemove?: () => void;
   upload?: (formData: FormData) => Promise<UploadImageResult>;
   deleteImage?: (publicId: string) => Promise<{ ok: boolean }>;
+  fieldErrors?: Record<string, string[] | undefined>;
 }) {
+  const skuError = fieldErrors?.[`variants.${index}.sku`]?.[0];
+  const nameError = fieldErrors?.[`variants.${index}.name`]?.[0];
   const canToggleOptions = optionKeys.length > 0;
 
   return (
@@ -389,12 +432,18 @@ function VariantRow({
           </td>
         ))}
         <td className="px-3 py-2.5">
-          <Input
-            value={variant.sku}
-            onChange={(e) => onUpdate("sku", e.target.value)}
-            placeholder="SKU"
-            className="h-8 min-w-24 w-full font-mono text-xs"
-          />
+          <div className="space-y-1">
+            <Input
+              value={variant.sku}
+              onChange={(e) => onUpdate("sku", e.target.value)}
+              placeholder="SKU"
+              aria-invalid={Boolean(skuError)}
+              className={`h-8 min-w-24 w-full font-mono text-xs ${skuError ? "border-destructive focus-visible:ring-destructive" : ""}`}
+            />
+            {skuError && (
+              <p className="text-[11px] text-destructive leading-tight">{skuError}</p>
+            )}
+          </div>
         </td>
         <td className="px-3 py-2.5 text-right">
           <Input

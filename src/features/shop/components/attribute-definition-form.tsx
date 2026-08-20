@@ -480,7 +480,12 @@ export function AttributeDefinitionForm({
                         setNewOption(val);
                         clearFieldError("options");
                       }}
-                      onKeyDown={handleKeyDown}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          addColorOption();
+                        }
+                      }}
                       placeholder="FF0000"
                       className="h-8 w-24 font-mono text-xs"
                       maxLength={6}

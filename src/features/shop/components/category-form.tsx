@@ -504,76 +504,78 @@ export function CategoryForm({
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2" data-field="parent">
-                <Label>Parent category</Label>
-                <Select
-                  value={parent ?? ""}
-                  onValueChange={(value) => {
-                    const newParent = (value as string) || null;
-                    if (isEdit && newParent !== parent) {
-                      setShowParentChangeWarning(true);
-                    } else {
-                      setShowParentChangeWarning(false);
-                    }
-                    setParent(newParent);
-                    clearFieldError("parent");
-                  }}
-                  items={[
-                    { value: "", label: "None (top-level)" },
-                    ...parentOptions.map((cat) => ({
-                      value: cat.id,
-                      label: cat.name,
-                    })),
-                  ]}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="None (top-level)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">None (top-level)</SelectItem>
-                    {parentOptions.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {"\u00A0\u00A0".repeat(cat.level)}
-                        {cat.level > 0 ? "\u2514 " : ""}
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fieldError("parent") && (
-                  <p className="text-xs text-destructive">
-                    {fieldError("parent")}
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2" data-field="parent">
+                  <Label>Parent category</Label>
+                  <Select
+                    value={parent ?? ""}
+                    onValueChange={(value) => {
+                      const newParent = (value as string) || null;
+                      if (isEdit && newParent !== parent) {
+                        setShowParentChangeWarning(true);
+                      } else {
+                        setShowParentChangeWarning(false);
+                      }
+                      setParent(newParent);
+                      clearFieldError("parent");
+                    }}
+                    items={[
+                      { value: "", label: "None (top-level)" },
+                      ...parentOptions.map((cat) => ({
+                        value: cat.id,
+                        label: cat.name,
+                      })),
+                    ]}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="None (top-level)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None (top-level)</SelectItem>
+                      {parentOptions.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {"\u00A0\u00A0".repeat(cat.level)}
+                          {cat.level > 0 ? "\u2514 " : ""}
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldError("parent") && (
+                    <p className="text-xs text-destructive">
+                      {fieldError("parent")}
+                    </p>
+                  )}
+                  {showParentChangeWarning && (
+                    <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
+                      <HugeiconsIcon icon={Warning} size={14} className="mt-0.5 shrink-0" />
+                      <p>Changing the parent will move this category and all its children in the hierarchy. Ancestor paths will be updated.</p>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty for a top-level category.
                   </p>
-                )}
-                {showParentChangeWarning && (
-                  <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
-                    <HugeiconsIcon icon={Warning} size={14} className="mt-0.5 shrink-0" />
-                    <p>Changing the parent will move this category and all its children in the hierarchy. Ancestor paths will be updated.</p>
-                  </div>
-                )}
-                <p className="text-xs text-muted-foreground">
-                  Leave empty for a top-level category.
-                </p>
+                </div>
+
+                <div className="space-y-2" data-field="sortOrder">
+                  <Label htmlFor="sort-order">Sort order</Label>
+                  <Input
+                    id="sort-order"
+                    type="number"
+                    min={0}
+                    value={sortOrder}
+                    onChange={(event) =>
+                      setSortOrder(Number(event.target.value))
+                    }
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Lower numbers appear first.
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-2" data-field="sortOrder">
-                <Label htmlFor="sort-order">Sort order</Label>
-                <Input
-                  id="sort-order"
-                  type="number"
-                  min={0}
-                  value={sortOrder}
-                  onChange={(event) =>
-                    setSortOrder(Number(event.target.value))
-                  }
-                  placeholder="0"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Lower numbers appear first.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 px-4 py-3">
                 <Switch
                   id="is-active"
                   checked={isActive}

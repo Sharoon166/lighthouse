@@ -3,7 +3,6 @@
 import {
   DashboardSquare03Icon,
   Folder02Icon,
-  Image01Icon,
   Logout02Icon,
   NewsIcon,
   PackageIcon,
@@ -30,7 +29,6 @@ const NAV_ITEMS = [
   { href: "/admin/attributes", label: "Attributes", icon: Settings04Icon },
   { href: "/admin/projects", label: "Projects", icon: Folder02Icon },
   { href: "/admin/blog", label: "Blog", icon: NewsIcon },
-  { href: "/admin/media", label: "Media", icon: Image01Icon },
 ];
 
 function initials(name: string) {

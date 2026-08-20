@@ -56,7 +56,7 @@ export async function createBrand(
   try {
     await connectToDatabase();
 
-    const slug = data.slug || (await uniqueSlug(data.name));
+    const slug = await uniqueSlug(data.slug || data.name);
 
     await BrandModel.create({
       name: data.name,
@@ -76,10 +76,14 @@ export async function createBrand(
     return { ok: true, slug };
   } catch (error) {
     console.error("Failed to create brand:", error);
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "A brand with this name or slug already exists."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }
@@ -109,7 +113,7 @@ export async function updateBrand(
     }
 
     const nextSlug =
-      data.slug || (await uniqueSlug(data.name, String(existing._id)));
+      await uniqueSlug(data.slug || data.name, String(existing._id));
 
     existing.set({
       name: data.name,
@@ -131,10 +135,14 @@ export async function updateBrand(
     return { ok: true, slug: nextSlug };
   } catch (error) {
     console.error("Failed to update brand:", error);
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "A brand with this name or slug already exists."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
-      formErrors: ["Something went wrong while saving. Please try again."],
+      formErrors: [message],
     };
   }
 }

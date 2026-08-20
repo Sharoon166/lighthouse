@@ -7,7 +7,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import { buttonVariants } from "@/components/ui/button";
@@ -60,7 +60,7 @@ function SkeletonGrid() {
   );
 }
 
-export function BlogPostsManager() {
+export function BlogPostsManager({ initialData }: { initialData?: BlogPostListResult }) {
   const { confirm } = useConfirm();
   const [view, setView] = useLocalStorage<View>(
     "lighthouse:blog-view",
@@ -71,11 +71,12 @@ export function BlogPostsManager() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
-  const [data, setData] = useState<BlogPostListResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<BlogPostListResult | null>(initialData ?? null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const skipInitialFetch = useRef(Boolean(initialData));
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -86,6 +87,11 @@ export function BlogPostsManager() {
   }, [search]);
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return;
+    }
+
     let cancelled = false;
 
     setIsLoading(true);

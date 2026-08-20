@@ -14,7 +14,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -195,17 +195,18 @@ function SkeletonTable() {
   );
 }
 
-export function BrandsManager() {
+export function BrandsManager({ initialData }: { initialData?: BrandListResult }) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [data, setData] = useState<BrandListResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<BrandListResult | null>(initialData ?? null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const skipInitialFetch = useRef(Boolean(initialData));
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -216,6 +217,11 @@ export function BrandsManager() {
   }, [search]);
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return;
+    }
+
     let cancelled = false;
 
     setIsLoading(true);

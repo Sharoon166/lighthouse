@@ -13,7 +13,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -253,17 +253,18 @@ function SkeletonTable() {
   );
 }
 
-export function AttributesManager() {
+export function AttributesManager({ initialData }: { initialData?: AttributeDefinitionListResult }) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [data, setData] = useState<AttributeDefinitionListResult | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<AttributeDefinitionListResult | null>(initialData ?? null);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [isMutating, setIsMutating] = useState(false);
+  const skipInitialFetch = useRef(Boolean(initialData));
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
@@ -278,6 +279,11 @@ export function AttributesManager() {
   }, [search]);
 
   useEffect(() => {
+    if (skipInitialFetch.current) {
+      skipInitialFetch.current = false;
+      return;
+    }
+
     let cancelled = false;
 
     setIsLoading(true);

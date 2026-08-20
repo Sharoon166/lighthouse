@@ -129,15 +129,21 @@ function TreeNode({
   );
 }
 
-export function CategoriesManager() {
+export function CategoriesManager({
+  initialTree,
+}: {
+  initialTree?: CategoryTreeNode[];
+}) {
   const { confirm } = useConfirm();
-  const [tree, setTree] = useState<CategoryTreeNode[]>([]);
+  const [tree, setTree] = useState<CategoryTreeNode[]>(initialTree ?? []);
   const [search, setSearch] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialTree);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (initialTree) return;
+
     let cancelled = false;
 
     setIsLoading(true);
@@ -158,7 +164,7 @@ export function CategoriesManager() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialTree]);
 
   const handleDelete = async (node: CategoryTreeNode) => {
     setActionError(null);

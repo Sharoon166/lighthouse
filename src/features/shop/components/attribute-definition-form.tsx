@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
@@ -16,7 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { FIELD_LIMITS } from "@/lib/field-limits";
-import { ColorPicker, ColorSwatch } from "@/components/shared/color-picker";
+import { ColorSwatch, PRESET_COLORS } from "@/components/shared/color-picker";
 import {
   type AttributeDefinition,
   type AttributeDefinitionActionResult,
@@ -140,6 +141,30 @@ export function AttributeDefinitionForm({
 
   const removeOption = (index: number) => {
     setOptions((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const addColorOption = () => {
+    const hex = `#${newOption.trim().toUpperCase()}`;
+    if (!/^#([0-9A-F]{6})$/.test(hex)) return;
+    if (options.some((o) => o.toUpperCase() === hex)) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        options: ["This color already exists."],
+      }));
+      return;
+    }
+    if (options.length >= FIELD_LIMITS.attributeDefinition.maxOptions) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        options: [
+          `Maximum ${FIELD_LIMITS.attributeDefinition.maxOptions} options allowed.`,
+        ],
+      }));
+      return;
+    }
+    setOptions((prev) => [...prev, hex]);
+    setNewOption("");
+    clearFieldError("options");
   };
 
   const buildPayload = (): AttributeDefinitionInput => ({
@@ -406,24 +431,72 @@ export function AttributeDefinitionForm({
               <div className="h-px bg-border" />
               <div className="space-y-3" data-field="options">
                 <Label>Colors</Label>
-                <ColorPicker
-                  value=""
-                  onChange={(hex) => {
-                    if (hex && !options.includes(hex)) {
-                      if (options.length >= FIELD_LIMITS.attributeDefinition.maxOptions) {
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          options: [
-                            `Maximum ${FIELD_LIMITS.attributeDefinition.maxOptions} options allowed.`,
-                          ],
-                        }));
-                        return;
-                      }
-                      setOptions((prev) => [...prev, hex]);
-                      clearFieldError("options");
-                    }
-                  }}
-                />
+                <p className="text-xs text-muted-foreground">
+                  Click a swatch or type a hex code to add colors.
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {PRESET_COLORS.map((color) => {
+                    const alreadyAdded = options.some(
+                      (o) => o.toUpperCase() === color.hex.toUpperCase(),
+                    );
+                    return (
+                      <button
+                        key={color.hex}
+                        type="button"
+                        title={`${color.name}${alreadyAdded ? " (added)" : ""}`}
+                        disabled={alreadyAdded}
+                        onClick={() => {
+                          if (options.length >= FIELD_LIMITS.attributeDefinition.maxOptions) {
+                            setFieldErrors((prev) => ({
+                              ...prev,
+                              options: [
+                                `Maximum ${FIELD_LIMITS.attributeDefinition.maxOptions} options allowed.`,
+                              ],
+                            }));
+                            return;
+                          }
+                          setOptions((prev) => [...prev, color.hex]);
+                          clearFieldError("options");
+                        }}
+                        className={`size-7 shrink-0 rounded-full border-2 transition-all ${
+                          alreadyAdded
+                            ? "cursor-not-allowed border-foreground/30 opacity-40"
+                            : "border-border hover:scale-110 hover:border-foreground/30"
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-muted-foreground">#</span>
+                    <Input
+                      value={newOption}
+                      onChange={(event) => {
+                        const val = event.target.value
+                          .replace(/[^0-9A-Fa-f]/g, "")
+                          .slice(0, 6);
+                        setNewOption(val);
+                        clearFieldError("options");
+                      }}
+                      onKeyDown={handleKeyDown}
+                      placeholder="FF0000"
+                      className="h-8 w-24 font-mono text-xs"
+                      maxLength={6}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addColorOption}
+                    disabled={!newOption.trim()}
+                  >
+                    <HugeiconsIcon icon={PlusSignIcon} size={14} />
+                    Add
+                  </Button>
+                </div>
                 {options.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {options.map((option, index) => (
@@ -432,7 +505,7 @@ export function AttributeDefinitionForm({
                         className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted pl-1 pr-2.5 py-0.5 text-xs"
                       >
                         <ColorSwatch color={option} size="xs" />
-                        {option}
+                        {option.toUpperCase()}
                         <button
                           type="button"
                           onClick={() => removeOption(index)}
@@ -451,7 +524,7 @@ export function AttributeDefinitionForm({
                 )}
                 {options.length === 0 && !fieldError("options") && (
                   <p className="text-xs text-muted-foreground">
-                    Pick at least one color for this attribute.
+                    Add at least one color for this attribute.
                   </p>
                 )}
               </div>

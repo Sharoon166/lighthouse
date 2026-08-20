@@ -5,7 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 
-const PRESET_COLORS = [
+export const PRESET_COLORS = [
   { name: "Black", hex: "#000000" },
   { name: "White", hex: "#FFFFFF" },
   { name: "Gray", hex: "#6B7280" },

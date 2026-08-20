@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft02Icon,
-  CheckIcon,
-  Delete02Icon,
-  PlusSignIcon,
-  SaveIcon,
-  Warning,
-} from "@hugeicons/core-free-icons";
+import { Delete02Icon, PlusSignIcon, SaveIcon, CheckIcon, ArrowLeft02Icon, Warning } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,6 +16,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { FIELD_LIMITS } from "@/lib/field-limits";
+import { ColorPicker, ColorSwatch } from "@/components/shared/color-picker";
 import {
   type AttributeDefinition,
   type AttributeDefinitionActionResult,
@@ -344,8 +338,8 @@ export function AttributeDefinitionForm({
             )}
           </div>
 
-          {/* Options (only for select and color types) */}
-          {(type === "select" || type === "color") && (
+          {/* Options (select type) */}
+          {type === "select" && (
             <>
               <div className="h-px bg-border" />
               <div className="space-y-3" data-field="options">
@@ -400,6 +394,64 @@ export function AttributeDefinitionForm({
                 {options.length === 0 && !fieldError("options") && (
                   <p className="text-xs text-muted-foreground">
                     Add at least one option for the dropdown.
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+
+          {/* Options (color type) */}
+          {type === "color" && (
+            <>
+              <div className="h-px bg-border" />
+              <div className="space-y-3" data-field="options">
+                <Label>Colors</Label>
+                <ColorPicker
+                  value=""
+                  onChange={(hex) => {
+                    if (hex && !options.includes(hex)) {
+                      if (options.length >= FIELD_LIMITS.attributeDefinition.maxOptions) {
+                        setFieldErrors((prev) => ({
+                          ...prev,
+                          options: [
+                            `Maximum ${FIELD_LIMITS.attributeDefinition.maxOptions} options allowed.`,
+                          ],
+                        }));
+                        return;
+                      }
+                      setOptions((prev) => [...prev, hex]);
+                      clearFieldError("options");
+                    }
+                  }}
+                />
+                {options.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {options.map((option, index) => (
+                      <span
+                        key={`${option}-${index}`}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted pl-1 pr-2.5 py-0.5 text-xs"
+                      >
+                        <ColorSwatch color={option} size="xs" />
+                        {option}
+                        <button
+                          type="button"
+                          onClick={() => removeOption(index)}
+                          className="ml-0.5 rounded-full p-0.5 text-muted-foreground hover:text-destructive"
+                        >
+                          <HugeiconsIcon icon={Delete02Icon} size={12} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {fieldError("options") && (
+                  <p className="text-xs text-destructive">
+                    {fieldError("options")}
+                  </p>
+                )}
+                {options.length === 0 && !fieldError("options") && (
+                  <p className="text-xs text-muted-foreground">
+                    Pick at least one color for this attribute.
                   </p>
                 )}
               </div>

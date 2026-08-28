@@ -3,12 +3,10 @@ import {
   ArrowUpRight01FreeIcons,
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
-import SparklesIcon from "@hugeicons/core-free-icons/SparklesIcon";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import HeroImage from "@/assets/hero-img.png";
-import LogoImage from "@/components/shared/logo-img";
 import { Marquee } from "@/components/shared/marquee";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Button } from "@/components/ui/button";
@@ -17,9 +15,15 @@ import {
   dummyCategories,
   dummyProducts,
   dummyProjects,
+  featuredBlogs,
   marqueeText,
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
+import { BlogCard } from "@/components/shared/blog-card";
+import { Clients } from "@/components/shared/clients";
+import { Partners } from "@/components/shared/partners";
+import { CTA } from "@/components/hero/cta";
 
 export default function Home() {
   return (
@@ -64,7 +68,7 @@ export default function Home() {
         </For>
       </Marquee>
 
-      <div className="container mx-auto">
+      <div className="container">
         <section>
           <SectionHeader
             title="Lighting Collections for Every Space"
@@ -120,11 +124,11 @@ export default function Home() {
               {({ id, title, price }, index) => (
                 <Link href="#" className="border">
                   <Image
-                    src={`/about-image.png`}
+                    src={`/products/${index+1}.png`}
                     width={1024}
                     height={1024}
                     alt={id}
-                    className="w-full h-80 -z-10 object-contain"
+                    className="w-full h-80 -z-10 object-contain bg-muted"
                   />
                   <div className="p-4">
                     <h3 className="text-xl">{title}</h3>
@@ -144,10 +148,10 @@ export default function Home() {
         </section>
       </div>
 
-      <section className="bg-[url('/noise-bg.png')] bg-cover py-0  flex max-md:flex-col items-center justify-between">
-        <div className="container ml-28">
+      <section className="bg-noise py-0  flex max-lg:flex-col items-center justify-between overflow-x-hidden">
+        <div className="container max-lg:pt-10 lg:ml-28">
           <h2 className="text-primary">About Lighthouse</h2>
-          <p className="max-w-2xl">
+          <p className="max-w-2xl text-wrap">
             For years, Light House has helped homeowners, architects, and
             businesses create warm, inviting spaces. We carefully source premium
             lighting that blends quality, performance, and timeless design. Our
@@ -166,11 +170,11 @@ export default function Home() {
           height={1024}
           priority
           alt=""
-          className="hover:brightness-150"
+          className="hover:brightness-125 transition-all"
         />
       </section>
 
-      <div className="container mx-auto">
+      <div className="container">
         <section>
           <SectionHeader
             title="Lighting That Transforms Every Space"
@@ -200,6 +204,30 @@ export default function Home() {
             </For>
           </div>
         </section>
+        <Clients />
+      </div>
+
+      <OppelDistributorBanner />
+
+      <section className="bg-muted mb-0">
+        <div className="container">
+          <SectionHeader
+            title="Lighting Ideas & Design Inspiration"
+            description="Explore expert tips, interior design trends, and practical lighting guides to help you create beautiful, functional spaces with confidence."
+            ctaText="View All Articles"
+          />
+          <div className="grid md:grid-cols-3 gap-4">
+            <For each={featuredBlogs} by={(blog) => blog.title}>
+              {(blog) => (
+                <BlogCard {...blog} />
+              )}
+            </For>
+          </div>
+        </div>
+      </section>
+      <div className="container">
+        <Partners />
+        <CTA />
       </div>
     </main>
   );

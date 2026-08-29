@@ -12,10 +12,33 @@ import { buttonVariants } from "@/components/ui/button";
 export default function NotFound() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isBlinking, setIsBlinking] = useState(false);
+  const [mouthExpression, setMouthExpression] = useState<"happy" | "surprised" | "silly" | "confused" | "neutral">("happy");
   const leftPupilRef = useRef<HTMLDivElement>(null);
   const rightPupilRef = useRef<HTMLDivElement>(null);
   const leftEyeRef = useRef<HTMLDivElement>(null);
   const rightEyeRef = useRef<HTMLDivElement>(null);
+
+  // Cycle mouth expressions
+  useEffect(() => {
+    const expressions: Array<"happy" | "surprised" | "silly" | "confused" | "neutral"> = [
+      "happy", "surprised", "silly", "confused", "neutral",
+    ];
+    const scheduleExpression = () => {
+      const delay = 2500 + Math.random() * 3500;
+      return setTimeout(() => {
+        setMouthExpression((prev) => {
+          let next = prev;
+          while (next === prev) {
+            next = expressions[Math.floor(Math.random() * expressions.length)];
+          }
+          return next;
+        });
+        timerId = scheduleExpression();
+      }, delay);
+    };
+    let timerId = scheduleExpression();
+    return () => clearTimeout(timerId);
+  }, []);
 
   // Track mouse position
   useEffect(() => {
@@ -120,6 +143,82 @@ export default function NotFound() {
             }}
           />
         </div>
+      </div>
+
+      {/* mouth */}
+      <div className="mb-6 flex justify-center">
+        <svg
+          width="48"
+          height="32"
+          viewBox="0 0 48 32"
+          className="sm:scale-150"
+          aria-hidden="true"
+          key={mouthExpression}
+        >
+          {mouthExpression === "happy" && (
+            <path
+              d="M8 12 C8 22, 40 22, 40 12"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              className="text-foreground"
+            />
+          )}
+          {mouthExpression === "surprised" && (
+            <ellipse
+              cx="24"
+              cy="18"
+              rx="6"
+              ry="8"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              className="text-foreground"
+            />
+          )}
+          {mouthExpression === "silly" && (
+            <>
+              <path
+                d="M8 14 C14 24, 34 24, 40 14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                className="text-foreground"
+              />
+              <ellipse
+                cx="28"
+                cy="22"
+                rx="4"
+                ry="3"
+                className="fill-rose-400"
+              />
+            </>
+          )}
+          {mouthExpression === "confused" && (
+            <path
+              d="M8 16 C14 10, 20 22, 24 16 C28 10, 34 22, 40 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              className="text-foreground"
+            />
+          )}
+          {mouthExpression === "neutral" && (
+            <line
+              x1="10"
+              y1="16"
+              x2="38"
+              y2="16"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              className="text-foreground"
+            />
+          )}
+        </svg>
       </div>
 
       <h1 className="font-heading text-[8rem] font-bold leading-none tracking-tighter text-secondary sm:text-[12rem]">

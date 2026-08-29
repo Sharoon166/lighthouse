@@ -17,15 +17,20 @@ import { cn } from "@/lib/utils";
 const NAV_LINKS = [
   { href: "/products", label: "Products" },
   { href: "/projects", label: "Projects" },
-  { href: "/blog", label: "Blog" },
+  { href: "/blogs", label: "Blog" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
   { href: "/sale", label: "Sale" },
 ];
 
-export function SiteHeader() {
+interface SiteHeaderProps {
+  variant?: "hero" | "page";
+}
+
+export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const isHero = variant === "hero";
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -43,15 +48,32 @@ export function SiteHeader() {
     pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="absolute top-0 z-50 w-full py-4">
+    <header
+      className={cn(
+        "z-50 w-full",
+        isHero
+          ? "absolute top-0 py-4"
+          : "static bg-background py-3",
+      )}
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="relative z-50 flex items-center gap-2 shrink-0">
-          <LogoImage />
+        <Link
+          href="/"
+          className="relative z-50 flex items-center gap-2 shrink-0"
+        >
+          <LogoImage dark={variant == "page" || mobileOpen} />
         </Link>
 
         {/* Desktop nav — centered pill */}
-        <nav className="hidden items-center gap-1 rounded-full border border-border/40 bg-muted/10 px-2 py-1 md:flex">
+        <nav
+          className={cn(
+            "hidden items-center gap-1 rounded-full px-2 py-1 md:flex",
+            isHero
+              ? "border border-border/40 bg-muted/10"
+              : "border border-border bg-muted/40",
+          )}
+        >
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}
@@ -60,7 +82,9 @@ export function SiteHeader() {
                 "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
                 isActive(href)
                   ? "bg-primary text-primary-foreground"
-                  : "text-background hover:bg-muted hover:text-foreground",
+                  : isHero
+                    ? "text-background hover:bg-muted hover:text-foreground"
+                    : "text-foreground hover:bg-muted",
               )}
             >
               {label}
@@ -69,18 +93,35 @@ export function SiteHeader() {
         </nav>
 
         {/* Right actions — desktop */}
-        <div className="hidden items-center gap-1 rounded-full border border-border/40 bg-muted/10 px-2 py-1 md:flex">
+        <div
+          className={cn(
+            "hidden items-center gap-1 rounded-full px-2 py-1 md:flex",
+            isHero
+              ? "border border-border/40 bg-muted/10"
+              : "border border-border bg-muted/40",
+          )}
+        >
           <button
             type="button"
             aria-label="Search"
-            className="flex size-8 items-center justify-center rounded-full text-background transition-colors hover:bg-muted hover:text-foreground"
+            className={cn(
+              "flex size-8 items-center justify-center rounded-full transition-colors hover:bg-muted",
+              isHero
+                ? "text-background hover:text-foreground"
+                : "text-foreground",
+            )}
           >
             <HugeiconsIcon icon={Search01Icon} size={18} />
           </button>
           <Link
             href="/cart"
             aria-label="Cart"
-            className="relative flex size-8 items-center justify-center rounded-full text-background transition-colors hover:bg-muted hover:text-foreground"
+            className={cn(
+              "relative flex size-8 items-center justify-center rounded-full transition-colors hover:bg-muted",
+              isHero
+                ? "text-background hover:text-foreground"
+                : "text-foreground",
+            )}
           >
             <HugeiconsIcon icon={ShoppingBag02Icon} size={18} />
             <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-gold text-[10px] font-bold text-background">
@@ -90,7 +131,12 @@ export function SiteHeader() {
           <Link
             href="/account"
             aria-label="Account"
-            className="flex size-8 items-center justify-center rounded-full text-background transition-colors hover:bg-muted hover:text-foreground"
+            className={cn(
+              "flex size-8 items-center justify-center rounded-full transition-colors hover:bg-muted",
+              isHero
+                ? "text-background hover:text-foreground"
+                : "text-foreground",
+            )}
           >
             <HugeiconsIcon icon={UserIcon} size={18} />
           </Link>
@@ -101,9 +147,15 @@ export function SiteHeader() {
           type="button"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           onClick={() => setMobileOpen((prev) => !prev)}
-          className={cn("relative z-50 flex size-10 items-center justify-center rounded-full border border-border/40 bg-background/10 backdrop-blur-md text-background md:hidden", {
-            "text-secondary": mobileOpen
-          })}
+          className={cn(
+            "relative z-50 flex size-10 items-center justify-center rounded-full backdrop-blur-md md:hidden",
+            isHero
+              ? "border border-border/40 bg-background/10 text-background"
+              : "border border-border bg-muted/40 text-foreground",
+            {
+              "text-secondary": mobileOpen,
+            },
+          )}
         >
           <HugeiconsIcon
             icon={mobileOpen ? Cancel01Icon : Menu01Icon}
@@ -118,7 +170,7 @@ export function SiteHeader() {
           "fixed inset-0 z-40 flex flex-col bg-background backdrop-blur-2xl transition-all duration-300 ease-in-out md:hidden pt-24 px-6 pb-8",
           mobileOpen
             ? "opacity-100 pointer-events-auto translate-y-0"
-            : "opacity-0 pointer-events-none -translate-y-4"
+            : "opacity-0 pointer-events-none -translate-y-4",
         )}
       >
         <div className="flex flex-col justify-between h-full max-w-md mx-auto w-full">
@@ -146,14 +198,11 @@ export function SiteHeader() {
                 className={cn(
                   "flex items-center justify-between rounded-2xl px-5 py-3 text-xl font-medium transition-all",
                   isActive(href)
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-foreground/80 hover:bg-muted/60 hover:text-foreground"
+                    ? "text-secondary text-3xl"
+                    : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
                 )}
               >
                 <span>{label}</span>
-                {isActive(href) && (
-                  <span className="size-2 rounded-full bg-primary-foreground" />
-                )}
               </Link>
             ))}
           </nav>
@@ -187,4 +236,8 @@ export function SiteHeader() {
       </div>
     </header>
   );
+}
+
+export function PageHeader() {
+  return <SiteHeader variant="page" />;
 }

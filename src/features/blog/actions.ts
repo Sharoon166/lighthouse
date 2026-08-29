@@ -356,11 +356,61 @@ export async function permanentlyDeleteBlogPost(
   return { ok: true, message: "Deleted forever." };
 }
 
+export async function getPublishedTags(): Promise<string[]> {
+  await connectToDatabase();
+
+  const documents = await BlogPostModel.find({
+    deletedAt: null,
+    status: "published",
+  })
+    .select("tags")
+    .lean();
+
+  const tagSet = new Set<string>();
+  for (const doc of documents) {
+    for (const tag of doc.tags) {
+      tagSet.add(tag);
+    }
+  }
+  return Array.from(tagSet).sort();
+}
+
+export async function getFeaturedPost(): Promise<BlogPostListItem | null> {
+  await connectToDatabase();
+
+  const doc = await BlogPostModel.findOne({
+    deletedAt: null,
+    status: "published",
+    featured: true,
+  })
+    .sort({ publishedAt: -1 })
+    .lean();
+
+  if (!doc) return null;
+
+  return {
+    id: String(doc._id),
+    title: doc.title,
+    slug: doc.slug,
+    summary: doc.summary,
+    tags: doc.tags,
+    authorName: doc.author.name,
+    status: doc.status,
+    featured: doc.featured,
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+    publishedAt: doc.publishedAt ? doc.publishedAt.toISOString() : null,
+    heroImage: doc.heroImage,
+    deletedAt: null,
+  };
+}
+
 const listBlogPostsSchema = z.object({
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(100).default(8),
   search: z.string().trim().max(200).default(""),
   status: z.enum(["all", "draft", "published"]).default("all"),
+  tag: z.string().trim().max(100).default(""),
 });
 
 export type BlogPostListItem = {
@@ -395,9 +445,9 @@ export async function listBlogPosts(
   input: unknown,
 ): Promise<BlogPostListResult> {
   const parsed = listBlogPostsSchema.safeParse(input);
-  const { page, pageSize, search, status } = parsed.success
+  const { page, pageSize, search, status, tag } = parsed.success
     ? parsed.data
-    : { page: 1, pageSize: 8, search: "", status: "all" as const };
+    : { page: 1, pageSize: 8, search: "", status: "all" as const, tag: "" };
 
   const filter: QueryFilter<BlogPost> = { deletedAt: null };
   if (status !== "all") {
@@ -405,6 +455,9 @@ export async function listBlogPosts(
   }
   if (search) {
     filter.title = { $regex: escapeRegExp(search), $options: "i" };
+  }
+  if (tag) {
+    filter.tags = { $in: [tag] };
   }
 
   await connectToDatabase();

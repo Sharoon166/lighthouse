@@ -723,7 +723,7 @@ export function BlogPostForm({
                     <Label htmlFor="slug">Slug</Label>
                     <div className="flex items-center gap-2">
                       <span className="shrink-0 text-sm text-muted-foreground">
-                        /blog/
+                        /blogs/
                       </span>
                       <Input
                         id="slug"

@@ -5,6 +5,7 @@ import type { JSONContent } from "@tiptap/react";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
+  addHeadingIdsToHtml,
   createTiptapExtensions,
   tiptapContentClassName,
 } from "./rich-text-constants";
@@ -14,46 +15,14 @@ interface RichTextPreviewProps {
   className?: string;
 }
 
-function addHeadingIds(content: JSONContent | null): JSONContent {
-  if (!content) return { type: "doc", content: [] };
-
-  let headingCounter = 1;
-
-  const walk = (node: JSONContent): JSONContent => {
-    if (node.type === "heading" && node.content) {
-      return {
-        ...node,
-        attrs: {
-          ...node.attrs,
-          id: `heading-${headingCounter++}`,
-        },
-      };
-    }
-
-    if (node.content && Array.isArray(node.content)) {
-      return {
-        ...node,
-        content: node.content.map(walk),
-      };
-    }
-
-    return node;
-  };
-
-  return walk(content);
-}
-
 export function RichTextPreview({ content, className }: RichTextPreviewProps) {
-  const contentWithIds = useMemo(() => addHeadingIds(content ?? null), [content]);
-
-  const html = useMemo(
-    () =>
-      generateHTML(
-        contentWithIds ?? { type: "doc", content: [] },
-        createTiptapExtensions(""),
-      ),
-    [contentWithIds],
-  );
+  const html = useMemo(() => {
+    const raw = generateHTML(
+      (content as JSONContent) ?? { type: "doc", content: [] },
+      createTiptapExtensions(""),
+    );
+    return addHeadingIdsToHtml(raw);
+  }, [content]);
 
   return (
     <div className={cn(tiptapContentClassName, className)}>

@@ -145,24 +145,27 @@ export const featuredBlogs = [
   {
     category: "INTERIOR DESIGN",
     title: "How to Choose the Perfect Pendant Light for Every Room",
-    description: "Discover how size, placement and style can transform kitchens, dining areas and living spaces with the...",
+    description:
+      "Discover how size, placement and style can transform kitchens, dining areas and living spaces with the...",
     readTime: "5 min read",
-    imageUrl: "/blogs/1.png"
+    imageUrl: "/blogs/1.png",
   },
   {
     category: "BUYING GUIDE",
     title: "7 Common Lighting Mistakes and How to Avoid Them",
-    description: "From incorrect fixture sizing to poor layering, learn the most common lighting mistakes and simple...",
+    description:
+      "From incorrect fixture sizing to poor layering, learn the most common lighting mistakes and simple...",
     readTime: "5 min read",
-    imageUrl: "/blogs/2.png"
+    imageUrl: "/blogs/2.png",
   },
   {
     category: "LIGHTING TRENDS",
     title: "Top Modern Lighting Trends Transforming Homes in 2026",
-    description: "Explore the latest trends in luxury lighting, warm ambient tones and statement fixtures that are...",
+    description:
+      "Explore the latest trends in luxury lighting, warm ambient tones and statement fixtures that are...",
     readTime: "5 min read",
-    imageUrl: "/blogs/3.png"
-  }
+    imageUrl: "/blogs/3.png",
+  },
 ];
 
 export const footerNav = [
@@ -188,7 +191,7 @@ export const footerNav = [
   {
     heading: "Support",
     links: [
-      { label: "Blog", href: "/blog" },
+      { label: "Blog", href: "/blogs" },
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms and Conditions", href: "/terms" },
       { label: "FAQs", href: "/faqs" },
@@ -199,10 +202,106 @@ export const footerNav = [
     heading: "Contact",
     links: [
       { label: "Islamabad, Pakistan", href: "" },
-      { label: "+92 300 1234567", href: "tel:+923001234567" },
-      { label: "hello@lighthouse.com", href: "mailto:hello@lighthouse.com" },
+      { label: "+92 21 3456 7890", href: "tel:+922134567890" },
+      { label: "+92 300 1234 567", href: "https://wa.me/923001234567" },
+      { label: "hello@lighthouse.pk", href: "mailto:hello@lighthouse.pk" },
       { label: "Mon-Sat \u2022 9AM-7PM", href: "" },
     ],
+  },
+];
+
+export const aboutStats = [
+  { value: "180+", label: "PROJECTS DELIVERED" },
+  { value: "98%", label: "CLIENT SATISFACTION" },
+  { value: "40+", label: "CITIES SERVED" },
+  { value: "12", label: "YEARS OF PRACTICE" },
+];
+
+export const howWeWork = [
+  {
+    number: "01",
+    title: "Craftsmanship First",
+    description:
+      "Every fixture we source is held to a single standard — would we put it in our own home? If not, it doesn't reach a client's.",
+  },
+  {
+    number: "02",
+    title: "Light as Architecture",
+    description:
+      "We treat lighting as a structural element, not a finish. The conversation starts at floor plan stage, not after the walls are painted.",
+  },
+  {
+    number: "03",
+    title: "Honest Advice",
+    description:
+      "We recommend what's right for the space, not what's most expensive. Our reputation is built on rooms that still look good in ten years.",
+  },
+  {
+    number: "04",
+    title: "End-to-End Service",
+    description:
+      "From brief through installation and aftercare — one team, one point of contact, no handoffs that lose detail.",
+  },
+];
+
+export const teamMembers = [
+  {
+    name: "Tariq Mahmood",
+    role: "FOUNDER & PRINCIPAL DESIGNER",
+    image: "/team/tariq.png",
+  },
+  {
+    name: "Zara Ahmed",
+    role: "LEAD OF RESIDENTIAL DESIGN",
+    image: "/team/zara.png",
+  },
+  {
+    name: "Hamza Rauf",
+    role: "COMMERCIAL PROJECTS DIRECTOR",
+    image: "/team/hamza.png",
+  },
+  {
+    name: "Sara Khan",
+    role: "CLIENT RELATIONS LEAD",
+    image: "/team/sara.png",
+  },
+];
+
+export const contactInfo = {
+  hotline: "+92 21 3456 7890",
+  sms: "+92 300 1234 567",
+  email: "hello@lighthouse.pk",
+};
+
+export const socialLinks = [
+  { name: "Facebook", url: "#" },
+  { name: "Instagram", url: "#" },
+  { name: "Twitter", url: "#" },
+  { name: "Linkedin", url: "#" },
+  { name: "Tiktok", url: "#" },
+];
+
+export const showrooms = [
+  {
+    id: "iqbal-town",
+    label: "Iqbal Town, Islamabad",
+    address: "Block 5, Iqbal Town, Islamabad",
+    embedUrl:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3401.487359564895!2d73.00718397574598!3d31.48286207429519!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3918ff7876e3d12d%3A0x56fa8c6de3b38cb8!2sBlock%205%2C%20Iqbal%20Town%2C%20Islamabad!5e0!3m2!1sen!2s!4v1724000000000!5m2!1sen!2s",
+  },
+  {
+    id: "gulberg",
+    label: "Gulberg III, Lahore",
+    address: "Block C, Gulberg III, Lahore",
+    embedUrl:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3401.487359564895!2d74.3!3d31.52!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sGulberg%20III%2C%20Lahore!5e0!3m2!1sen!2s!4v1724000000000!5m2!1sen!2s",
+  },
+  {
+    id: "clifton",
+    label: "Clifton Block 5, Karachi",
+    address: "Block 5, Clifton, Karachi, 75600",
+    embedUrl:
+      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3402.7!2d67.02!3d24.81!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sClifton%20Block%205%2C%20Karachi!5e0!3m2!1sen!2s!4v1724000000000!5m2!1sen!2s",
   },
 ];
 
@@ -233,4 +332,3 @@ export const partners = [
     imageURL: "https://cdn.simpleicons.org/ikea",
   },
 ];
-

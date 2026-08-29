@@ -1,18 +1,25 @@
-import { Clock01Icon } from "@hugeicons/core-free-icons";
+import { ArrowRight01Icon, Clock01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { JSONContent } from "@tiptap/react";
 import Image from "next/image";
+import Link from "next/link";
+import { CTA } from "@/components/hero/cta";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { RichTextPreview } from "@/components/shared/rich-text-preview";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { formatDate } from "@/lib/date-utils";
 import { calculateReadingTime } from "@/features/blog/seo-helpers";
-import type { BlogPostDraftData } from "../actions";
-import { TableOfContents } from "./table-of-contents";
+import { formatDate } from "@/lib/date-utils";
+import type { BlogPostDraftData, BlogPostListItem } from "../actions";
+import { BlogCard } from "./blog-card";
+import { HeroActions } from "./hero-actions";
 import { ShareButtons } from "./share-buttons";
+import { TableOfContents } from "./table-of-contents";
 
 interface BlogPostDetailProps {
   post: BlogPostDraftData;
+  recentPosts: BlogPostListItem[];
+  relatedPosts: BlogPostListItem[];
 }
 
 interface TocItem {
@@ -32,9 +39,8 @@ function extractTableOfContents(content: JSONContent | null): TocItem[] {
       if (node.type === "heading" && node.content) {
         const level = (node.attrs?.level as number) || 2;
         const text =
-          node.content
-            .map((n) => (n.type === "text" ? n.text : ""))
-            .join("") || "";
+          node.content.map((n) => (n.type === "text" ? n.text : "")).join("") ||
+          "";
 
         if (text && level >= 2 && level <= 4) {
           items.push({
@@ -66,85 +72,73 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-export function BlogPostDetail({ post }: BlogPostDetailProps) {
+export function BlogPostDetail({
+  post,
+  recentPosts,
+  relatedPosts,
+}: BlogPostDetailProps) {
   const toc = extractTableOfContents(post.content as JSONContent);
   const readingTime = calculateReadingTime(post.content);
 
   return (
-    <article className="relative">
-      {/* Hero Section */}
-      <div className="border-b border-border bg-background">
-        <div className="container mx-auto max-w-4xl px-4 py-12 md:py-16">
-          {/* Tags */}
-          {post.tags.length > 0 && (
-            <div className="mb-6 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-xs">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-
-          {/* Title */}
-          <h1 className="mb-6 font-heading text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
-            {post.title}
-          </h1>
-
-          {/* Summary */}
-          {post.summary && (
-            <p className="mb-8 text-lg leading-relaxed text-muted-foreground md:text-xl">
-              {post.summary}
-            </p>
-          )}
-
-          {/* Meta Info */}
-          <div className="flex flex-wrap items-center gap-4 border-t border-border pt-6">
-            {/* Author */}
-            <div className="flex items-center gap-3">
-              <Avatar className="size-10">
-                <AvatarFallback className="bg-primary/10 text-sm font-medium text-primary">
-                  {initials(post.author.name)}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  {post.author.name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {post.author.designation || "Author"}
-                </p>
+    <article>
+      {/* Hero */}
+      <section className="relative overflow-hidden py-10">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Blogs", href: "/blogs" },
+            { label: post.title },
+          ]}
+          className="container"
+        />
+        <div className="container mt-12">
+          <div className="space-y-4">
+            <h1 className="text-secondary text-balance max-w-6xl">
+              {post.title}
+            </h1>
+            {post.summary && (
+              <p className="text-lg text-pretty">{post.summary}</p>
+            )}
+            <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+              <div className="flex items-center gap-3">
+                <Avatar className="size-10">
+                  <AvatarFallback className="bg-primary/10 text-xs font-medium text-primary">
+                    {initials(post.author.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {post.author.name}
+                  </p>
+                  {post.author.designation && (
+                    <p className="text-xs text-muted-foreground">
+                      {post.author.designation}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-
-            <span className="text-muted-foreground">•</span>
-
-            {/* Published Date */}
-            <time
-              dateTime={post.publishedAt || ""}
-              className="text-sm text-muted-foreground"
-            >
-              {formatDate(post.publishedAt)}
-            </time>
-
-            <span className="text-muted-foreground">•</span>
-
-            {/* Reading Time */}
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <HugeiconsIcon icon={Clock01Icon} size={16} />
-              <span>{readingTime} min read</span>
-            </div>
-
-            <div className="ml-auto">
-              <ShareButtons title={post.title} summary={post.summary} />
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                {post.publishedAt && (
+                  <time dateTime={post.publishedAt}>
+                    {formatDate(post.publishedAt)}
+                  </time>
+                )}
+                <span>•</span>
+                <div className="flex items-center gap-1">
+                  <HugeiconsIcon icon={Clock01Icon} size={14} />
+                  <span>{readingTime} min read</span>
+                </div>
+                <HeroActions title={post.title} summary={post.summary} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Hero Image */}
       {post.heroImage && (
-        <div className="relative aspect-[21/9] w-full overflow-hidden border-b border-border bg-muted">
+        <div className="container relative aspect-2/1 w-full overflow-hidden bg-muted">
           <Image
             src={post.heroImage.url}
             alt={post.title}
@@ -156,20 +150,63 @@ export function BlogPostDetail({ post }: BlogPostDetailProps) {
         </div>
       )}
 
-      {/* Main Content Area */}
-      <div className="container mx-auto max-w-7xl px-4 py-12 md:py-16">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr] xl:grid-cols-[280px_1fr_240px]">
-          {/* Table of Contents */}
-          {toc.length > 0 && <TableOfContents items={toc} />}
+      {/* Mobile TOC - Collapsible */}
+      {toc.length > 0 && (
+        <details className="container mt-6 xl:hidden">
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground select-none">
+            Table of Contents
+          </summary>
+          <nav className="mt-3 space-y-1" aria-label="Table of contents">
+            {toc.map((item, index) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="flex items-baseline gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <span className="font-heading text-base font-bold text-gold shrink-0">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="line-clamp-1">{item.text}</span>
+              </a>
+            ))}
+          </nav>
+        </details>
+      )}
+
+      {/* Content - Three Column */}
+      <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="grid grid-cols-1 gap-12 xl:grid-cols-[200px_1fr_240px]">
+          {/* Left Sidebar - TOC + Share */}
+          <aside className="hidden xl:block">
+            <div className="sticky top-8">
+              <TableOfContents items={toc} />
+
+              <div className="border-t border-border mt-6 pt-6">
+                <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Share
+                </h3>
+                <ShareButtons title={post.title} summary={post.summary} />
+              </div>
+            </div>
+          </aside>
 
           {/* Main Content */}
           <div className="min-w-0">
             <div className="prose prose-lg prose-slate max-w-none dark:prose-invert">
               <RichTextPreview content={post.content as JSONContent} />
             </div>
-
+            <div className="mt-16 p-6 md:p-8 border-t space-y-4">
+              <h4 className="text-2xl font-semibold uppercase">Tagged</h4>
+              <div className=" flex flex-wrap items-center gap-2">
+                {post.tags.map((tag) => (
+                  <Badge key={tag} variant="outline">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
             {/* Author Bio */}
-            <div className="mt-16 rounded-2xl border border-border bg-card p-6 md:p-8">
+            <div className="mt-6 p-6 md:p-8 border-t">
               <div className="flex items-start gap-4">
                 <Avatar className="size-16 shrink-0 md:size-20">
                   <AvatarFallback className="bg-primary/10 text-lg font-medium text-primary">
@@ -177,10 +214,10 @@ export function BlogPostDetail({ post }: BlogPostDetailProps) {
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gold">
                     Written By
                   </p>
-                  <h3 className="mt-1 text-xl font-bold text-foreground">
+                  <h3 className="mt-4 text-xl font-bold text-foreground">
                     {post.author.name}
                   </h3>
                   {post.author.designation && (
@@ -198,23 +235,72 @@ export function BlogPostDetail({ post }: BlogPostDetailProps) {
             </div>
           </div>
 
-          {/* Right Sidebar - Additional Content (Optional) */}
+          {/* Right Sidebar - Recent Posts */}
           <aside className="hidden xl:block">
-            <div className="sticky top-8 space-y-6">
-              {/* Share Section */}
-              <div className="rounded-lg border border-border bg-card p-4">
-                <h3 className="mb-3 text-sm font-semibold text-foreground">
-                  Share This
-                </h3>
-                <ShareButtons
-                  title={post.title}
-                  summary={post.summary}
-                  vertical
-                />
-              </div>
+            <div className="sticky top-8 space-y-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Recent Posts
+              </h3>
+              {recentPosts.length > 0 ? (
+                <div className="space-y-4">
+                  {recentPosts.map((rp) => (
+                    <Link
+                      key={rp.id}
+                      href={`/blogs/${rp.slug}`}
+                      className="group block"
+                    >
+                      {rp.heroImage && (
+                        <div className="mb-2 overflow-hidden rounded-lg">
+                          <Image
+                            src={rp.heroImage.url}
+                            alt={rp.title}
+                            width={240}
+                            height={140}
+                            className="aspect-[16/9] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                        </div>
+                      )}
+                      <h4 className="text-sm font-medium leading-snug line-clamp-2 group-hover:text-primary">
+                        {rp.title}
+                      </h4>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No recent posts yet.
+                </p>
+              )}
             </div>
           </aside>
         </div>
+      </div>
+
+      {/* Related Articles - Mobile/Tablet */}
+      {relatedPosts.length > 0 && (
+        <section className="container pb-12">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="font-heading text-2xl font-bold">
+              Related Articles
+            </h2>
+            <Link
+              href="/blogs"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              All Articles
+              <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
+            </Link>
+          </div>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {relatedPosts.map((post) => (
+              <BlogCard key={post.id} post={post} />
+            ))}
+          </div>
+        </section>
+      )}
+      <div className="container">
+        {/* CTA */}
+        <CTA />
       </div>
     </article>
   );

@@ -633,3 +633,84 @@ export async function deleteProjectImage(
     return { ok: false };
   }
 }
+
+export type PublicProjectListItem = {
+  id: string;
+  title: string;
+  slug: string;
+  subtitle: string;
+  category: string;
+  image: string;
+  featured: boolean;
+};
+
+export async function getPublishedProjects(): Promise<PublicProjectListItem[]> {
+  await connectToDatabase();
+
+  const documents = await ProjectModel.find({
+    status: "published",
+    deletedAt: null,
+  })
+    .sort({ publishedAt: -1 })
+    .lean();
+
+  return documents.map((doc) => ({
+    id: String(doc._id),
+    title: doc.title,
+    slug: doc.slug,
+    subtitle: doc.subtitle,
+    category: doc.categories[0] || "Project",
+    image: doc.heroImage?.url || "",
+    featured: doc.featured,
+  }));
+}
+
+export async function getRelatedProjects(
+  currentSlug: string,
+  categories: string[],
+  limit = 3,
+): Promise<ProjectListItem[]> {
+  await connectToDatabase();
+
+  const documents = await ProjectModel.find({
+    status: "published",
+    deletedAt: null,
+    slug: { $ne: currentSlug },
+    ...(categories.length > 0 ? { categories: { $in: categories } } : {}),
+  })
+    .sort({ publishedAt: -1 })
+    .limit(limit)
+    .lean();
+
+  // If not enough related by category, fill with other published projects
+  if (documents.length < limit) {
+    const slugs = new Set([currentSlug, ...documents.map((d) => d.slug)]);
+    const fillers = await ProjectModel.find({
+      status: "published",
+      deletedAt: null,
+      slug: { $nin: Array.from(slugs) },
+    })
+      .sort({ publishedAt: -1 })
+      .limit(limit - documents.length)
+      .lean();
+    documents.push(...fillers);
+  }
+
+  return documents.map((doc) => ({
+    id: String(doc._id),
+    title: doc.title,
+    slug: doc.slug,
+    subtitle: doc.subtitle,
+    client: doc.client,
+    location: doc.location,
+    categories: doc.categories,
+    projectStatus: doc.projectStatus,
+    status: doc.status,
+    featured: doc.featured,
+    createdAt: doc.createdAt.toISOString(),
+    updatedAt: doc.updatedAt.toISOString(),
+    publishedAt: doc.publishedAt ? doc.publishedAt.toISOString() : null,
+    heroImage: doc.heroImage,
+    deletedAt: null,
+  }));
+}

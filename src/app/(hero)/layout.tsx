@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { PageHeader } from "@/components/layout/site-header";
+import { SiteHeader } from "@/components/layout/site-header";
 
-export default function SiteLayout({ children }: { children: ReactNode }) {
+export default function HeroLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <PageHeader />
+      <SiteHeader variant="hero" />
       {children}
       <SiteFooter />
     </>

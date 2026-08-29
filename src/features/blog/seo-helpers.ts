@@ -61,7 +61,7 @@ export function generateBlogPostMetadata(
     openGraph: {
       title: metaTitle,
       description: metaDescription,
-      url: `${siteUrl}/blog/${post.slug}`,
+      url: `${siteUrl}/blogs/${post.slug}`,
       siteName: "Lighthouse",
       images: [
         {
@@ -88,7 +88,7 @@ export function generateBlogPostMetadata(
       ...post.tags,
     ],
     alternates: {
-      canonical: `${siteUrl}/blog/${post.slug}`,
+      canonical: `${siteUrl}/blogs/${post.slug}`,
     },
   };
 }
@@ -137,6 +137,6 @@ export function generateBlogPostJsonLd(
     ].join(", "),
     articleSection: post.tags[0] || "Blog",
     wordCount: calculateReadingTime(post.content) * 200, // Approximate
-    url: `${siteUrl}/blog/${post.slug}`,
+    url: `${siteUrl}/blogs/${post.slug}`,
   };
 }

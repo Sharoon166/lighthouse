@@ -2,7 +2,7 @@
 
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
@@ -50,6 +50,7 @@ export function BlogGrid({ initialData, tags, featuredPost }: BlogGridProps) {
   const [data, setData] = useState<BlogPostListResult>(initialData);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -60,7 +61,8 @@ export function BlogGrid({ initialData, tags, featuredPost }: BlogGridProps) {
   }, [search]);
 
   useEffect(() => {
-    if (page === 1 && !debouncedSearch && !activeTag) {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
       return;
     }
 

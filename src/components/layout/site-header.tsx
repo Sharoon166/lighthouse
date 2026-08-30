@@ -2,6 +2,7 @@
 
 import {
   Cancel01Icon,
+  Idea01Icon,
   Menu01Icon,
   Search01Icon,
   ShoppingBag02Icon,
@@ -14,13 +15,16 @@ import { useEffect, useState } from "react";
 import LogoImage from "@/components/shared/logo-img";
 import { cn } from "@/lib/utils";
 
+const IS_PHASE_2 = false;
+
 const NAV_LINKS = [
   { href: "/products", label: "Products" },
   { href: "/projects", label: "Projects" },
   { href: "/blogs", label: "Blog" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
-  { href: "/sale", label: "Sale" },
+  // { href: "/sale", label: "Sale" },
+  { href: "/opple", label: "Opple" },
 ];
 
 interface SiteHeaderProps {
@@ -43,6 +47,18 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
+
+  // Close mobile menu if window is resized past the md breakpoint
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setMobileOpen(false);
+        document.body.style.overflow = "";
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
@@ -109,6 +125,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               isHero
                 ? "text-background hover:text-foreground"
                 : "text-foreground",
+              !IS_PHASE_2 && "hidden",
             )}
           >
             <HugeiconsIcon icon={Search01Icon} size={18} />
@@ -121,6 +138,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               isHero
                 ? "text-background hover:text-foreground"
                 : "text-foreground",
+              !IS_PHASE_2 && "hidden",
             )}
           >
             <HugeiconsIcon icon={ShoppingBag02Icon} size={18} />
@@ -136,6 +154,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               isHero
                 ? "text-background hover:text-foreground"
                 : "text-foreground",
+              !IS_PHASE_2 && "hidden",
             )}
           >
             <HugeiconsIcon icon={UserIcon} size={18} />
@@ -175,7 +194,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
       >
         <div className="flex flex-col justify-between h-full max-w-md mx-auto w-full">
           {/* Integrated Search */}
-          <div className="relative mb-6">
+          <div className={cn("relative mb-6", !IS_PHASE_2 && "hidden")}>
             <input
               type="text"
               placeholder="Search..."
@@ -196,19 +215,22 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 href={href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center justify-between rounded-2xl px-5 py-3 text-xl font-medium transition-all",
+                  "flex items-center gap-2 rounded-2xl px-5 py-3 text-xl font-medium transition-all",
                   isActive(href)
-                    ? "text-secondary text-3xl"
+                    ? "text-secondary text-3xl font-bold"
                     : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
                 )}
               >
                 <span>{label}</span>
+                {isActive(href) && (
+                  <HugeiconsIcon icon={Idea01Icon} size={30} className="text-gold" />
+                )}
               </Link>
             ))}
           </nav>
 
           {/* Bottom CTA Row */}
-          <div className="pt-6 border-t border-border/40 grid grid-cols-2 gap-3 mt-auto">
+          <div className={cn("pt-6 border-t border-border/40 grid grid-cols-2 gap-3 mt-auto", !IS_PHASE_2 && "hidden")}>
             <Link
               href="/cart"
               onClick={() => setMobileOpen(false)}

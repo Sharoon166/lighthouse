@@ -54,9 +54,9 @@ export default function AboutPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="border-y border-border">
+      <section>
         <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border">
             <For each={aboutStats} by={(stat) => stat.label}>
               {({ value, label }) => (
                 <div className="py-10 px-6 text-center space-y-2">
@@ -74,7 +74,9 @@ export default function AboutPage() {
       </section>
 
       {/* How We Work */}
-      <section className="container">
+      <section className="bg-muted">
+        <div className="container">
+        
         <div className="max-w-3xl space-y-3 mb-12">
           <h2>How We Work</h2>
           <p>
@@ -99,6 +101,7 @@ export default function AboutPage() {
               </div>
             )}
           </For>
+          </div>
         </div>
       </section>
 
@@ -108,33 +111,40 @@ export default function AboutPage() {
       </section>
 
       {/* Our Team */}
-      <section className="container">
-        <div className="max-w-3xl space-y-3 mb-12">
-          <h2>Our Team</h2>
-          <p>
-            A team of lighting enthusiasts, designers, and experts dedicated to
-            helping you create spaces that shine.
-          </p>
-        </div>
+      <section className="bg-muted">
+        <div className="container">
+          <div className="max-w-3xl space-y-3 mb-12">
+            <h2>Our Team</h2>
+            <p>
+              A team of lighting enthusiasts, designers, and experts dedicated
+              to helping you create spaces that shine.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          <For each={teamMembers} by={(member) => member.name}>
-            {({ name, role, image }) => (
-              <div className="space-y-3">
-                <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-                  <Image src={image} alt={name} fill className="object-cover" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <For each={teamMembers} by={(member) => member.name}>
+              {({ name, role, image }) => (
+                <div className="space-y-3">
+                  <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+                    <Image
+                      src={image}
+                      alt={name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="font-heading font-semibold text-primary-foreground">
+                      {name}
+                    </p>
+                    <p className="text-xs tracking-widest text-gold uppercase">
+                      {role}
+                    </p>
+                  </div>
                 </div>
-                <div className="space-y-1">
-                  <p className="font-heading font-semibold text-primary-foreground">
-                    {name}
-                  </p>
-                  <p className="text-xs tracking-widest text-gold uppercase">
-                    {role}
-                  </p>
-                </div>
-              </div>
-            )}
-          </For>
+              )}
+            </For>
+          </div>
         </div>
       </section>
 

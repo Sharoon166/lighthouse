@@ -19,7 +19,7 @@ export function ShowroomTabs() {
             className={cn(
               "rounded-full border px-5 py-2 text-sm font-medium transition-colors",
               activeId === room.id
-                ? "border-primary bg-primary text-primary-foreground"
+                ? "border-primary bg-secondary text-secondary-foreground"
                 : "border-border text-foreground hover:bg-muted",
             )}
           >
@@ -28,7 +28,7 @@ export function ShowroomTabs() {
         ))}
       </div>
 
-      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-border bg-muted">
+      <div className="relative h-96 w-full overflow-hidden rounded-lg border border-border bg-muted">
         <iframe
           src={active.embedUrl}
           className="absolute inset-0 h-full w-full border-0"

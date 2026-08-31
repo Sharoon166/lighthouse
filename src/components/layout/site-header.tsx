@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import LogoImage from "@/components/shared/logo-img";
 import { cn } from "@/lib/utils";
 
-const IS_PHASE_2 = false;
+const IS_PHASE_2 = true;
 
 const NAV_LINKS = [
   { href: "/products", label: "Products" },

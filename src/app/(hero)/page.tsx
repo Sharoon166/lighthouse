@@ -1,14 +1,19 @@
 import {
   ArrowRight02Icon,
   ArrowUpRight01FreeIcons,
-  PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import HeroImage from "@/assets/hero-img.png";
+import { CTA } from "@/components/hero/cta";
+import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
+import { BlogCard } from "@/components/shared/blog-card";
+import { Clients } from "@/components/shared/clients";
 import { Marquee } from "@/components/shared/marquee";
+import { Partners } from "@/components/shared/partners";
 import { SectionHeader } from "@/components/shared/section-header";
+import { ProductCard } from "@/components/shop/product-card";
 import { Button } from "@/components/ui/button";
 import { For } from "@/components/utils/for";
 import {
@@ -19,11 +24,6 @@ import {
   marqueeText,
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
-import { BlogCard } from "@/components/shared/blog-card";
-import { Clients } from "@/components/shared/clients";
-import { Partners } from "@/components/shared/partners";
-import { CTA } from "@/components/hero/cta";
 
 export default function Home() {
   return (
@@ -49,18 +49,18 @@ export default function Home() {
             </p>
           </div>
 
-          <Button size="lg" className="group py-7 font-bold">
+          <Button size="lg" className="group py-8 gap-4 font-bold">
             Shop Collection
             <HugeiconsIcon
               icon={ArrowUpRight01FreeIcons}
-              className="bg-primary-foreground text-primary p-1 rounded-full size-7 group-hover:rotate-45 transition-transform"
+              className="bg-primary-foreground text-primary p-1 rounded-full size-8 group-hover:rotate-45 transition-transform"
             />
           </Button>
         </div>
       </section>
       <Marquee duration="10s" className="bg-gray-900 text-gold py-4">
         <For each={marqueeText}>
-          {(text, index) => (
+          {(text) => (
             <>
               <span>{text}</span>✦
             </>
@@ -84,7 +84,7 @@ export default function Home() {
                     "p-6 min-h-80 bg-contain relative overflow-hidden",
                     {
                       "row-span-1 col-span-12 md:col-span-6 lg:col-span-8":
-                        index == 0,
+                        index === 0,
                       "lg:row-span-2 col-span-12 md:col-span-6 lg:col-span-4":
                         index === 1,
                       "row-span-1 col-span-12 md:col-span-6 lg:col-span-4":
@@ -122,26 +122,16 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <For each={dummyProducts} by={(product) => product.id}>
               {({ id, title, price }, index) => (
-                <Link href="#" className="border">
-                  <Image
-                    src={`/products/${index + 1}.png`}
-                    width={1024}
-                    height={1024}
-                    alt={id}
-                    className="h-80 aspect-square -z-10 object-contain bg-muted"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-xl font-sans">{title}</h3>
-                    <div className="flex items-center justify-between">
-                      <p className="text-muted-foreground font-semibold uppercase font-heading">
-                        {price}
-                      </p>
-                      <Button variant="secondary" className="rounded-full">
-                        <HugeiconsIcon icon={PlusSignIcon} />
-                      </Button>
-                    </div>
-                  </div>
-                </Link>
+                <ProductCard
+                  key={id}
+                  product={{
+                    id,
+                    name: title,
+                    slug: id,
+                    price,
+                    image: `/products/${index + 1}.png`,
+                  }}
+                />
               )}
             </For>
           </div>
@@ -161,7 +151,7 @@ export default function Home() {
           </p>
 
           <Button size="lg" className="mt-2">
-            Learn More <HugeiconsIcon icon={ArrowRight02Icon} />
+            Learn More <HugeiconsIcon icon={ArrowRight02Icon} className="size-6" />
           </Button>
         </div>
 

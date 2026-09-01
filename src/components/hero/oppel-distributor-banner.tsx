@@ -44,7 +44,7 @@ export function OppelDistributorBanner() {
               View Opple Collection{" "}
               <HugeiconsIcon
                 icon={ArrowRight02Icon}
-                className="group-hover:translate-x-1.5 transition-transform"
+                className="group-hover:translate-x-1.5 transition-transform size-6"
               />
             </Button>
           </div>

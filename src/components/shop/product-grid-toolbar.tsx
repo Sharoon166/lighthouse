@@ -1,20 +1,22 @@
 "use client";
 
-import { PlusSignIcon, Search01Icon } from "@hugeicons/core-free-icons";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import Image from "next/image";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import type { ShopProductItem } from "@/lib/shop-data";
 import { formatCurrency } from "@/lib/format";
+import type { ShopProductItem } from "@/lib/shop-data";
+import { ProductCard } from "./product-card";
 
 interface ProductGridToolbarProps {
   products: ShopProductItem[];
   total: number;
 }
 
-export function ProductGridToolbar({ products, total }: ProductGridToolbarProps) {
+export function ProductGridToolbar({
+  products,
+  total,
+}: ProductGridToolbarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -44,7 +46,10 @@ export function ProductGridToolbar({ products, total }: ProductGridToolbarProps)
       {/* Top bar: Search input + Stats counter + Sort dropdown */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border-b border-border pb-4">
         {/* Search bar */}
-        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-md">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="relative flex-1 max-w-md"
+        >
           <input
             type="text"
             value={searchVal}
@@ -61,7 +66,9 @@ export function ProductGridToolbar({ products, total }: ProductGridToolbarProps)
 
         {/* Counter and Sort */}
         <div className="flex items-center justify-between md:justify-end gap-4 text-xs text-muted-foreground">
-          <span>{total} products | Page 1 of {Math.max(1, Math.ceil(total / 12))}</span>
+          <span>
+            {total} products | Page 1 of {Math.max(1, Math.ceil(total / 12))}
+          </span>
           <select
             onChange={handleSortChange}
             defaultValue={searchParams.get("sort") || "featured"}
@@ -79,41 +86,16 @@ export function ProductGridToolbar({ products, total }: ProductGridToolbarProps)
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
-            <div
+            <ProductCard
               key={product.id}
-              className="group flex flex-col justify-between rounded border border-border/80 bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
-            >
-              <Link href={`/products/${product.slug}`} className="block relative aspect-square bg-muted/30 overflow-hidden">
-                <Image
-                  src={product.images[0] || "/products/1.png"}
-                  alt={product.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  className="object-contain p-6 transition-transform duration-500 group-hover:scale-105"
-                />
-              </Link>
-
-              <div className="p-4 space-y-3 bg-card border-t border-border/40">
-                <Link href={`/products/${product.slug}`}>
-                  <h4 className="font-heading font-medium text-base text-foreground group-hover:text-gold transition-colors line-clamp-1">
-                    {product.name}
-                  </h4>
-                </Link>
-
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-sm text-foreground">
-                    {formatCurrency(product.price)}
-                  </span>
-                  <button
-                    type="button"
-                    aria-label={`Add ${product.name} to cart`}
-                    className="flex size-8 items-center justify-center rounded-full bg-slate-900 text-white transition-colors hover:bg-gold hover:text-slate-950"
-                  >
-                    <HugeiconsIcon icon={PlusSignIcon} size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
+              product={{
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                price: formatCurrency(product.price),
+                image: product.images[0] || "/products/1.png",
+              }}
+            />
           ))}
         </div>
       ) : (

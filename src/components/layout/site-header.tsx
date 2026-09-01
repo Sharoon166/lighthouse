@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import LogoImage from "@/components/shared/logo-img";
 import { cn } from "@/lib/utils";
 
-const IS_PHASE_2 = true;
+const IS_PHASE_2 = false;
 
 const NAV_LINKS = [
   { href: "/products", label: "Products" },
@@ -111,12 +111,37 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         {/* Right actions — desktop */}
         <div
           className={cn(
-            "hidden items-center gap-1 rounded-full px-2 py-1 md:flex",
+            "hidden items-center gap-1 rounded-full md:flex",
             isHero
               ? "border border-border/40 bg-muted/10"
               : "border border-border bg-muted/40",
           )}
         >
+          {/* Search bar — Phase 1 */}
+          {!IS_PHASE_2 && (
+            <div
+              className={cn(
+                "flex items-center  rounded-full px-2",
+                isHero
+                  ? "bg-background/10 text-background"
+                  : "bg-muted text-foreground",
+              )}
+            >
+              <HugeiconsIcon icon={Search01Icon} size={18} />
+              <input
+                type="text"
+                placeholder="Search...."
+                className={cn(
+                  "w-40 bg-transparent text-sm outline-none placeholder:text-current/50 px-4 pl-2 py-2",
+                  isHero
+                    ? "text-background placeholder:text-background/50"
+                    : "text-foreground placeholder:text-foreground/50",
+                )}
+              />
+            </div>
+          )}
+
+          {/* Search button — Phase 2 */}
           <button
             type="button"
             aria-label="Search"
@@ -194,17 +219,15 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
       >
         <div className="flex flex-col justify-between h-full max-w-md mx-auto w-full">
           {/* Integrated Search */}
-          <div className={cn("relative mb-6", !IS_PHASE_2 && "hidden")}>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full rounded-full border border-border/60 bg-muted/40 px-10 py-2.5 text-sm outline-none focus:border-primary transition-colors"
-            />
-            <HugeiconsIcon
-              icon={Search01Icon}
-              size={18}
-              className="absolute left-3.5 top-3 text-muted-foreground"
-            />
+          <div className="relative mb-6">
+            <div className="flex items-center gap-2 rounded-full bg-muted/40 px-4 py-2.5">
+              <HugeiconsIcon icon={Search01Icon} size={18} className="text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search...."
+                className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              />
+            </div>
           </div>
 
           {/* Navigation Links */}

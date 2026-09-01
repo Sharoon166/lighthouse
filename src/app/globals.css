@@ -192,13 +192,13 @@
     --sidebar-ring: oklch(0.6 0.2 264);
 }
 
-@utility container{
+@utility container {
     margin-inline: auto;
     padding-inline: 1rem;
 }
 
-@utility bg-noise{
-    background-image: url('/noise-bg.png');
+@utility bg-noise {
+    background-image: url("/noise-bg.png");
     background-size: cover;
 }
 
@@ -223,7 +223,7 @@
 
     h1 {
         @apply text-6xl;
-        font-size: clamp(45px, 5vw, 64px);
+        font-size: clamp(70px, 5vw, 60px);
     }
 
     p {
@@ -231,11 +231,12 @@
     }
 
     section {
-        @apply py-8;
+        @apply py-18;
         & + section {
             @apply mb-32;
         }
     }
+    
     button:not(:disabled),
     [role="button"]:not(:disabled) {
         cursor: pointer;
@@ -282,8 +283,8 @@
     animation: glance-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@layer components {    
-    .heading-underline{
+@layer components {
+    .heading-underline {
         position: relative;
         padding-bottom: 20px;
     }
@@ -294,7 +295,7 @@
         left: 0;
         height: 4px;
         width: 70%;
-        background: var(--gold)
+        background: var(--gold);
     }
 
     .blog-prose {

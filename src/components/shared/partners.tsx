@@ -10,7 +10,7 @@ export function Partners() {
         description="We work directly with globally recognized manufacturers, so every fixture we sell is backed by proven engineering, not just looks."
         noCta
       />
-      <div className="flex items-center max-md:justify-center flex-wrap gap-x-18">
+      <div className="flex items-center max-md:justify-center flex-wrap gap-x-18 gay-y-10">
         <For each={partners} by={(partner) => partner.id}>
           {({ id, name, imageURL }) => (
             <img

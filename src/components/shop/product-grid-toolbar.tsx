@@ -81,7 +81,7 @@ export function ProductGridToolbar({ products, total }: ProductGridToolbarProps)
           {products.map((product) => (
             <div
               key={product.id}
-              className="group flex flex-col justify-between rounded-xl border border-border/80 bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+              className="group flex flex-col justify-between rounded border border-border/80 bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
             >
               <Link href={`/products/${product.slug}`} className="block relative aspect-square bg-muted/30 overflow-hidden">
                 <Image

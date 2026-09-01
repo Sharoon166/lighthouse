@@ -28,20 +28,20 @@ import { CTA } from "@/components/hero/cta";
 export default function Home() {
   return (
     <main>
-      <section className="relative h-[90dvh] overflow-hidden flex justify-center items-center px-6">
+      <section className="relative h-[95dvh] overflow-hidden flex justify-center items-center px-6">
         <Image
           src={HeroImage}
           alt="hero image"
           priority
           className="absolute top-0 right-0 -z-10 h-full w-full object-cover"
         />
-        <div className="space-y-8">
-          <div className="lg:w-1/2 space-y-4">
-            <h1 className="text-balance">
+        <div className="space-y-8 container">
+          <div className="lg:w-[65%] space-y-4">
+            <h1 className="text-pretty max-sm:text-5xl">
               A house is only as warm as its{" "}
               <span className="text-gold">light</span>
             </h1>
-            <p>
+            <p className="lg:text-lg">
               Pendants, chandeliers, and architectural fixtures for homes and
               commercial spaces across Pakistan. Chosen for how a room feels
               once the switch is on, not just how the fixture looks when
@@ -49,7 +49,7 @@ export default function Home() {
             </p>
           </div>
 
-          <Button size="lg" className="group">
+          <Button size="lg" className="group py-7 font-bold">
             Shop Collection
             <HugeiconsIcon
               icon={ArrowUpRight01FreeIcons}
@@ -104,7 +104,7 @@ export default function Home() {
                     width={1024}
                     height={1024}
                     alt={id}
-                    className="absolute top-0 right-0 w-full h-full -z-10 object-cover"
+                    className="absolute top-0 right-0 w-full h-full -z-10 object-cover brightness-170"
                   />
                 </Link>
               )}
@@ -124,19 +124,19 @@ export default function Home() {
               {({ id, title, price }, index) => (
                 <Link href="#" className="border">
                   <Image
-                    src={`/products/${index+1}.png`}
+                    src={`/products/${index + 1}.png`}
                     width={1024}
                     height={1024}
                     alt={id}
-                    className="w-full h-80 -z-10 object-contain bg-muted"
+                    className="h-80 aspect-square -z-10 object-contain bg-muted"
                   />
                   <div className="p-4">
-                    <h3 className="text-xl">{title}</h3>
+                    <h3 className="text-xl font-sans">{title}</h3>
                     <div className="flex items-center justify-between">
-                      <p className="text-gold uppercase tracking-widest">
+                      <p className="text-muted-foreground font-semibold uppercase font-heading">
                         {price}
                       </p>
-                      <Button variant="secondary">
+                      <Button variant="secondary" className="rounded-full">
                         <HugeiconsIcon icon={PlusSignIcon} />
                       </Button>
                     </div>
@@ -148,10 +148,11 @@ export default function Home() {
         </section>
       </div>
 
-      <section className="bg-noise py-0  flex max-lg:flex-col items-center justify-between overflow-x-hidden">
-        <div className="container max-lg:pt-10 lg:ml-28">
+      <section className="bg-noise pb-0 lg:pt-0 grid lg:grid-cols-5 place-items-center overflow-hidden">
+        <div className="container max-lg:pt-10 lg:ml-28 space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10">
           <h2 className="text-primary">About Lighthouse</h2>
-          <p className="max-w-2xl text-wrap">
+
+          <p className="max-w-2xl">
             For years, Light House has helped homeowners, architects, and
             businesses create warm, inviting spaces. We carefully source premium
             lighting that blends quality, performance, and timeless design. Our
@@ -159,23 +160,30 @@ export default function Home() {
             of every room.
           </p>
 
-          <Button size="lg" className="mt-6">
+          <Button size="lg" className="mt-2">
             Learn More <HugeiconsIcon icon={ArrowRight02Icon} />
           </Button>
         </div>
 
         <Image
-          src={"/about-image.png"}
+          src="/about-image.png"
           width={1024}
           height={1024}
           priority
           alt=""
-          className="hover:brightness-125 transition-all"
+          className="
+          w-full
+            lg:col-start-3
+            lg:col-span-5
+            lg:row-start-1
+            hover:brightness-125
+            transition-all
+          "
         />
       </section>
 
-      <div className="container">
-        <section>
+      <section className="bg-muted mb-0">
+        <div className="container">
           <SectionHeader
             title="Lighting That Transforms Every Space"
             description="Explore a selection of residential and commercial projects featuring our premium lighting solutions, designed to enhance ambience, functionality and style."
@@ -203,7 +211,9 @@ export default function Home() {
               )}
             </For>
           </div>
-        </section>
+        </div>
+      </section>
+      <div className="container">
         <Clients />
       </div>
 
@@ -218,14 +228,12 @@ export default function Home() {
           />
           <div className="grid md:grid-cols-3 gap-4">
             <For each={featuredBlogs} by={(blog) => blog.title}>
-              {(blog) => (
-                <BlogCard {...blog} />
-              )}
+              {(blog) => <BlogCard {...blog} />}
             </For>
           </div>
         </div>
       </section>
-      <div className="container">
+      <div className="container space-y-32">
         <Partners />
         <CTA />
       </div>

@@ -18,7 +18,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Show } from "@/components/utils/show";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -92,7 +91,7 @@ export function SidebarNav({
           collapsed ? "flex-col gap-5" : "justify-between px-2",
         )}
       >
-        <Show when={!collapsed}>
+        {!collapsed && (
           <Link
             href="/admin"
             onClick={onNavigate}
@@ -101,7 +100,7 @@ export function SidebarNav({
           >
             Lighthouse
           </Link>
-        </Show>
+        )}
         {onToggleCollapse && (
           <button
             type="button"

@@ -2,7 +2,6 @@ import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type React from "react";
 import { cn } from "@/lib/utils";
-import { Show } from "../utils/show";
 
 interface SectionHeaderProps {
   title: string;
@@ -43,7 +42,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
       </div>
 
       {/* Right Column: CTA Anchor Link */}
-      <Show when={!noCta}>
+      {!noCta && (
         <div className="shrink-0 pb-1">
           <a
             href={ctaHref}
@@ -57,7 +56,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
             />
           </a>
         </div>
-      </Show>
+      )}
     </header>
   );
 };

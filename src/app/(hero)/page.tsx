@@ -15,7 +15,6 @@ import { Partners } from "@/components/shared/partners";
 import { SectionHeader } from "@/components/shared/section-header";
 import { ProductCard } from "@/components/shop/product-card";
 import { Button } from "@/components/ui/button";
-import { For } from "@/components/utils/for";
 import {
   dummyCategories,
   dummyProducts,
@@ -59,13 +58,9 @@ export default function Home() {
         </div>
       </section>
       <Marquee duration="10s" className="bg-gray-900 text-gold py-4">
-        <For each={marqueeText}>
-          {(text) => (
-            <>
-              <span>{text}</span>✦
-            </>
-          )}
-        </For>
+        {marqueeText.map((text) => (
+          <span key={text}>{text}✦</span>
+        ))}
       </Marquee>
 
       <div className="container">
@@ -76,39 +71,38 @@ export default function Home() {
           />
 
           <div className="grid grid-cols-12 gap-4">
-            <For each={dummyCategories} by={(category) => category.id}>
-              {({ id, title, items }, index) => (
-                <Link
-                  href="#"
-                  className={cn(
-                    "p-6 min-h-80 bg-contain relative overflow-hidden",
-                    {
-                      "row-span-1 col-span-12 md:col-span-6 lg:col-span-8":
-                        index === 0,
-                      "lg:row-span-2 col-span-12 md:col-span-6 lg:col-span-4":
-                        index === 1,
-                      "row-span-1 col-span-12 md:col-span-6 lg:col-span-4":
-                        index === 2 || index === 3,
-                    },
-                  )}
-                >
-                  <h3 className="text-primary text-xl font-normal tracking-tight">
-                    {title}
-                  </h3>
-                  <p className="text-gold uppercase tracking-widest">
-                    {items} Designs
-                  </p>
+            {dummyCategories.map((category, index) => (
+              <Link
+                key={category.id}
+                href="#"
+                className={cn(
+                  "p-6 min-h-80 bg-contain relative overflow-hidden",
+                  {
+                    "row-span-1 col-span-12 md:col-span-6 lg:col-span-8":
+                      index === 0,
+                    "lg:row-span-2 col-span-12 md:col-span-6 lg:col-span-4":
+                      index === 1,
+                    "row-span-1 col-span-12 md:col-span-6 lg:col-span-4":
+                      index === 2 || index === 3,
+                  },
+                )}
+              >
+                <h3 className="text-primary text-xl font-normal tracking-tight">
+                  {category.title}
+                </h3>
+                <p className="text-gold uppercase tracking-widest">
+                  {category.items} Designs
+                </p>
 
-                  <Image
-                    src={`/${id}.png`}
-                    width={1024}
-                    height={1024}
-                    alt={id}
-                    className="absolute top-0 right-0 w-full h-full -z-10 object-cover brightness-170"
-                  />
-                </Link>
-              )}
-            </For>
+                <Image
+                  src={`/${category.id}.png`}
+                  width={1024}
+                  height={1024}
+                  alt={category.id}
+                  className="absolute top-0 right-0 w-full h-full -z-10 object-cover brightness-170"
+                />
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -120,20 +114,18 @@ export default function Home() {
           />
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            <For each={dummyProducts} by={(product) => product.id}>
-              {({ id, title, price }, index) => (
-                <ProductCard
-                  key={id}
-                  product={{
-                    id,
-                    name: title,
-                    slug: id,
-                    price,
-                    image: `/products/${index + 1}.png`,
-                  }}
-                />
-              )}
-            </For>
+            {dummyProducts.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                product={{
+                  id: product.id,
+                  name: product.title,
+                  slug: product.id,
+                  price: product.price,
+                  image: `/products/${index + 1}.png`,
+                }}
+              />
+            ))}
           </div>
         </section>
       </div>
@@ -180,26 +172,25 @@ export default function Home() {
             ctaText="View all Projects"
           />
           <div className="grid grid-cols-3 gap-4">
-            <For each={dummyProjects} by={(project) => project.id}>
-              {({ title, subtitle, link, image }, index) => (
-                <Link
-                  href={link}
-                  style={{ backgroundImage: `url(${image})` }}
-                  className={cn(
-                    `border min-h-72 p-4 bg-cover max-md:col-span-3 place-content-end`,
-                    {
-                      "md:col-span-2 md:row-span-2": index === 0,
-                    },
-                  )}
-                >
-                  <h3 className="text-xl text-primary">{title}</h3>
-                  <div className="flex items-center gap-4 text-gold">
-                    <p>{subtitle}</p>
-                    <HugeiconsIcon icon={ArrowRight02Icon} />
-                  </div>
-                </Link>
-              )}
-            </For>
+            {dummyProjects.map((project, index) => (
+              <Link
+                key={project.id}
+                href={project.link}
+                style={{ backgroundImage: `url(${project.image})` }}
+                className={cn(
+                  `border min-h-72 p-4 bg-cover max-md:col-span-3 place-content-end`,
+                  {
+                    "md:col-span-2 md:row-span-2": index === 0,
+                  },
+                )}
+              >
+                <h3 className="text-xl text-primary">{project.title}</h3>
+                <div className="flex items-center gap-4 text-gold">
+                  <p>{project.subtitle}</p>
+                  <HugeiconsIcon icon={ArrowRight02Icon} />
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -217,9 +208,9 @@ export default function Home() {
             ctaText="View All Articles"
           />
           <div className="grid md:grid-cols-3 gap-4">
-            <For each={featuredBlogs} by={(blog) => blog.title}>
-              {(blog) => <BlogCard {...blog} />}
-            </For>
+            {featuredBlogs.map((blog) => (
+              <BlogCard key={blog.title} {...blog} />
+            ))}
           </div>
         </div>
       </section>

@@ -1,5 +1,4 @@
 import { SectionHeader } from "@/components/shared/section-header";
-import { For } from "@/components/utils/for";
 import { clients } from "@/lib/constants";
 
 export function Clients() {
@@ -11,17 +10,16 @@ export function Clients() {
         noCta
       />
       <div className="flex items-center max-md:justify-center flex-wrap gap-x-18 gap-y-10">
-        <For each={clients} by={(client) => client.id}>
-          {({ id, name, imageURL }) => (
-            <img
-              src={imageURL}
-              alt={name}
-              className="size-32"
-              title={name}
-              suppressHydrationWarning
-            />
-          )}
-        </For>
+        {clients.map((client) => (
+          <img
+            key={client.id}
+            src={client.imageURL}
+            alt={client.name}
+            className="size-32"
+            title={client.name}
+            suppressHydrationWarning
+          />
+        ))}
       </div>
     </section>
   );

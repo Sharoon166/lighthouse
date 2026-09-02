@@ -16,14 +16,14 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { EditorContent, type JSONContent, useEditor } from "@tiptap/react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { uploadInlineImage } from "@/features/blog/actions";
 import { cn } from "@/lib/utils";
 import {
   createTiptapExtensions,
   tiptapContentClassName,
 } from "./rich-text-constants";
-import { uploadInlineImage } from "@/features/blog/actions";
 
 interface RichTextEditorProps {
   value?: JSONContent | null;
@@ -159,9 +159,14 @@ export function RichTextEditor({
 
       try {
         // Optimize image before uploading
-        const { optimizeImage, IMAGE_OPTIMIZATION_PRESETS } = await import("@/lib/image-optimizer");
-        const optimizedBlob = await optimizeImage(file, IMAGE_OPTIMIZATION_PRESETS.blogInline);
-        
+        const { optimizeImage, IMAGE_OPTIMIZATION_PRESETS } = await import(
+          "@/lib/image-optimizer"
+        );
+        const optimizedBlob = await optimizeImage(
+          file,
+          IMAGE_OPTIMIZATION_PRESETS.blogInline,
+        );
+
         // Convert back to File for upload
         const optimizedFile = new File([optimizedBlob], file.name, {
           type: optimizedBlob.type,
@@ -183,18 +188,15 @@ export function RichTextEditor({
               })
               .run();
           } else {
-            editor
-              .chain()
-              .focus()
-              .setImage({ src: result.url })
-              .run();
+            editor.chain().focus().setImage({ src: result.url }).run();
           }
         } else {
           alert(result.message || "Failed to upload image");
         }
       } catch (error) {
         console.error("Image upload error:", error);
-        const message = error instanceof Error ? error.message : "Failed to upload image";
+        const message =
+          error instanceof Error ? error.message : "Failed to upload image";
         alert(`${message}. Please try again.`);
       } finally {
         setIsUploading(false);

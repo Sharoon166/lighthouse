@@ -143,7 +143,8 @@ export default function Home() {
           </p>
 
           <Button size="lg" className="mt-2">
-            Learn More <HugeiconsIcon icon={ArrowRight02Icon} className="size-6" />
+            Learn More{" "}
+            <HugeiconsIcon icon={ArrowRight02Icon} className="size-6" />
           </Button>
         </div>
 

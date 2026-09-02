@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-
-import { ProductForm } from "@/features/shop/components/product-form";
-import { getAllCategoriesAdmin } from "@/features/shop/actions/category-actions";
 import { getAllBrands } from "@/features/shop/actions/brand-actions";
+import { getAllCategoriesAdmin } from "@/features/shop/actions/category-actions";
+import { ProductForm } from "@/features/shop/components/product-form";
 
 export const metadata: Metadata = {
   title: "New product · Lighthouse",

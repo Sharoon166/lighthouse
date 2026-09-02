@@ -16,19 +16,19 @@ import {
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
-import { Dialog } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 import {
+  type AttributeDefinition,
   type AttributeDefinitionListItem,
   type AttributeDefinitionListResult,
-  type AttributeDefinition,
   deactivateAttributeDefinition,
   deleteAttributeDefinition,
   getAttributeDefinitionById,
@@ -89,7 +89,8 @@ function AttributeTable({
         header: "Options",
         cell: (info) => {
           const opts = info.getValue();
-          if (!opts.length) return <span className="text-muted-foreground">—</span>;
+          if (!opts.length)
+            return <span className="text-muted-foreground">—</span>;
           return (
             <div className="flex flex-wrap gap-1">
               {opts.slice(0, 3).map((o, i) => (
@@ -253,13 +254,19 @@ function SkeletonTable() {
   );
 }
 
-export function AttributesManager({ initialData }: { initialData?: AttributeDefinitionListResult }) {
+export function AttributesManager({
+  initialData,
+}: {
+  initialData?: AttributeDefinitionListResult;
+}) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [data, setData] = useState<AttributeDefinitionListResult | null>(initialData ?? null);
+  const [data, setData] = useState<AttributeDefinitionListResult | null>(
+    initialData ?? null,
+  );
   const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -268,7 +275,8 @@ export function AttributesManager({ initialData }: { initialData?: AttributeDefi
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
-  const [editingAttribute, setEditingAttribute] = useState<AttributeDefinition | null>(null);
+  const [editingAttribute, setEditingAttribute] =
+    useState<AttributeDefinition | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -330,7 +338,9 @@ export function AttributesManager({ initialData }: { initialData?: AttributeDefi
   const openEditDialog = async (attribute: AttributeDefinitionListItem) => {
     const raw = await getAttributeDefinitionById(attribute.id);
     if (!raw) return;
-    const serialized = JSON.parse(JSON.stringify(raw)) as AttributeDefinition & { _id: string };
+    const serialized = JSON.parse(
+      JSON.stringify(raw),
+    ) as AttributeDefinition & { _id: string };
     setDialogMode("edit");
     setEditingAttribute({ ...serialized, id: serialized._id });
     setDialogOpen(true);

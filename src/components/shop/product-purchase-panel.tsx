@@ -11,8 +11,8 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
-import type { ShopProductItem } from "@/lib/shop-data";
 import { formatCurrency } from "@/lib/format";
+import type { ShopProductItem } from "@/lib/shop-data";
 
 interface ProductPurchasePanelProps {
   product: ShopProductItem;
@@ -23,12 +23,14 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
     product.finishes[0]?.name || "Brass",
   );
   const [quantity, setQuantity] = useState(1);
-  const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({
-    materialsAndCare: false,
-    shippingAndReturns: false,
-    payment: false,
-    installationAndBulbs: false,
-  });
+  const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(
+    {
+      materialsAndCare: false,
+      shippingAndReturns: false,
+      payment: false,
+      installationAndBulbs: false,
+    },
+  );
 
   const toggleAccordion = (key: string) => {
     setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -50,7 +52,12 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
       <div className="flex items-center gap-2 text-sm">
         <div className="flex items-center text-amber-500">
           {[...Array(5)].map((_, i) => (
-            <HugeiconsIcon key={i} icon={StarIcon} size={16} className="fill-amber-400 text-amber-400" />
+            <HugeiconsIcon
+              key={i}
+              icon={StarIcon}
+              size={16}
+              className="fill-amber-400 text-amber-400"
+            />
           ))}
         </div>
         <span className="font-semibold text-foreground">
@@ -156,15 +163,27 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
       {/* Value Badges */}
       <div className="space-y-2.5 rounded-xl border border-border/60 bg-muted/20 p-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-2.5">
-          <HugeiconsIcon icon={DeliveryTruck01Icon} size={18} className="text-gold" />
+          <HugeiconsIcon
+            icon={DeliveryTruck01Icon}
+            size={18}
+            className="text-gold"
+          />
           <span>3–5 business days delivery within Karachi & nationwide</span>
         </div>
         <div className="flex items-center gap-2.5">
-          <HugeiconsIcon icon={ArrowReloadVerticalIcon} size={18} className="text-gold" />
+          <HugeiconsIcon
+            icon={ArrowReloadVerticalIcon}
+            size={18}
+            className="text-gold"
+          />
           <span>7 days easy return guarantee</span>
         </div>
         <div className="flex items-center gap-2.5">
-          <HugeiconsIcon icon={CheckmarkBadge01Icon} size={18} className="text-gold" />
+          <HugeiconsIcon
+            icon={CheckmarkBadge01Icon}
+            size={18}
+            className="text-gold"
+          />
           <span>2-year warranty on electrics & internal wiring</span>
         </div>
       </div>

@@ -256,7 +256,7 @@ export function BlogPostDetail({
                             alt={rp.title}
                             width={240}
                             height={140}
-                            className="aspect-[16/9] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="aspect-video w-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
                       )}

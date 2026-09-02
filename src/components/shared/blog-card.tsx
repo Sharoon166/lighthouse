@@ -31,7 +31,10 @@ export function BlogCard({
         <span className="uppercase text-sm font-semibold tracking-[0.2em] text-gold">
           {category}
         </span>
-        <h3 className="mt-3 font-heading text-lg leading-snug line-clamp-2" title={title}>
+        <h3
+          className="mt-3 font-heading text-lg leading-snug line-clamp-2"
+          title={title}
+        >
           {title}
         </h3>
         <p className="mt-3 leading-relaxed text-muted-foreground line-clamp-2">

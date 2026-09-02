@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import {
   Call02Icon,
-  Mail01Icon,
-  MessageCircle,
   Facebook01Icon,
   InstagramIcon,
-  NewTwitterIcon,
   Linkedin01Icon,
+  Mail01Icon,
+  MessageCircle,
+  NewTwitterIcon,
   TiktokIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { contactInfo, socialLinks } from "@/lib/constants";
 
 const socialIconMap: Record<string, typeof Facebook01Icon> = {
@@ -52,15 +52,18 @@ export function ContactForm() {
         <div className="space-y-2">
           <h2>Send us a message</h2>
           <p>
-            Do you have a question? A complaint? Or need help to choose the right
-            product from Light House. Feel free to contact us.
+            Do you have a question? A complaint? Or need help to choose the
+            right product from Light House. Feel free to contact us.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName" className="text-xs tracking-widest uppercase text-muted-foreground">
+              <Label
+                htmlFor="firstName"
+                className="text-xs tracking-widest uppercase text-muted-foreground"
+              >
                 First Name
               </Label>
               <Input
@@ -72,7 +75,10 @@ export function ContactForm() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName" className="text-xs tracking-widest uppercase text-muted-foreground">
+              <Label
+                htmlFor="lastName"
+                className="text-xs tracking-widest uppercase text-muted-foreground"
+              >
                 Last Name
               </Label>
               <Input
@@ -86,7 +92,10 @@ export function ContactForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs tracking-widest uppercase text-muted-foreground">
+            <Label
+              htmlFor="email"
+              className="text-xs tracking-widest uppercase text-muted-foreground"
+            >
               Email Address
             </Label>
             <Input
@@ -100,7 +109,10 @@ export function ContactForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone" className="text-xs tracking-widest uppercase text-muted-foreground">
+            <Label
+              htmlFor="phone"
+              className="text-xs tracking-widest uppercase text-muted-foreground"
+            >
               Phone
             </Label>
             <div className="flex gap-2">
@@ -119,7 +131,10 @@ export function ContactForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="message" className="text-xs tracking-widest uppercase text-muted-foreground">
+            <Label
+              htmlFor="message"
+              className="text-xs tracking-widest uppercase text-muted-foreground"
+            >
               Message
             </Label>
             <Textarea
@@ -149,7 +164,11 @@ export function ContactForm() {
         <div className="space-y-6">
           <div className="flex items-start gap-4">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary-foreground/10">
-              <HugeiconsIcon icon={Call02Icon} size={18} className="text-gold" />
+              <HugeiconsIcon
+                icon={Call02Icon}
+                size={18}
+                className="text-gold"
+              />
             </div>
             <div className="space-y-1">
               <p className="text-xs tracking-widest uppercase text-secondary-foreground/60">
@@ -161,7 +180,11 @@ export function ContactForm() {
 
           <div className="flex items-start gap-4">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary-foreground/10">
-              <HugeiconsIcon icon={MessageCircle} size={18} className="text-gold" />
+              <HugeiconsIcon
+                icon={MessageCircle}
+                size={18}
+                className="text-gold"
+              />
             </div>
             <div className="space-y-1">
               <p className="text-xs tracking-widest uppercase text-secondary-foreground/60">
@@ -173,7 +196,11 @@ export function ContactForm() {
 
           <div className="flex items-start gap-4">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-secondary-foreground/10">
-              <HugeiconsIcon icon={Mail01Icon} size={18} className="text-gold" />
+              <HugeiconsIcon
+                icon={Mail01Icon}
+                size={18}
+                className="text-gold"
+              />
             </div>
             <div className="space-y-1">
               <p className="text-xs tracking-widest uppercase text-secondary-foreground/60">

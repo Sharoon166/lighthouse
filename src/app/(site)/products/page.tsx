@@ -22,7 +22,9 @@ interface ProductsPageProps {
   }>;
 }
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+export default async function ProductsPage({
+  searchParams,
+}: ProductsPageProps) {
   const params = await searchParams;
 
   const categorySlug = params.category;
@@ -66,8 +68,8 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               Our Collection
             </h1>
             <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-sans">
-              Explore our curated lighting collections, thoughtfully selected to bring
-              warmth, character, and style to every space.
+              Explore our curated lighting collections, thoughtfully selected to
+              bring warmth, character, and style to every space.
             </p>
           </div>
         </div>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-
-import { BlogPostsManager } from "@/features/blog/components/blog-posts-manager";
 import { listBlogPosts } from "@/features/blog/actions";
+import { BlogPostsManager } from "@/features/blog/components/blog-posts-manager";
 
 export const metadata: Metadata = {
   title: "Blog · Lighthouse",

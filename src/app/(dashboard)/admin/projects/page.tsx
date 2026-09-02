@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-
-import { ProjectsManager } from "@/features/projects/components/projects-manager";
 import { listProjects } from "@/features/projects/actions";
+import { ProjectsManager } from "@/features/projects/components/projects-manager";
 
 export const metadata: Metadata = {
   title: "Projects · Lighthouse",

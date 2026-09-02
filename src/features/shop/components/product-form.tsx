@@ -15,10 +15,17 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { RichTextEditor } from "@/components/shared/rich-text-editor";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { ColorPicker, ColorSwatch } from "@/components/shared/color-picker";
 import { ImageDropzone } from "@/components/shared/image-dropzone";
+import { RichTextEditor } from "@/components/shared/rich-text-editor";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,8 +41,8 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  InputGroupTextarea,
   InputGroupText,
+  InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import {
@@ -48,8 +55,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { FIELD_LIMITS } from "@/lib/field-limits";
 import { slugify } from "@/lib/utils";
-import { deleteShopImage, uploadShopImage } from "../actions/image-actions";
 import { getCategoryAttributes } from "../actions/category-actions";
+import { deleteShopImage, uploadShopImage } from "../actions/image-actions";
 import {
   createProduct,
   type Product,
@@ -57,12 +64,12 @@ import {
   updateProduct,
 } from "../actions/product-actions";
 import { type ProductInput, productInputSchema } from "../validation/product";
-import { VariantTable, type VariantRow } from "./variant-table";
-import { SpecsEditor, type SpecEntry } from "./specs-editor";
 import {
   AddAttributeDialog,
   type AttributeLibraryItem,
 } from "./add-attribute-dialog";
+import { type SpecEntry, SpecsEditor } from "./specs-editor";
+import { type VariantRow, VariantTable } from "./variant-table";
 
 // ── Types ──────────────────────────────────────────────────────
 
@@ -233,9 +240,7 @@ function AddOptionValueDialog({
     onOpenChange(false);
   };
 
-  const unselectedPredefined = predefinedValues.filter(
-    (v) => !selected.has(v),
-  );
+  const unselectedPredefined = predefinedValues.filter((v) => !selected.has(v));
 
   return (
     <Dialog
@@ -274,9 +279,7 @@ function AddOptionValueDialog({
         )}
 
         <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">
-            Custom value
-          </Label>
+          <Label className="text-xs text-muted-foreground">Custom value</Label>
           <div className="flex gap-2">
             <Input
               value={customValue}
@@ -389,7 +392,10 @@ export function ProductForm({
   const [options, setOptions] = useState<OptionDraft[]>(() => {
     if (!initialData?.variantAttributes?.length) return [];
     return initialData.variantAttributes.map((attrName) => {
-      const baseVal = readBaseAttr(initialData.baseAttributes, String(attrName));
+      const baseVal = readBaseAttr(
+        initialData.baseAttributes,
+        String(attrName),
+      );
       return {
         name: String(attrName),
         values: baseVal ? baseVal.split(",").map((v) => v.trim()) : [],
@@ -482,26 +488,23 @@ export function ProductForm({
   }, []);
 
   // ── Fetch category attributes ──
-  const fetchCategoryAttributes = useCallback(
-    (categoryId: string) => {
-      setIsLoadingAttributes(true);
-      if (categoryFetchTimer.current) clearTimeout(categoryFetchTimer.current);
+  const fetchCategoryAttributes = useCallback((categoryId: string) => {
+    setIsLoadingAttributes(true);
+    if (categoryFetchTimer.current) clearTimeout(categoryFetchTimer.current);
 
-      categoryFetchTimer.current = setTimeout(() => {
-        getCategoryAttributes(categoryId)
-          .then((attrs) => {
-            setCategoryAttributes(attrs);
-          })
-          .catch(() => {
-            setCategoryAttributes([]);
-          })
-          .finally(() => {
-            setIsLoadingAttributes(false);
-          });
-      }, 300);
-    },
-    [],
-  );
+    categoryFetchTimer.current = setTimeout(() => {
+      getCategoryAttributes(categoryId)
+        .then((attrs) => {
+          setCategoryAttributes(attrs);
+        })
+        .catch(() => {
+          setCategoryAttributes([]);
+        })
+        .finally(() => {
+          setIsLoadingAttributes(false);
+        });
+    }, 300);
+  }, []);
 
   useEffect(() => {
     if (!category) {
@@ -1148,9 +1151,14 @@ export function ProductForm({
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Switch checked={isFeatured} onCheckedChange={setIsFeatured} />
+                  <Switch
+                    checked={isFeatured}
+                    onCheckedChange={setIsFeatured}
+                  />
                   <div>
-                    <Label className="cursor-pointer font-medium">Featured</Label>
+                    <Label className="cursor-pointer font-medium">
+                      Featured
+                    </Label>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       Featured products are highlighted on the storefront.
                     </p>
@@ -1219,7 +1227,9 @@ export function ProductForm({
                       >
                         <HugeiconsIcon icon={PlusSignIcon} size={10} />
                         {attr.name}
-                        <span className="text-[10px] opacity-60 capitalize">{attr.type}</span>
+                        <span className="text-[10px] opacity-60 capitalize">
+                          {attr.type}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1298,7 +1308,9 @@ export function ProductForm({
                                 {value}
                                 <button
                                   type="button"
-                                  onClick={() => removeValueFromOption(index, vi)}
+                                  onClick={() =>
+                                    removeValueFromOption(index, vi)
+                                  }
                                   className="ml-0.5 text-muted-foreground hover:text-destructive"
                                 >
                                   ×
@@ -1320,7 +1332,9 @@ export function ProductForm({
                                 {value}
                                 <button
                                   type="button"
-                                  onClick={() => removeValueFromOption(index, vi)}
+                                  onClick={() =>
+                                    removeValueFromOption(index, vi)
+                                  }
                                   className="ml-0.5 text-muted-foreground hover:text-destructive"
                                 >
                                   ×
@@ -1342,7 +1356,8 @@ export function ProductForm({
               {options.length > 0 && (
                 <div className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-4 py-3">
                   <div>
-                    {generatedCombinations.length > 0 && variants.length === 0 ? (
+                    {generatedCombinations.length > 0 &&
+                    variants.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         <span className="font-medium text-foreground">
                           {generatedCombinations.length}
@@ -1370,7 +1385,9 @@ export function ProductForm({
                     type="button"
                     size="sm"
                     onClick={generateVariants}
-                    disabled={generatedCombinations.length === 0 || variants.length > 0}
+                    disabled={
+                      generatedCombinations.length === 0 || variants.length > 0
+                    }
                     title={
                       variants.length > 0
                         ? "Remove existing variants before generating new ones"
@@ -1483,13 +1500,17 @@ export function ProductForm({
                   Rich text description for the specifications section.
                 </p>
                 <RichTextEditor
-                  value={specificationsDescription ? (() => {
-                    try {
-                      return JSON.parse(specificationsDescription);
-                    } catch {
-                      return specificationsDescription;
-                    }
-                  })() : undefined}
+                  value={
+                    specificationsDescription
+                      ? (() => {
+                          try {
+                            return JSON.parse(specificationsDescription);
+                          } catch {
+                            return specificationsDescription;
+                          }
+                        })()
+                      : undefined
+                  }
                   onChange={(json) => {
                     setSpecificationsDescription(JSON.stringify(json));
                   }}
@@ -1691,9 +1712,7 @@ export function ProductForm({
               </div>
 
               <div className="space-y-2" data-field="seo.metaDescription">
-                <Label htmlFor="seo-meta-description">
-                  Meta Description
-                </Label>
+                <Label htmlFor="seo-meta-description">Meta Description</Label>
                 <InputGroup className="min-h-[5rem]">
                   <InputGroupTextarea
                     id="seo-meta-description"
@@ -1778,7 +1797,6 @@ export function ProductForm({
           }}
         />
       )}
-
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ProductForm } from "@/features/shop/components/product-form";
-import { getProductById } from "@/features/shop/actions/product-actions";
-import { getAllCategoriesAdmin } from "@/features/shop/actions/category-actions";
 import { getAllBrands } from "@/features/shop/actions/brand-actions";
+import { getAllCategoriesAdmin } from "@/features/shop/actions/category-actions";
+import { getProductById } from "@/features/shop/actions/product-actions";
+import { ProductForm } from "@/features/shop/components/product-form";
 
 export const metadata: Metadata = {
   title: "Edit product · Lighthouse",
@@ -28,12 +28,12 @@ export default async function EditProductPage({
   const serializedProduct = JSON.parse(JSON.stringify(product));
 
   return (
-      <ProductForm
-        mode="edit"
-        id={id}
-        initialData={serializedProduct}
-        categories={categories}
-        brands={brands}
-      />
+    <ProductForm
+      mode="edit"
+      id={id}
+      initialData={serializedProduct}
+      categories={categories}
+      brands={brands}
+    />
   );
 }

@@ -1,9 +1,9 @@
 /**
  * Production-quality client-side image optimization utility.
- * 
+ *
  * This module provides reusable image optimization for all upload paths
  * in the application (blog, projects, gallery, future products module).
- * 
+ *
  * Key features:
  * - Automatic dimension resizing without upscaling
  * - Transparency preservation
@@ -93,12 +93,12 @@ function calculateOutputDimensions(
 
 /**
  * Optimize an image for upload.
- * 
+ *
  * @param source - File or Blob to optimize
  * @param config - Optimization configuration
  * @returns Optimized blob
  * @throws Error if optimization fails
- * 
+ *
  * @example
  * ```typescript
  * const file = await optimizeImage(
@@ -139,12 +139,13 @@ export async function optimizeImage(
     const originalHeight = bitmap.height;
 
     // Calculate output dimensions
-    const { width: outputWidth, height: outputHeight } = calculateOutputDimensions(
-      originalWidth,
-      originalHeight,
-      config.maxWidth,
-      config.maxHeight,
-    );
+    const { width: outputWidth, height: outputHeight } =
+      calculateOutputDimensions(
+        originalWidth,
+        originalHeight,
+        config.maxWidth,
+        config.maxHeight,
+      );
 
     // Create canvas with output dimensions
     const canvas = document.createElement("canvas");

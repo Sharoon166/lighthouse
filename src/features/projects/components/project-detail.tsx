@@ -64,48 +64,40 @@ export function ProjectDetail({
       </section>
 
       {/* Meta Bar */}
-        <div className="container flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-          {project.location && (
-            <span className="inline-flex items-center gap-2">
-              <HugeiconsIcon
-                icon={MapPinIcon}
-                size={16}
-                className="text-gold"
-              />
-              Location: {project.location}
-            </span>
-          )}
-          {year && (
-            <span className="inline-flex items-center gap-2">
-              <HugeiconsIcon
-                icon={Calendar03Icon}
-                size={16}
-                className="text-gold"
-              />
-              Year: {year}
-            </span>
-          )}
-          {project.client && (
-            <span className="inline-flex items-center gap-2">
-              <HugeiconsIcon
-                icon={User02Icon}
-                size={16}
-                className="text-gold"
-              />
-              Client: {project.client}
-            </span>
-          )}
-          {project.installationDetails && (
-            <span className="inline-flex items-center gap-2">
-              <HugeiconsIcon
-                icon={Briefcase01Icon}
-                size={16}
-                className="text-gold"
-              />
-              Scope: {project.installationDetails}
-            </span>
-          )}
-        </div>
+      <div className="container flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+        {project.location && (
+          <span className="inline-flex items-center gap-2">
+            <HugeiconsIcon icon={MapPinIcon} size={16} className="text-gold" />
+            Location: {project.location}
+          </span>
+        )}
+        {year && (
+          <span className="inline-flex items-center gap-2">
+            <HugeiconsIcon
+              icon={Calendar03Icon}
+              size={16}
+              className="text-gold"
+            />
+            Year: {year}
+          </span>
+        )}
+        {project.client && (
+          <span className="inline-flex items-center gap-2">
+            <HugeiconsIcon icon={User02Icon} size={16} className="text-gold" />
+            Client: {project.client}
+          </span>
+        )}
+        {project.installationDetails && (
+          <span className="inline-flex items-center gap-2">
+            <HugeiconsIcon
+              icon={Briefcase01Icon}
+              size={16}
+              className="text-gold"
+            />
+            Scope: {project.installationDetails}
+          </span>
+        )}
+      </div>
 
       {/* Hero Image */}
       {project.heroImage && (
@@ -311,10 +303,7 @@ export function ProjectDetail({
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {project.features.map((f) => (
-              <div
-                key={f.id}
-                className="border border-border bg-card p-5"
-              >
+              <div key={f.id} className="border border-border bg-card p-5">
                 <h4 className="font-heading font-bold">{f.title}</h4>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {f.description}
@@ -350,7 +339,7 @@ export function ProjectDetail({
               <Link
                 key={rp.id}
                 href={`/projects/${rp.slug}`}
-                className="group relative block overflow-hidden bg-muted aspect-[3/2]"
+                className="group relative block overflow-hidden bg-muted aspect-3/2"
               >
                 {rp.heroImage && (
                   <Image
@@ -361,7 +350,7 @@ export function ProjectDetail({
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-5">
                   <h4 className="font-heading text-lg font-bold text-white leading-snug">
                     {rp.title}

@@ -8,7 +8,10 @@ export const projectInputSchema = z
       .string()
       .trim()
       .min(1, "Slug is required")
-      .max(FIELD_LIMITS.slug, `Slug must be ${FIELD_LIMITS.slug} characters or fewer`)
+      .max(
+        FIELD_LIMITS.slug,
+        `Slug must be ${FIELD_LIMITS.slug} characters or fewer`,
+      )
       .regex(
         /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
         "Slug must contain only lowercase letters, numbers and hyphens",
@@ -17,11 +20,17 @@ export const projectInputSchema = z
       .string()
       .trim()
       .min(1, "Title is required")
-      .max(FIELD_LIMITS.name.medium, `Title must be ${FIELD_LIMITS.name.medium} characters or fewer`),
+      .max(
+        FIELD_LIMITS.name.medium,
+        `Title must be ${FIELD_LIMITS.name.medium} characters or fewer`,
+      ),
     subtitle: z
       .string()
       .trim()
-      .max(FIELD_LIMITS.name.long, `Subtitle must be ${FIELD_LIMITS.name.long} characters or fewer`),
+      .max(
+        FIELD_LIMITS.name.long,
+        `Subtitle must be ${FIELD_LIMITS.name.long} characters or fewer`,
+      ),
     description: z.string().trim(),
     client: z.string().trim(),
     duration: z.string().trim(),
@@ -32,9 +41,15 @@ export const projectInputSchema = z
           .string()
           .trim()
           .min(1)
-          .max(FIELD_LIMITS.tag.name, `Categories must be ${FIELD_LIMITS.tag.name} characters or fewer`),
+          .max(
+            FIELD_LIMITS.tag.name,
+            `Categories must be ${FIELD_LIMITS.tag.name} characters or fewer`,
+          ),
       )
-      .max(FIELD_LIMITS.tag.maxCount, `Up to ${FIELD_LIMITS.tag.maxCount} categories allowed`),
+      .max(
+        FIELD_LIMITS.tag.maxCount,
+        `Up to ${FIELD_LIMITS.tag.maxCount} categories allowed`,
+      ),
     materials: z.string().trim(),
     lightControl: z.string().trim(),
     budgetRange: z.string().trim(),
@@ -87,11 +102,17 @@ export const projectInputSchema = z
       metaTitle: z
         .string()
         .trim()
-        .max(FIELD_LIMITS.seo.metaTitle, `Meta title must be ${FIELD_LIMITS.seo.metaTitle} characters or fewer`),
+        .max(
+          FIELD_LIMITS.seo.metaTitle,
+          `Meta title must be ${FIELD_LIMITS.seo.metaTitle} characters or fewer`,
+        ),
       metaDescription: z
         .string()
         .trim()
-        .max(FIELD_LIMITS.seo.metaDescription, `Meta description must be ${FIELD_LIMITS.seo.metaDescription} characters or fewer`),
+        .max(
+          FIELD_LIMITS.seo.metaDescription,
+          `Meta description must be ${FIELD_LIMITS.seo.metaDescription} characters or fewer`,
+        ),
       focusKeyword: z.string().trim(),
       noIndex: z.boolean(),
     }),

@@ -11,7 +11,9 @@ interface CategorySearchFilterProps {
   categories: ShopCategoryItem[];
 }
 
-export function CategorySearchFilter({ categories }: CategorySearchFilterProps) {
+export function CategorySearchFilter({
+  categories,
+}: CategorySearchFilterProps) {
   const [query, setQuery] = useState("");
 
   const filtered = categories.filter(
@@ -50,7 +52,7 @@ export function CategorySearchFilter({ categories }: CategorySearchFilterProps) 
           <Link
             key={category.id}
             href={`/products?category=${category.slug}`}
-            className="group relative flex flex-col justify-end overflow-hidden rounded-xl bg-slate-900 p-6 min-h-[260px] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border border-white/10"
+            className="group relative flex flex-col justify-end overflow-hidden rounded-xl bg-slate-900 p-6 min-h-65 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border border-white/10"
           >
             {/* Background Image */}
             <Image
@@ -61,7 +63,7 @@ export function CategorySearchFilter({ categories }: CategorySearchFilterProps) 
               className="object-cover object-center opacity-70 transition-transform duration-500 group-hover:scale-105 group-hover:opacity-80"
             />
             {/* Dark gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
 
             {/* Content overlay */}
             <div className="relative z-10 space-y-1">

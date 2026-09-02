@@ -1,9 +1,9 @@
 "use client";
 
-import { format } from "date-fns";
-import { useState, useRef, useEffect } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar03Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { format } from "date-fns";
+import { useEffect, useRef, useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -93,9 +93,7 @@ export function DateTimePicker({
           )}
         >
           <HugeiconsIcon icon={Calendar03Icon} size={16} />
-          {selectedDate
-            ? format(selectedDate, "PPP 'at' HH:mm")
-            : placeholder}
+          {selectedDate ? format(selectedDate, "PPP 'at' HH:mm") : placeholder}
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar

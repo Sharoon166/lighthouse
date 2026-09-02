@@ -42,15 +42,16 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  InputGroupTextarea,
   InputGroupText,
+  InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { TaggedInput } from "@/components/ui/tagged-input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSlugValidation } from "@/hooks/use-slug-validation";
-import { cn, slugify } from "@/lib/utils";
+import { BLOG_CATEGORIES } from "@/lib/constants";
 import { FIELD_LIMITS } from "@/lib/field-limits";
+import { cn, slugify } from "@/lib/utils";
 import type { BlogPostHeroImage } from "@/models/blog-post";
 import {
   type BlogPostActionResult,
@@ -91,6 +92,7 @@ type LocalDraft = {
   savedAt: number;
   title: string;
   summary: string;
+  category: string;
   tags: string[];
   content: JSONContent | null;
   authorName: string;
@@ -201,6 +203,7 @@ export function BlogPostForm({
 
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [summary, setSummary] = useState(initialData?.summary ?? "");
+  const [category, setCategory] = useState(initialData?.category ?? "");
   const [tags, setTags] = useState<string[]>(initialData?.tags ?? []);
   const [content, setContent] = useState<JSONContent | null>(
     (initialData?.content as JSONContent | null) ?? null,
@@ -272,6 +275,7 @@ export function BlogPostForm({
     if (!initialData) return;
     setTitle(initialData.title);
     setSummary(initialData.summary);
+    setCategory(initialData.category);
     setTags(initialData.tags);
     setContent((initialData.content as JSONContent | null) ?? null);
     setAuthorName(initialData.author.name);
@@ -295,6 +299,7 @@ export function BlogPostForm({
       savedAt: Date.now(),
       title,
       summary,
+      category,
       tags,
       content,
       authorName,
@@ -307,6 +312,7 @@ export function BlogPostForm({
       if (
         !title &&
         !summary &&
+        !category &&
         tags.length === 0 &&
         isEmptyContent(content) &&
         !authorName &&
@@ -327,6 +333,7 @@ export function BlogPostForm({
     isEdit,
     title,
     summary,
+    category,
     tags,
     content,
     authorName,
@@ -367,6 +374,7 @@ export function BlogPostForm({
     slug,
     title,
     summary,
+    category,
     tags,
     content: content ?? EMPTY_DOC,
     heroImage,
@@ -486,6 +494,7 @@ export function BlogPostForm({
   const restoreDraft = (draft: LocalDraft) => {
     setTitle(draft.title);
     setSummary(draft.summary);
+    setCategory(draft.category);
     setTags(draft.tags);
     setContent(draft.content);
     setAuthorName(draft.authorName);
@@ -561,9 +570,15 @@ export function BlogPostForm({
             {formErrors.length > 0 ? (
               formErrors.map((message) => <p key={message}>{message}</p>)
             ) : (
-              <p>
-                Could not save your post. Please check the highlighted fields.
-              </p>
+              <ul className="list-disc pl-4">
+                {Object.entries(fieldErrors)
+                  .filter(([, errors]) => errors && errors.length > 0)
+                  .map(([field, errors]) =>
+                    errors!.map((message) => (
+                      <li key={`${field}-${message}`}>{message}</li>
+                    )),
+                  )}
+              </ul>
             )}
           </div>
         </div>
@@ -695,28 +710,58 @@ export function BlogPostForm({
                       )}
                     </div>
 
-                    <div className="space-y-2" data-field="tags">
-                      <Label htmlFor="tags">Tags</Label>
-                      <TaggedInput
-                        id="tags"
-                        value={tags}
-                        onChange={(next) => {
-                          setTags(next);
-                          clearFieldError("tags");
+                    <div className="space-y-2" data-field="category">
+                      <Label htmlFor="category">Category</Label>
+                      <select
+                        id="category"
+                        value={category}
+                        onChange={(event) => {
+                          setCategory(event.target.value);
+                          clearFieldError("category");
                         }}
-                        maxTags={8}
-                        placeholder="Add tags — press Enter…"
-                      />
-                      {fieldError("tags") ? (
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <option value="">Select a category</option>
+                        {BLOG_CATEGORIES.map((cat) => (
+                          <option key={cat.value} value={cat.value}>
+                            {cat.label}
+                          </option>
+                        ))}
+                      </select>
+                      {fieldError("category") ? (
                         <p className="text-xs text-destructive">
-                          {fieldError("tags")}
+                          {fieldError("category")}
                         </p>
                       ) : (
                         <p className="text-xs text-muted-foreground">
-                          Press Enter or comma to add a tag. {tags.length}/{FIELD_LIMITS.tag.maxCount}
+                          Choose the category for this post.
                         </p>
                       )}
                     </div>
+                  </div>
+
+                  <div className="space-y-2" data-field="tags">
+                    <Label htmlFor="tags">Tags</Label>
+                    <TaggedInput
+                      id="tags"
+                      value={tags}
+                      onChange={(next) => {
+                        setTags(next);
+                        clearFieldError("tags");
+                      }}
+                      maxTags={8}
+                      placeholder="Add tags — press Enter…"
+                    />
+                    {fieldError("tags") ? (
+                      <p className="text-xs text-destructive">
+                        {fieldError("tags")}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        Press Enter or comma to add a tag. {tags.length}/
+                        {FIELD_LIMITS.tag.maxCount}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2" data-field="slug">
@@ -788,7 +833,10 @@ export function BlogPostForm({
                         aria-invalid={Boolean(fieldError("summary"))}
                         maxLength={FIELD_LIMITS.description.long}
                       />
-                      <InputGroupAddon align="block-end" className="border-t border-border">
+                      <InputGroupAddon
+                        align="block-end"
+                        className="border-t border-border"
+                      >
                         <InputGroupText>
                           {summary.length}/{FIELD_LIMITS.description.long}
                         </InputGroupText>
@@ -881,7 +929,9 @@ export function BlogPostForm({
                           }}
                           onBlur={() => validateField("author.designation")}
                           placeholder="e.g. Lead Product Designer"
-                          aria-invalid={Boolean(fieldError("author.designation"))}
+                          aria-invalid={Boolean(
+                            fieldError("author.designation"),
+                          )}
                           maxLength={FIELD_LIMITS.name.short}
                         />
                         <InputGroupAddon align="inline-end">
@@ -913,7 +963,10 @@ export function BlogPostForm({
                         aria-invalid={Boolean(fieldError("author.bio"))}
                         maxLength={FIELD_LIMITS.description.medium}
                       />
-                      <InputGroupAddon align="block-end" className="border-t border-border">
+                      <InputGroupAddon
+                        align="block-end"
+                        className="border-t border-border"
+                      >
                         <InputGroupText>
                           {authorBio.length}/{FIELD_LIMITS.description.medium}
                         </InputGroupText>
@@ -980,11 +1033,17 @@ export function BlogPostForm({
                           summary.slice(0, 155) || "Auto-generated from summary"
                         }
                         maxLength={FIELD_LIMITS.seo.metaDescription}
-                        aria-invalid={Boolean(fieldError("seo.metaDescription"))}
+                        aria-invalid={Boolean(
+                          fieldError("seo.metaDescription"),
+                        )}
                       />
-                      <InputGroupAddon align="block-end" className="border-t border-border">
+                      <InputGroupAddon
+                        align="block-end"
+                        className="border-t border-border"
+                      >
                         <InputGroupText>
-                          {seoMetaDescription.length}/{FIELD_LIMITS.seo.metaDescription}
+                          {seoMetaDescription.length}/
+                          {FIELD_LIMITS.seo.metaDescription}
                         </InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
@@ -1011,7 +1070,8 @@ export function BlogPostForm({
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>
-                          {seoFocusKeyword.length}/{FIELD_LIMITS.seo.focusKeyword}
+                          {seoFocusKeyword.length}/
+                          {FIELD_LIMITS.seo.focusKeyword}
                         </InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
@@ -1244,7 +1304,7 @@ export function BlogPostForm({
               <p className="text-xs text-muted-foreground">
                 {featured
                   ? "This post is featured."
-                  : "Up to 3 posts can be featured."}
+                  : "Only 1 post can be featured."}
               </p>
               <div className="space-y-2">
                 <Button
@@ -1284,7 +1344,8 @@ export function BlogPostForm({
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
-                  Meta Title ({(seoMetaTitle || title).length}/{FIELD_LIMITS.seo.metaTitle})
+                  Meta Title ({(seoMetaTitle || title).length}/
+                  {FIELD_LIMITS.seo.metaTitle})
                 </div>
                 <div className="text-sm font-medium text-blue-600">
                   {seoMetaTitle || title || "Untitled Post"}
@@ -1293,8 +1354,8 @@ export function BlogPostForm({
 
               <div className="space-y-2">
                 <div className="text-xs text-muted-foreground">
-                  Meta Description ({(seoMetaDescription || summary).length}
-                  /{FIELD_LIMITS.seo.metaDescription})
+                  Meta Description ({(seoMetaDescription || summary).length}/
+                  {FIELD_LIMITS.seo.metaDescription})
                 </div>
                 <div className="text-xs text-muted-foreground line-clamp-2">
                   {seoMetaDescription || summary || "No description provided"}

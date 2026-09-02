@@ -39,15 +39,16 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  InputGroupTextarea,
   InputGroupText,
+  InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { TaggedInput } from "@/components/ui/tagged-input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSlugValidation } from "@/hooks/use-slug-validation";
-import { cn, slugify } from "@/lib/utils";
+import { PROJECT_CATEGORIES } from "@/lib/constants";
 import { FIELD_LIMITS } from "@/lib/field-limits";
+import { cn, slugify } from "@/lib/utils";
 import type { ProjectImage } from "@/models/project";
 import {
   createProject,
@@ -440,10 +441,15 @@ export function ProjectForm({
             {formErrors.length > 0 ? (
               formErrors.map((message) => <p key={message}>{message}</p>)
             ) : (
-              <p>
-                Could not save your project. Please check the highlighted
-                fields.
-              </p>
+              <ul className="list-disc pl-4">
+                {Object.entries(fieldErrors)
+                  .filter(([, errors]) => errors && errors.length > 0)
+                  .map(([field, errors]) =>
+                    errors!.map((message) => (
+                      <li key={`${field}-${message}`}>{message}</li>
+                    )),
+                  )}
+              </ul>
             )}
           </div>
         </div>
@@ -521,7 +527,9 @@ export function ProjectForm({
                         aria-invalid={Boolean(fieldError("title"))}
                       />
                       <InputGroupAddon align="inline-end">
-                        <InputGroupText>{title.length}/{FIELD_LIMITS.name.medium}</InputGroupText>
+                        <InputGroupText>
+                          {title.length}/{FIELD_LIMITS.name.medium}
+                        </InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
                     {fieldError("title") && (
@@ -546,7 +554,9 @@ export function ProjectForm({
                         aria-invalid={Boolean(fieldError("subtitle"))}
                       />
                       <InputGroupAddon align="inline-end">
-                        <InputGroupText>{subtitle.length}/{FIELD_LIMITS.name.long}</InputGroupText>
+                        <InputGroupText>
+                          {subtitle.length}/{FIELD_LIMITS.name.long}
+                        </InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
                     {fieldError("subtitle") && (
@@ -640,6 +650,7 @@ export function ProjectForm({
                     }}
                     maxTags={8}
                     placeholder="Add categories — press Enter…"
+                    suggestions={PROJECT_CATEGORIES}
                   />
                   {fieldError("categories") ? (
                     <p className="text-xs text-destructive">
@@ -647,7 +658,8 @@ export function ProjectForm({
                     </p>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      Press Enter or comma to add. {categories.length}/{FIELD_LIMITS.tag.maxCount}
+                      Press Enter or comma to add. {categories.length}/
+                      {FIELD_LIMITS.tag.maxCount}
                     </p>
                   )}
                 </div>
@@ -1021,11 +1033,17 @@ export function ProjectForm({
                           "Auto-generated from description"
                         }
                         maxLength={FIELD_LIMITS.seo.metaDescription}
-                        aria-invalid={Boolean(fieldError("seo.metaDescription"))}
+                        aria-invalid={Boolean(
+                          fieldError("seo.metaDescription"),
+                        )}
                       />
-                      <InputGroupAddon align="block-end" className="border-t border-border">
+                      <InputGroupAddon
+                        align="block-end"
+                        className="border-t border-border"
+                      >
                         <InputGroupText>
-                          {seoMetaDescription.length}/{FIELD_LIMITS.seo.metaDescription}
+                          {seoMetaDescription.length}/
+                          {FIELD_LIMITS.seo.metaDescription}
                         </InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>
@@ -1052,7 +1070,8 @@ export function ProjectForm({
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>
-                          {seoFocusKeyword.length}/{FIELD_LIMITS.seo.focusKeyword}
+                          {seoFocusKeyword.length}/
+                          {FIELD_LIMITS.seo.focusKeyword}
                         </InputGroupText>
                       </InputGroupAddon>
                     </InputGroup>

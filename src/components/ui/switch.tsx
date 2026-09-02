@@ -1,7 +1,7 @@
 "use client";
 
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch";
-import * as React from "react";
+import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -9,7 +9,9 @@ function Switch({
   className,
   ...props
 }: Omit<React.ComponentProps<typeof SwitchPrimitive.Root>, "onChange"> & {
-  onCheckedChange?: React.ComponentProps<typeof SwitchPrimitive.Root>["onCheckedChange"];
+  onCheckedChange?: React.ComponentProps<
+    typeof SwitchPrimitive.Root
+  >["onCheckedChange"];
 }) {
   return (
     <SwitchPrimitive.Root

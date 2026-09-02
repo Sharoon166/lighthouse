@@ -5,7 +5,7 @@ import { footerNav } from "@/lib/constants";
 export function SiteFooter() {
   return (
     <footer className="mt-10 px-6 pt-16 pb-8 bg-noise">
-      <div className="mx-auto max-w-7xl">
+      <div className="container">
         <div className="max-w-md space-y-4">
           <LogoImage />
           <p className="leading-relaxed">
@@ -18,7 +18,7 @@ export function SiteFooter() {
         <div className="mt-14 grid grid-cols-2 gap-10 md:grid-cols-4">
           {footerNav.map((group) => (
             <div key={group.heading}>
-              <h4 className="text-sm font-semibold tracking-widest text-gray-200 uppercase">
+              <h4 className="font-semibold tracking-widest text-gray-200 uppercase">
                 {group.heading}
               </h4>
               <ul className="mt-4 space-y-2.5">
@@ -33,7 +33,7 @@ export function SiteFooter() {
                           {...(isExternal
                             ? { target: "_blank", rel: "noopener noreferrer" }
                             : {})}
-                          className="text-sm transition-colors hover:text-muted"
+                          className="transition-colors hover:text-muted"
                         >
                           {link.label}
                         </Link>

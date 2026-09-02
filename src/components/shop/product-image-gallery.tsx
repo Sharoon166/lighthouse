@@ -8,8 +8,13 @@ interface ProductImageGalleryProps {
   name: string;
 }
 
-export function ProductImageGallery({ images, name }: ProductImageGalleryProps) {
-  const [selectedImage, setSelectedImage] = useState(images[0] || "/products/1.png");
+export function ProductImageGallery({
+  images,
+  name,
+}: ProductImageGalleryProps) {
+  const [selectedImage, setSelectedImage] = useState(
+    images[0] || "/products/1.png",
+  );
 
   return (
     <div className="flex flex-col-reverse md:flex-row gap-4">

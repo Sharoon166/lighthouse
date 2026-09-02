@@ -1,6 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BLOG_CATEGORIES } from "@/lib/constants";
 import type { BlogPostListItem } from "../actions";
+
+function getCategoryLabel(value: string): string {
+  return BLOG_CATEGORIES.find((c) => c.value === value)?.label ?? value;
+}
 
 export function BlogCard({ post }: { post: BlogPostListItem }) {
   const wordCount = post.summary ? post.summary.split(/\s+/).length : 100;
@@ -24,9 +29,9 @@ export function BlogCard({ post }: { post: BlogPostListItem }) {
         )}
       </div>
       <div className="border border-t-0 border-border pt-5 pb-2 p-4">
-        {post.tags.length > 0 && (
+        {post.category && (
           <span className="uppercase text-sm font-semibold tracking-[0.2em] text-gold">
-            {post.tags[0]}
+            {getCategoryLabel(post.category)}
           </span>
         )}
         <h3

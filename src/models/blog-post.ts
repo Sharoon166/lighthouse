@@ -23,6 +23,7 @@ export interface BlogPost {
   slug: string;
   summary: string;
   content: Record<string, unknown> | null;
+  category: string;
   tags: string[];
   author: BlogPostAuthor;
   status: "draft" | "published";
@@ -79,6 +80,7 @@ const blogPostSchema = new Schema<BlogPost>(
     },
     summary: { type: String, default: "", trim: true },
     content: { type: Schema.Types.Mixed, default: null },
+    category: { type: String, default: "", trim: true },
     tags: { type: [String], default: [] },
     author: { type: authorSchema, required: true },
     status: { type: String, enum: ["draft", "published"], default: "draft" },

@@ -305,6 +305,27 @@ export const showrooms = [
   },
 ];
 
+export const BLOG_CATEGORIES = [
+  { label: "Design Guide", value: "design-guide" },
+  { label: "Trends", value: "trends" },
+  { label: "Project Spotlight", value: "project-spotlight" },
+  { label: "Buying Guide", value: "buying-guide" },
+  { label: "Installation Tips", value: "installation-tips" },
+  { label: "Showroom News", value: "showroom-news" },
+  { label: "Sustainability", value: "sustainability" },
+] as const;
+
+export type BlogCategory = (typeof BLOG_CATEGORIES)[number]["value"];
+
+export const PROJECT_CATEGORIES = [
+  { label: "Residential", value: "residential" },
+  { label: "Commercial", value: "commercial" },
+  { label: "Hospitality", value: "hospitality" },
+  { label: "Office", value: "office" },
+] as const;
+
+export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number]["value"];
+
 export const partners = [
   {
     id: "partner-001",

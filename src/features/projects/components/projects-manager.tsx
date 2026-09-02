@@ -1,15 +1,17 @@
 "use client";
 
 import {
+  Delete02Icon,
   PlusSignIcon,
-  Recycle02Icon,
   Search01Icon,
+  StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { SegmentedControl } from "@/components/shared/segmented-control";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
   InputGroup,
@@ -20,13 +22,16 @@ import { Pagination } from "@/components/ui/pagination";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 import {
-  type ProjectListItem,
-  type ProjectListResult,
   deleteProject,
   listProjects,
+  type ProjectListItem,
+  type ProjectListResult,
+  toggleFeaturedProject,
 } from "../actions";
 import { ProjectCards } from "./project-cards";
 import { ProjectTable } from "./project-table";
+
+const MAX_FEATURED = 3;
 
 type ProjectStatus = "all" | "draft" | "published";
 type View = "table" | "cards";
@@ -60,7 +65,11 @@ function SkeletonGrid() {
   );
 }
 
-export function ProjectsManager({ initialData }: { initialData?: ProjectListResult }) {
+export function ProjectsManager({
+  initialData,
+}: {
+  initialData?: ProjectListResult;
+}) {
   const { confirm } = useConfirm();
   const [view, setView] = useLocalStorage<View>(
     "lighthouse:projects-view",
@@ -71,7 +80,9 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
-  const [data, setData] = useState<ProjectListResult | null>(initialData ?? null);
+  const [data, setData] = useState<ProjectListResult | null>(
+    initialData ?? null,
+  );
   const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -97,13 +108,18 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
     setIsLoading(true);
     setError(null);
 
-    listProjects({ page, pageSize, search: debouncedSearch, status, category: "" })
+    listProjects({
+      page,
+      pageSize,
+      search: debouncedSearch,
+      status,
+      category: "",
+    })
       .then((result) => {
         if (!cancelled) setData(result);
       })
       .catch(() => {
-        if (!cancelled)
-          setError("Could not load projects. Please try again.");
+        if (!cancelled) setError("Could not load projects. Please try again.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -114,6 +130,26 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
     };
   }, [page, pageSize, debouncedSearch, status]);
 
+  const handleToggleFeatured = async (project: ProjectListItem) => {
+    setActionError(null);
+    const result = await toggleFeaturedProject(project.slug);
+
+    if (!result.ok) {
+      setActionError(result.message);
+      return;
+    }
+
+    setData((previous) => {
+      if (!previous) return previous;
+      return {
+        ...previous,
+        projects: previous.projects.map((p) =>
+          p.slug === project.slug ? { ...p, featured: result.featured } : p,
+        ),
+      };
+    });
+  };
+
   const handleDelete = async (project: ProjectListItem) => {
     setActionError(null);
 
@@ -121,8 +157,8 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
       title: "Move this project to trash?",
       description: (
         <>
-          "{project.title}" will be moved to trash. You can restore it anytime or
-          delete it forever from the trash.
+          "{project.title}" will be moved to trash. You can restore it anytime
+          or delete it forever from the trash.
         </>
       ),
       confirmLabel: "Move to trash",
@@ -151,6 +187,9 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
     setData(refreshed);
   };
 
+  const featuredProjects = data?.projects.filter((p) => p.featured) ?? [];
+  const canFeatureMore = featuredProjects.length < MAX_FEATURED;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -167,7 +206,7 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
             href="/admin/projects/trash"
             className={buttonVariants({ variant: "outline" })}
           >
-            <HugeiconsIcon icon={Recycle02Icon} size={16} />
+            <HugeiconsIcon icon={Delete02Icon} size={16} />
             Trash
           </Link>
           <Link href="/admin/projects/new" className={buttonVariants()}>
@@ -176,6 +215,45 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
           </Link>
         </div>
       </div>
+
+      {/* Featured Section */}
+      {data && featuredProjects.length > 0 && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg bg-muted/40 px-4 py-3">
+          <HugeiconsIcon
+            icon={StarIcon}
+            size={14}
+            className="shrink-0 text-muted-foreground"
+          />
+          <span className="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Featured
+          </span>
+          <div className="hidden h-4 w-px bg-border sm:block" />
+          {featuredProjects.map((project) => (
+            <div key={project.id} className="group flex items-center gap-2.5">
+              {project.heroImage?.url ? (
+                <img
+                  src={project.heroImage.url}
+                  alt=""
+                  className="size-8 shrink-0 rounded object-cover"
+                />
+              ) : (
+                <div className="size-8 shrink-0 rounded bg-border" />
+              )}
+              <span className="max-w-50 truncate text-sm text-foreground">
+                {project.title}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleToggleFeatured(project)}
+                className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-all hover:text-destructive group-hover:opacity-100"
+                title="Unfeature"
+              >
+                <HugeiconsIcon icon={Delete02Icon} size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -232,9 +310,13 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
       ) : data && data.projects.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
           <p className="text-sm text-muted-foreground">
-            No projects found. Try a different search, or create your first project.
+            No projects found. Try a different search, or create your first
+            project.
           </p>
-          <Link href="/admin/projects/new" className={cn(buttonVariants(), "mt-4")}>
+          <Link
+            href="/admin/projects/new"
+            className={cn(buttonVariants(), "mt-4")}
+          >
             <HugeiconsIcon icon={PlusSignIcon} size={16} />
             New project
           </Link>
@@ -247,11 +329,15 @@ export function ProjectsManager({ initialData }: { initialData?: ProjectListResu
                 <ProjectTable
                   projects={data.projects}
                   onDelete={isDeleting ? undefined : handleDelete}
+                  onToggleFeatured={handleToggleFeatured}
+                  canFeatureMore={canFeatureMore}
                 />
               ) : (
                 <ProjectCards
                   projects={data.projects}
                   onDelete={isDeleting ? undefined : handleDelete}
+                  onToggleFeatured={handleToggleFeatured}
+                  canFeatureMore={canFeatureMore}
                 />
               )}
             </div>

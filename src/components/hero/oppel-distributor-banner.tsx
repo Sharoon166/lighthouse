@@ -1,7 +1,7 @@
+import { ArrowRight02Icon, MapPin } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import LogoImage from "../shared/logo-img";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowRight02Icon, MapPin } from "@hugeicons/core-free-icons";
 import { Button } from "../ui/button";
 
 export function OppelDistributorBanner() {

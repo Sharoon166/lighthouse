@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CategoryForm } from "@/features/shop/components/category-form";
-import {
-  getCategoryById,
-  getAllCategoriesAdmin,
-} from "@/features/shop/actions/category-actions";
 import { getAllAttributeDefinitions } from "@/features/shop/actions/attribute-definition-actions";
+import {
+  getAllCategoriesAdmin,
+  getCategoryById,
+} from "@/features/shop/actions/category-actions";
+import { CategoryForm } from "@/features/shop/components/category-form";
 
 export const metadata: Metadata = {
   title: "Edit category · Lighthouse",

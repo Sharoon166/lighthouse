@@ -19,8 +19,8 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
-import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 import {
   type BlogPostListItem,
   type BlogPostListResult,
@@ -31,13 +31,19 @@ import {
 
 const SKELETON_KEYS = ["one", "two", "three", "four", "five"];
 
-export function BlogTrashManager({ initialData }: { initialData?: BlogPostListResult }) {
+export function BlogTrashManager({
+  initialData,
+}: {
+  initialData?: BlogPostListResult;
+}) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
-  const [data, setData] = useState<BlogPostListResult | null>(initialData ?? null);
+  const [data, setData] = useState<BlogPostListResult | null>(
+    initialData ?? null,
+  );
   const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);

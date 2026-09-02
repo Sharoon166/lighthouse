@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CTA } from "@/components/hero/cta";
-import {
-  getProject,
-  getRelatedProjects,
-} from "@/features/projects/actions";
+import { getProject, getRelatedProjects } from "@/features/projects/actions";
 import { ProjectDetail } from "@/features/projects/components/project-detail";
 
 interface Props {
@@ -33,11 +30,7 @@ export default async function ProjectPage({ params }: Props) {
     notFound();
   }
 
-  const relatedProjects = await getRelatedProjects(
-    slug,
-    project.categories,
-    3,
-  );
+  const relatedProjects = await getRelatedProjects(slug, project.categories, 3);
 
   return (
     <>

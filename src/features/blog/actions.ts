@@ -25,6 +25,7 @@ export type BlogPostDraftData = {
   slug: string;
   title: string;
   summary: string;
+  category: string;
   tags: string[];
   content: Record<string, unknown> | null;
   author: {
@@ -56,6 +57,7 @@ function buildPostData(data: z.infer<typeof blogPostInputSchema>): {
   title: string;
   summary: string;
   content: Record<string, unknown>;
+  category: string;
   tags: string[];
   author: { name: string; designation: string; bio: string };
   status: "draft" | "published";
@@ -72,6 +74,7 @@ function buildPostData(data: z.infer<typeof blogPostInputSchema>): {
     title: data.title,
     summary: data.summary,
     content: data.content,
+    category: data.category,
     tags: data.tags,
     author: {
       name: data.author.name,
@@ -124,12 +127,12 @@ export async function createBlogPost(
         featured: true,
         deletedAt: null,
       });
-      if (count >= 3) {
+      if (count >= 1) {
         return {
           ok: false,
           fieldErrors: {
             featured: [
-              "Maximum 3 featured posts allowed. Unfeature another post first.",
+              "Maximum 1 featured post allowed. Unfeature the current post first.",
             ],
           },
           formErrors: [],
@@ -195,12 +198,12 @@ export async function updateBlogPost(
         featured: true,
         deletedAt: null,
       });
-      if (count >= 3) {
+      if (count >= 1) {
         return {
           ok: false,
           fieldErrors: {
             featured: [
-              "Maximum 3 featured posts allowed. Unfeature another post first.",
+              "Maximum 1 featured post allowed. Unfeature the current post first.",
             ],
           },
           formErrors: [],
@@ -254,6 +257,7 @@ const cachedGetBlogPost = unstable_cache(
       slug: document.slug,
       title: document.title,
       summary: document.summary,
+      category: document.category,
       tags: document.tags,
       content: document.content,
       author: {
@@ -393,6 +397,7 @@ export async function getFeaturedPost(): Promise<BlogPostListItem | null> {
     title: doc.title,
     slug: doc.slug,
     summary: doc.summary,
+    category: doc.category,
     tags: doc.tags,
     authorName: doc.author.name,
     status: doc.status,
@@ -410,6 +415,7 @@ const listBlogPostsSchema = z.object({
   pageSize: z.number().int().min(1).max(100).default(8),
   search: z.string().trim().max(200).default(""),
   status: z.enum(["all", "draft", "published"]).default("all"),
+  category: z.string().trim().default(""),
   tag: z.string().trim().max(100).default(""),
 });
 
@@ -418,6 +424,7 @@ export type BlogPostListItem = {
   title: string;
   slug: string;
   summary: string;
+  category: string;
   tags: string[];
   authorName: string;
   status: "draft" | "published";
@@ -445,9 +452,16 @@ export async function listBlogPosts(
   input: unknown,
 ): Promise<BlogPostListResult> {
   const parsed = listBlogPostsSchema.safeParse(input);
-  const { page, pageSize, search, status, tag } = parsed.success
+  const { page, pageSize, search, status, category, tag } = parsed.success
     ? parsed.data
-    : { page: 1, pageSize: 8, search: "", status: "all" as const, tag: "" };
+    : {
+        page: 1,
+        pageSize: 8,
+        search: "",
+        status: "all" as const,
+        category: "",
+        tag: "",
+      };
 
   const filter: QueryFilter<BlogPost> = { deletedAt: null };
   if (status !== "all") {
@@ -455,6 +469,9 @@ export async function listBlogPosts(
   }
   if (search) {
     filter.title = { $regex: escapeRegExp(search), $options: "i" };
+  }
+  if (category) {
+    filter.category = category;
   }
   if (tag) {
     filter.tags = { $in: [tag] };
@@ -476,6 +493,7 @@ export async function listBlogPosts(
     title: document.title,
     slug: document.slug,
     summary: document.summary,
+    category: document.category,
     tags: document.tags,
     authorName: document.author.name,
     status: document.status,
@@ -533,6 +551,7 @@ export async function listTrashedBlogPosts(
     title: document.title,
     slug: document.slug,
     summary: document.summary,
+    category: document.category,
     tags: document.tags,
     authorName: document.author.name,
     status: document.status,
@@ -576,11 +595,11 @@ export async function toggleFeaturedBlogPost(
       featured: true,
       deletedAt: null,
     });
-    if (count >= 3) {
+    if (count >= 1) {
       return {
         ok: false,
         message:
-          "Maximum 3 featured posts allowed. Unfeature another post first.",
+          "Maximum 1 featured post allowed. Unfeature the current post first.",
       };
     }
   }

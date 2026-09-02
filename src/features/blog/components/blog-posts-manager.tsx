@@ -1,15 +1,18 @@
 "use client";
 
 import {
+  Delete02Icon,
   PlusSignIcon,
-  Recycle02Icon,
   Search01Icon,
+  StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { SegmentedControl } from "@/components/shared/segmented-control";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import {
   InputGroup,
@@ -24,9 +27,12 @@ import {
   type BlogPostListResult,
   deleteBlogPost,
   listBlogPosts,
+  toggleFeaturedBlogPost,
 } from "../actions";
 import { BlogPostCards } from "./blog-post-cards";
 import { BlogTable } from "./blog-table";
+
+const MAX_FEATURED = 1;
 
 type PostStatus = "all" | "draft" | "published";
 type View = "table" | "cards";
@@ -60,7 +66,11 @@ function SkeletonGrid() {
   );
 }
 
-export function BlogPostsManager({ initialData }: { initialData?: BlogPostListResult }) {
+export function BlogPostsManager({
+  initialData,
+}: {
+  initialData?: BlogPostListResult;
+}) {
   const { confirm } = useConfirm();
   const [view, setView] = useLocalStorage<View>(
     "lighthouse:blog-view",
@@ -71,7 +81,9 @@ export function BlogPostsManager({ initialData }: { initialData?: BlogPostListRe
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
-  const [data, setData] = useState<BlogPostListResult | null>(initialData ?? null);
+  const [data, setData] = useState<BlogPostListResult | null>(
+    initialData ?? null,
+  );
   const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -114,6 +126,26 @@ export function BlogPostsManager({ initialData }: { initialData?: BlogPostListRe
     };
   }, [page, pageSize, debouncedSearch, status]);
 
+  const handleToggleFeatured = async (post: BlogPostListItem) => {
+    setActionError(null);
+    const result = await toggleFeaturedBlogPost(post.slug);
+
+    if (!result.ok) {
+      setActionError(result.message);
+      return;
+    }
+
+    setData((previous) => {
+      if (!previous) return previous;
+      return {
+        ...previous,
+        posts: previous.posts.map((p) =>
+          p.slug === post.slug ? { ...p, featured: result.featured } : p,
+        ),
+      };
+    });
+  };
+
   const handleDelete = async (post: BlogPostListItem) => {
     setActionError(null);
 
@@ -121,7 +153,7 @@ export function BlogPostsManager({ initialData }: { initialData?: BlogPostListRe
       title: "Move this post to trash?",
       description: (
         <>
-          “{post.title}” will be moved to trash. You can restore it anytime or
+          "{post.title}" will be moved to trash. You can restore it anytime or
           delete it forever from the trash.
         </>
       ),
@@ -150,6 +182,9 @@ export function BlogPostsManager({ initialData }: { initialData?: BlogPostListRe
     setData(refreshed);
   };
 
+  const featuredPosts = data?.posts.filter((p) => p.featured) ?? [];
+  const canFeatureMore = featuredPosts.length < MAX_FEATURED;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -166,7 +201,7 @@ export function BlogPostsManager({ initialData }: { initialData?: BlogPostListRe
             href="/admin/blog/trash"
             className={buttonVariants({ variant: "outline" })}
           >
-            <HugeiconsIcon icon={Recycle02Icon} size={16} />
+            <HugeiconsIcon icon={Delete02Icon} size={16} />
             Trash
           </Link>
           <Link href="/admin/blog/new" className={buttonVariants()}>
@@ -175,6 +210,45 @@ export function BlogPostsManager({ initialData }: { initialData?: BlogPostListRe
           </Link>
         </div>
       </div>
+
+      {/* Featured Section */}
+      {data && featuredPosts.length > 0 && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg bg-muted/40 px-4 py-3">
+          <HugeiconsIcon
+            icon={StarIcon}
+            size={14}
+            className="shrink-0 text-muted-foreground"
+          />
+          <span className="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Featured
+          </span>
+          <div className="hidden h-4 w-px bg-border sm:block" />
+          {featuredPosts.map((post) => (
+            <div key={post.id} className="group flex items-center gap-2.5">
+              {post.heroImage?.url ? (
+                <img
+                  src={post.heroImage.url}
+                  alt=""
+                  className="size-8 shrink-0 rounded object-cover"
+                />
+              ) : (
+                <div className="size-8 shrink-0 rounded bg-border" />
+              )}
+              <span className="max-w-50 truncate text-sm text-foreground">
+                {post.title}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleToggleFeatured(post)}
+                className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-all hover:text-destructive group-hover:opacity-100"
+                title="Unfeature"
+              >
+                <HugeiconsIcon icon={Delete02Icon} size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -246,11 +320,15 @@ export function BlogPostsManager({ initialData }: { initialData?: BlogPostListRe
                 <BlogTable
                   posts={data.posts}
                   onDelete={isDeleting ? undefined : handleDelete}
+                  onToggleFeatured={handleToggleFeatured}
+                  canFeatureMore={canFeatureMore}
                 />
               ) : (
                 <BlogPostCards
                   posts={data.posts}
                   onDelete={isDeleting ? undefined : handleDelete}
+                  onToggleFeatured={handleToggleFeatured}
+                  canFeatureMore={canFeatureMore}
                 />
               )}
             </div>

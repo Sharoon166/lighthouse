@@ -2,13 +2,11 @@
 
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { PROJECT_CATEGORIES } from "@/lib/constants";
 
-const categories = [
-  "All Projects",
-  "Residential",
-  "Commercial",
-  "Hospitality",
-  "Office",
+const allCategories = [
+  { label: "All Projects", value: "all" },
+  ...PROJECT_CATEGORIES,
 ] as const;
 
 interface ProjectFiltersProps {
@@ -29,18 +27,18 @@ export function ProjectFilters({
   return (
     <div className="container flex flex-col gap-4 py-8 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-wrap items-center gap-2">
-        {categories.map((cat) => (
+        {allCategories.map((cat) => (
           <button
-            key={cat}
+            key={cat.value}
             type="button"
-            onClick={() => onCategoryChange(cat)}
+            onClick={() => onCategoryChange(cat.value)}
             className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-              activeCategory === cat
+              activeCategory === cat.value
                 ? "border-primary bg-primary text-primary-foreground"
                 : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
             }`}
           >
-            {cat}
+            {cat.label}
           </button>
         ))}
       </div>

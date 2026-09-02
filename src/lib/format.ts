@@ -1,6 +1,9 @@
 const cachedFormatters = new Map<string, Intl.NumberFormat>();
 
-function getFormatter(locale: string, options: Intl.NumberFormatOptions): Intl.NumberFormat {
+function getFormatter(
+  locale: string,
+  options: Intl.NumberFormatOptions,
+): Intl.NumberFormat {
   const key = `${locale}::${JSON.stringify(options)}`;
   let formatter = cachedFormatters.get(key);
   if (!formatter) {

@@ -56,10 +56,12 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
     throw new Error("Brand not found");
   }
 
-  const variantAttributes = [...new Set([
-    ...(data.variantDimensions ?? []),
-    ...(data.attributes ?? []).map((a) => a.name),
-  ])];
+  const variantAttributes = [
+    ...new Set([
+      ...(data.variantDimensions ?? []),
+      ...(data.attributes ?? []).map((a) => a.name),
+    ]),
+  ];
 
   const baseAttributes = new Map<string, string>();
   for (const spec of data.specifications ?? []) {
@@ -82,8 +84,7 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
       materialsAndCare: data.content?.materialsAndCare?.trim() || "",
       shippingAndReturns: data.content?.shippingAndReturns?.trim() || "",
       payment: data.content?.payment?.trim() || "",
-      installationAndBulbs:
-        data.content?.installationAndBulbs?.trim() || "",
+      installationAndBulbs: data.content?.installationAndBulbs?.trim() || "",
     },
     specifications: (data.specifications ?? [])
       .filter((s) => s.key.trim() && s.value.trim())
@@ -170,9 +171,10 @@ export async function createProduct(
     return { ok: true, slug };
   } catch (error) {
     console.error("Failed to create product:", error);
-    const message = (error as { code?: number }).code === 11000
-      ? "A product with this slug or a variant with this SKU already exists. Please use unique values."
-      : "Something went wrong while saving. Please try again.";
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "A product with this slug or a variant with this SKU already exists. Please use unique values."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},
@@ -205,8 +207,10 @@ export async function updateProduct(
       };
     }
 
-    const nextSlug =
-      await uniqueSlug(data.slug || data.name, String(existing._id));
+    const nextSlug = await uniqueSlug(
+      data.slug || data.name,
+      String(existing._id),
+    );
 
     const productData = await buildProductData(data);
 
@@ -222,9 +226,10 @@ export async function updateProduct(
     return { ok: true, slug: nextSlug };
   } catch (error) {
     console.error("Failed to update product:", error);
-    const message = (error as { code?: number }).code === 11000
-      ? "A product with this slug or a variant with this SKU already exists. Please use unique values."
-      : "Something went wrong while saving. Please try again.";
+    const message =
+      (error as { code?: number }).code === 11000
+        ? "A product with this slug or a variant with this SKU already exists. Please use unique values."
+        : "Something went wrong while saving. Please try again.";
     return {
       ok: false,
       fieldErrors: {},

@@ -12,7 +12,10 @@ import {
 } from "@/models/attribute-definition";
 import { CategoryModel } from "@/models/category";
 import { ProductModel } from "@/models/product";
-import { type AttributeDefinitionInput, attributeDefinitionInputSchema } from "../validation/attribute-definition";
+import {
+  type AttributeDefinitionInput,
+  attributeDefinitionInputSchema,
+} from "../validation/attribute-definition";
 
 export type { AttributeDefinition };
 
@@ -67,7 +70,10 @@ export async function createAttributeDefinition(
       key,
       name: data.name,
       type: data.type,
-      options: data.type === "select" || data.type === "color" ? (data.options ?? []) : [],
+      options:
+        data.type === "select" || data.type === "color"
+          ? (data.options ?? [])
+          : [],
       isActive: data.isActive,
       sortOrder: data.sortOrder,
     });
@@ -117,7 +123,10 @@ export async function updateAttributeDefinition(
     existing.set({
       name: data.name,
       type: data.type,
-      options: data.type === "select" || data.type === "color" ? (data.options ?? []) : [],
+      options:
+        data.type === "select" || data.type === "color"
+          ? (data.options ?? [])
+          : [],
       isActive: data.isActive,
       sortOrder: data.sortOrder,
     });
@@ -165,7 +174,7 @@ export async function deleteAttributeDefinition(
 
   const usedInProduct = await ProductModel.exists({
     $or: [
-      { "variantAttributes": existing.name },
+      { variantAttributes: existing.name },
       { [`attributes.${existing.key}`]: { $exists: true } },
     ],
   });
@@ -265,7 +274,7 @@ export async function listAttributeDefinitions(
 
   const attributeIds = documents.map((d) => String(d._id));
 
-  let usageCountMap = new Map<string, number>();
+  const usageCountMap = new Map<string, number>();
   if (attributeIds.length > 0) {
     const objectIds = attributeIds.map((id) => new Types.ObjectId(id));
     const usageCounts = await CategoryModel.aggregate([
@@ -293,18 +302,20 @@ export async function listAttributeDefinitions(
     }
   }
 
-  const attributes: AttributeDefinitionListItem[] = documents.map((document) => ({
-    id: String(document._id),
-    key: document.key,
-    name: document.name,
-    type: document.type,
-    options: document.options,
-    isActive: document.isActive,
-    sortOrder: document.sortOrder,
-    usageCount: usageCountMap.get(String(document._id)) ?? 0,
-    createdAt: document.createdAt.toISOString(),
-    updatedAt: document.updatedAt.toISOString(),
-  }));
+  const attributes: AttributeDefinitionListItem[] = documents.map(
+    (document) => ({
+      id: String(document._id),
+      key: document.key,
+      name: document.name,
+      type: document.type,
+      options: document.options,
+      isActive: document.isActive,
+      sortOrder: document.sortOrder,
+      usageCount: usageCountMap.get(String(document._id)) ?? 0,
+      createdAt: document.createdAt.toISOString(),
+      updatedAt: document.updatedAt.toISOString(),
+    }),
+  );
 
   return {
     attributes,

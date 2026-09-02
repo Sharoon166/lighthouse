@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
-import {
-  Home01Icon,
-  ArrowLeft02Icon,
-} from "@hugeicons/core-free-icons";
+import { ArrowLeft02Icon, Home01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 
 export default function NotFound() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isBlinking, setIsBlinking] = useState(false);
-  const [mouthExpression, setMouthExpression] = useState<"happy" | "surprised" | "silly" | "confused" | "neutral">("happy");
+  const [mouthExpression, setMouthExpression] = useState<
+    "happy" | "surprised" | "silly" | "confused" | "neutral"
+  >("happy");
   const leftPupilRef = useRef<HTMLDivElement>(null);
   const rightPupilRef = useRef<HTMLDivElement>(null);
   const leftEyeRef = useRef<HTMLDivElement>(null);
@@ -20,9 +19,9 @@ export default function NotFound() {
 
   // Cycle mouth expressions
   useEffect(() => {
-    const expressions: Array<"happy" | "surprised" | "silly" | "confused" | "neutral"> = [
-      "happy", "surprised", "silly", "confused", "neutral",
-    ];
+    const expressions: Array<
+      "happy" | "surprised" | "silly" | "confused" | "neutral"
+    > = ["happy", "surprised", "silly", "confused", "neutral"];
     const scheduleExpression = () => {
       const delay = 2500 + Math.random() * 3500;
       return setTimeout(() => {
@@ -51,10 +50,7 @@ export default function NotFound() {
 
   // Move pupils to track cursor
   useEffect(() => {
-    const movePupil = (
-      pupil: HTMLDivElement,
-      eye: HTMLDivElement,
-    ) => {
+    const movePupil = (pupil: HTMLDivElement, eye: HTMLDivElement) => {
       const eyeRect = eye.getBoundingClientRect();
       const eyeCenterX = eyeRect.left + eyeRect.width / 2;
       const eyeCenterY = eyeRect.top + eyeRect.height / 2;
@@ -62,10 +58,7 @@ export default function NotFound() {
       const dx = mousePos.x - eyeCenterX;
       const dy = mousePos.y - eyeCenterY;
       const angle = Math.atan2(dy, dx);
-      const distance = Math.min(
-        Math.sqrt(dx * dx + dy * dy) * 0.12,
-        22,
-      );
+      const distance = Math.min(Math.sqrt(dx * dx + dy * dy) * 0.12, 22);
 
       const px = Math.cos(angle) * distance;
       const py = Math.sin(angle) * distance;

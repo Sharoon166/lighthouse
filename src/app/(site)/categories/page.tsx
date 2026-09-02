@@ -26,8 +26,8 @@ export default async function CategoriesPage() {
               Our Categories
             </h1>
             <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-sans">
-              Explore our curated lighting collections, thoughtfully selected to bring
-              warmth, character, and style to every space.
+              Explore our curated lighting collections, thoughtfully selected to
+              bring warmth, character, and style to every space.
             </p>
           </div>
         </div>

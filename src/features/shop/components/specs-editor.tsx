@@ -1,9 +1,6 @@
 "use client";
 
-import {
-  Delete02Icon,
-  PlusSignIcon,
-} from "@hugeicons/core-free-icons";
+import { Delete02Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -37,7 +34,8 @@ export function SpecsEditor({
 
   const addSpec = (key: string, val: string) => {
     if (!key.trim() || !val.trim()) return;
-    if (value.some((s) => s.key.toLowerCase() === key.trim().toLowerCase())) return;
+    if (value.some((s) => s.key.toLowerCase() === key.trim().toLowerCase()))
+      return;
     onChange([...value, { key: key.trim(), value: val.trim() }]);
   };
 
@@ -56,7 +54,8 @@ export function SpecsEditor({
   };
 
   const addFromSuggested = (suggested: { key: string; name: string }) => {
-    if (value.some((s) => s.key.toLowerCase() === suggested.key.toLowerCase())) return;
+    if (value.some((s) => s.key.toLowerCase() === suggested.key.toLowerCase()))
+      return;
     onChange([...value, { key: suggested.key, value: "" }]);
   };
 
@@ -76,7 +75,10 @@ export function SpecsEditor({
             const isBoolean = suggestedType === "boolean";
 
             return (
-              <div key={`${spec.key}-${index}`} className="flex items-center gap-2">
+              <div
+                key={`${spec.key}-${index}`}
+                className="flex items-center gap-2"
+              >
                 <Input
                   value={spec.key}
                   onChange={(e) => updateSpec(index, "key", e.target.value)}
@@ -86,7 +88,9 @@ export function SpecsEditor({
                 {isBoolean ? (
                   <Select
                     value={spec.value || ""}
-                    onValueChange={(val) => updateSpec(index, "value", val ?? "")}
+                    onValueChange={(val) =>
+                      updateSpec(index, "value", val ?? "")
+                    }
                   >
                     <SelectTrigger className="h-9 flex-1 text-sm">
                       <SelectValue placeholder="Select" />

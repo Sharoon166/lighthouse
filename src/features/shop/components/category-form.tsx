@@ -22,14 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  InputGroupTextarea,
   InputGroupText,
+  InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -39,18 +39,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { slugify } from "@/lib/utils";
 import { FIELD_LIMITS } from "@/lib/field-limits";
+import { slugify } from "@/lib/utils";
+import { createAttributeDefinition } from "../actions/attribute-definition-actions";
 import {
   type Category,
   type CategoryActionResult,
   createCategory,
   updateCategory,
 } from "../actions/category-actions";
-import {
-  uploadShopImage,
-  deleteShopImage,
-} from "../actions/image-actions";
+import { deleteShopImage, uploadShopImage } from "../actions/image-actions";
 import {
   type CategoryInput,
   categoryInputSchema,
@@ -59,9 +57,6 @@ import {
   AddAttributeDialog,
   type AttributeLibraryItem,
 } from "./add-attribute-dialog";
-import {
-  createAttributeDefinition,
-} from "../actions/attribute-definition-actions";
 
 interface CategoryAttributeAssignmentUI {
   attributeId: string;
@@ -102,7 +97,9 @@ function scrollToFirstError(fieldErrors: {
   if (!node) return;
   node.scrollIntoView({ behavior: "smooth", block: "center" });
   node
-    .querySelector<HTMLElement>("input, textarea, select, [data-slot=select-trigger]")
+    .querySelector<HTMLElement>(
+      "input, textarea, select, [data-slot=select-trigger]",
+    )
     ?.focus({ preventScroll: true });
 }
 
@@ -191,10 +188,7 @@ export function CategoryForm({
 
   const excludedIds =
     isEdit && initialData
-      ? [
-          editId,
-          ...(initialData.ancestors?.map(String) ?? []),
-        ]
+      ? [editId, ...(initialData.ancestors?.map(String) ?? [])]
       : [];
 
   const parentOptions = allCategories.filter(
@@ -308,10 +302,7 @@ export function CategoryForm({
 
       setSavedNotice("Category saved.");
       if (savedNoticeTimer.current) clearTimeout(savedNoticeTimer.current);
-      savedNoticeTimer.current = setTimeout(
-        () => setSavedNotice(null),
-        3000,
-      );
+      savedNoticeTimer.current = setTimeout(() => setSavedNotice(null), 3000);
 
       if (!isEdit) {
         router.replace("/admin/categories");
@@ -380,10 +371,15 @@ export function CategoryForm({
             {formErrors.length > 0 ? (
               formErrors.map((message) => <p key={message}>{message}</p>)
             ) : (
-              <p>
-                Could not save your category. Please check the highlighted
-                fields.
-              </p>
+              <ul className="list-disc pl-4">
+                {Object.entries(fieldErrors)
+                  .filter(([, errors]) => errors && errors.length > 0)
+                  .map(([field, errors]) =>
+                    errors!.map((message) => (
+                      <li key={`${field}-${message}`}>{message}</li>
+                    )),
+                  )}
+              </ul>
             )}
           </div>
         </div>
@@ -414,7 +410,9 @@ export function CategoryForm({
                     maxLength={FIELD_LIMITS.name.short}
                   />
                   <InputGroupAddon align="inline-end">
-                    <InputGroupText>{name.length}/{FIELD_LIMITS.name.short}</InputGroupText>
+                    <InputGroupText>
+                      {name.length}/{FIELD_LIMITS.name.short}
+                    </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
                 {fieldError("name") && (
@@ -467,7 +465,10 @@ export function CategoryForm({
                     aria-invalid={Boolean(fieldError("description"))}
                     maxLength={FIELD_LIMITS.description.medium}
                   />
-                  <InputGroupAddon align="block-end" className="border-t border-border">
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
                     <InputGroupText>
                       {description.length}/{FIELD_LIMITS.description.medium}
                     </InputGroupText>
@@ -548,8 +549,16 @@ export function CategoryForm({
                   )}
                   {showParentChangeWarning && (
                     <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
-                      <HugeiconsIcon icon={Warning} size={14} className="mt-0.5 shrink-0" />
-                      <p>Changing the parent will move this category and all its children in the hierarchy. Ancestor paths will be updated.</p>
+                      <HugeiconsIcon
+                        icon={Warning}
+                        size={14}
+                        className="mt-0.5 shrink-0"
+                      />
+                      <p>
+                        Changing the parent will move this category and all its
+                        children in the hierarchy. Ancestor paths will be
+                        updated.
+                      </p>
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground">
@@ -745,9 +754,7 @@ export function CategoryForm({
               </div>
 
               <div className="space-y-2" data-field="seo.metaDescription">
-                <Label htmlFor="seo-meta-description">
-                  Meta Description
-                </Label>
+                <Label htmlFor="seo-meta-description">Meta Description</Label>
                 <InputGroup className="min-h-[5rem]">
                   <InputGroupTextarea
                     id="seo-meta-description"
@@ -761,13 +768,15 @@ export function CategoryForm({
                       "Auto-generated from description"
                     }
                     maxLength={FIELD_LIMITS.seo.metaDescription}
-                    aria-invalid={Boolean(
-                      fieldError("seo.metaDescription"),
-                    )}
+                    aria-invalid={Boolean(fieldError("seo.metaDescription"))}
                   />
-                  <InputGroupAddon align="block-end" className="border-t border-border">
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
                     <InputGroupText>
-                      {seoMetaDescription.length}/{FIELD_LIMITS.seo.metaDescription}
+                      {seoMetaDescription.length}/
+                      {FIELD_LIMITS.seo.metaDescription}
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>

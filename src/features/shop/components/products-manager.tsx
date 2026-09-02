@@ -25,14 +25,14 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
-import { cn } from "@/lib/utils";
-import { formatCurrency, formatPriceRange } from "@/lib/format";
 import { formatDate } from "@/lib/date-utils";
+import { formatCurrency, formatPriceRange } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import {
-  type ProductListItem,
-  type ProductListResult,
   deleteProduct,
   listProducts,
+  type ProductListItem,
+  type ProductListResult,
 } from "../actions/product-actions";
 
 const columnHelper = createColumnHelper<ProductListItem>();
@@ -226,14 +226,20 @@ function SkeletonTable() {
   );
 }
 
-export function ProductsManager({ initialData }: { initialData?: ProductListResult }) {
+export function ProductsManager({
+  initialData,
+}: {
+  initialData?: ProductListResult;
+}) {
   const { confirm } = useConfirm();
   const [status, setStatus] = useState<ProductStatus>("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [data, setData] = useState<ProductListResult | null>(initialData ?? null);
+  const [data, setData] = useState<ProductListResult | null>(
+    initialData ?? null,
+  );
   const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -264,8 +270,7 @@ export function ProductsManager({ initialData }: { initialData?: ProductListResu
         if (!cancelled) setData(result);
       })
       .catch(() => {
-        if (!cancelled)
-          setError("Could not load products. Please try again.");
+        if (!cancelled) setError("Could not load products. Please try again.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);

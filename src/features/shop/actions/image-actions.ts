@@ -1,6 +1,10 @@
 "use server";
 
-import { CLOUDINARY_DEFAULT_FOLDER, uploadImage, deleteImage } from "@/lib/cloudinary";
+import {
+  CLOUDINARY_DEFAULT_FOLDER,
+  deleteImage,
+  uploadImage,
+} from "@/lib/cloudinary";
 
 const SHOP_FOLDER = `${CLOUDINARY_DEFAULT_FOLDER}/shop`;
 

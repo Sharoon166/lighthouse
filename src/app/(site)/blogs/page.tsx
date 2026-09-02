@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { CTA } from "@/components/hero/cta";
 import { PageHero } from "@/components/shared/page-hero";
-import {
-  getFeaturedPost,
-  getPublishedTags,
-  listBlogPosts,
-} from "@/features/blog/actions";
+import { getFeaturedPost, listBlogPosts } from "@/features/blog/actions";
 import { BlogGrid } from "@/features/blog/components/blog-grid";
 import { FeaturedBlogCard } from "@/features/blog/components/featured-blog-card";
 
@@ -16,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const [initialData, featuredPost, tags] = await Promise.all([
+  const [initialData, featuredPost] = await Promise.all([
     listBlogPosts({
       page: 1,
       pageSize: 9,
@@ -24,8 +20,7 @@ export default async function BlogPage() {
       status: "published",
     }),
     getFeaturedPost(),
-    getPublishedTags(),
-  ]);  
+  ]);
 
   return (
     <>
@@ -42,14 +37,10 @@ export default async function BlogPage() {
           </div>
         )}
 
-        <BlogGrid
-          initialData={initialData}
-          tags={tags}
-          featuredPost={featuredPost}
-        />
+        <BlogGrid initialData={initialData} featuredPost={featuredPost} />
       </div>
       <div className="container">
-      <CTA />
+        <CTA />
       </div>
     </>
   );

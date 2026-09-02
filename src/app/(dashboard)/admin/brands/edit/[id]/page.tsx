@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BrandForm } from "@/features/shop/components/brand-form";
 import { getBrandById } from "@/features/shop/actions/brand-actions";
+import { BrandForm } from "@/features/shop/components/brand-form";
 
 export const metadata: Metadata = {
   title: "Edit brand · Lighthouse",
@@ -19,5 +19,7 @@ export default async function EditBrandPage({ params }: EditBrandPageProps) {
 
   const serializedBrand = JSON.parse(JSON.stringify(brand));
 
-  return <BrandForm mode="edit" id={id} initialData={serializedBrand as never} />;
+  return (
+    <BrandForm mode="edit" id={id} initialData={serializedBrand as never} />
+  );
 }

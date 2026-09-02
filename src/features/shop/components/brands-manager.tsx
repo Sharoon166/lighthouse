@@ -23,8 +23,8 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
-import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 import {
   type BrandListItem,
   type BrandListResult,
@@ -195,7 +195,11 @@ function SkeletonTable() {
   );
 }
 
-export function BrandsManager({ initialData }: { initialData?: BrandListResult }) {
+export function BrandsManager({
+  initialData,
+}: {
+  initialData?: BrandListResult;
+}) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -232,8 +236,7 @@ export function BrandsManager({ initialData }: { initialData?: BrandListResult }
         if (!cancelled) setData(result);
       })
       .catch(() => {
-        if (!cancelled)
-          setError("Could not load brands. Please try again.");
+        if (!cancelled) setError("Could not load brands. Please try again.");
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -337,7 +340,10 @@ export function BrandsManager({ initialData }: { initialData?: BrandListResult }
           <p className="text-sm text-muted-foreground">
             No brands found. Try a different search, or add your first brand.
           </p>
-          <Link href="/admin/brands/new" className={cn(buttonVariants(), "mt-4")}>
+          <Link
+            href="/admin/brands/new"
+            className={cn(buttonVariants(), "mt-4")}
+          >
             <HugeiconsIcon icon={PlusSignIcon} size={16} />
             New brand
           </Link>

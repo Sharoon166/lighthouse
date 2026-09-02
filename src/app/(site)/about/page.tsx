@@ -57,7 +57,10 @@ export default function AboutPage() {
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border">
             {aboutStats.map((stat) => (
-              <div key={stat.label} className="py-10 px-6 text-center space-y-2">
+              <div
+                key={stat.label}
+                className="py-10 px-6 text-center space-y-2"
+              >
                 <p className="text-4xl font-heading font-semibold text-primary-foreground">
                   {stat.value}
                 </p>
@@ -73,29 +76,28 @@ export default function AboutPage() {
       {/* How We Work */}
       <section className="bg-muted">
         <div className="container">
-        
-        <div className="max-w-3xl space-y-3 mb-12">
-          <h2>How We Work</h2>
-          <p>
-            From your first idea to the final installation, we make the lighting
-            process simple, thoughtful, and tailored to your space.
-          </p>
-        </div>
+          <div className="max-w-3xl space-y-3 mb-12">
+            <h2>How We Work</h2>
+            <p>
+              From your first idea to the final installation, we make the
+              lighting process simple, thoughtful, and tailored to your space.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
-          {howWeWork.map((item) => (
-            <div key={item.number} className="space-y-4">
-              <p className="text-5xl font-heading font-semibold text-muted-foreground/40">
-                {item.number}
-              </p>
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold text-primary-foreground">
-                  {item.title}
-                </h3>
-                <p>{item.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+            {howWeWork.map((item) => (
+              <div key={item.number} className="space-y-4">
+                <p className="text-5xl font-heading font-semibold text-muted-foreground/40">
+                  {item.number}
+                </p>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-semibold text-primary-foreground">
+                    {item.title}
+                  </h3>
+                  <p>{item.description}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
           </div>
         </div>
       </section>
@@ -119,7 +121,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {teamMembers.map((member) => (
               <div key={member.name} className="space-y-3">
-                <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+                <div className="relative aspect-3/4 overflow-hidden bg-muted">
                   <Image
                     src={member.image}
                     alt={member.name}

@@ -1,6 +1,10 @@
 "use client";
 
-import { Delete02Icon, Edit02Icon } from "@hugeicons/core-free-icons";
+import {
+  Delete02Icon,
+  Edit02Icon,
+  StarIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   createColumnHelper,
@@ -12,8 +16,8 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 import type { ProjectListItem } from "../actions";
 
 const columnHelper = createColumnHelper<ProjectListItem>();
@@ -21,9 +25,13 @@ const columnHelper = createColumnHelper<ProjectListItem>();
 export function ProjectTable({
   projects,
   onDelete,
+  onToggleFeatured,
+  canFeatureMore,
 }: {
   projects: ProjectListItem[];
   onDelete?: (project: ProjectListItem) => void;
+  onToggleFeatured?: (project: ProjectListItem) => void;
+  canFeatureMore?: boolean;
 }) {
   const columns = useMemo(
     () => [
@@ -104,6 +112,38 @@ export function ProjectTable({
         header: "",
         cell: (info) => (
           <div className="flex items-center justify-end gap-1">
+            {onToggleFeatured && (
+              <button
+                type="button"
+                aria-label={
+                  info.row.original.featured
+                    ? `Unfeature ${info.row.original.title}`
+                    : `Feature ${info.row.original.title}`
+                }
+                title={
+                  info.row.original.featured
+                    ? "Remove from featured"
+                    : canFeatureMore
+                      ? "Add to featured"
+                      : "Featured limit reached"
+                }
+                disabled={
+                  !info.row.original.featured && !canFeatureMore
+                }
+                onClick={() => onToggleFeatured(info.row.original)}
+                className={cn(
+                  "flex size-8 items-center justify-center rounded-md transition-colors",
+                  info.row.original.featured
+                    ? "text-amber-500 hover:bg-amber-50 hover:text-amber-600"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  !info.row.original.featured &&
+                    !canFeatureMore &&
+                    "cursor-not-allowed opacity-40",
+                )}
+              >
+                <HugeiconsIcon icon={StarIcon} size={16} />
+              </button>
+            )}
             <Link
               href={`/admin/projects/edit/${info.row.original.slug}`}
               aria-label={`Edit ${info.row.original.title}`}
@@ -129,7 +169,7 @@ export function ProjectTable({
         ),
       }),
     ],
-    [onDelete],
+    [onDelete, onToggleFeatured, canFeatureMore],
   );
 
   const table = useReactTable({

@@ -54,7 +54,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "pendant-lights",
     name: "Pendant Lights",
     slug: "pendant-lights",
-    description: "Suspended statement fixtures designed to elevate dining tables and kitchen islands.",
+    description:
+      "Suspended statement fixtures designed to elevate dining tables and kitchen islands.",
     image: "/1.png",
     designsCount: 42,
   },
@@ -70,7 +71,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "chandeliers",
     name: "Chandeliers",
     slug: "chandeliers",
-    description: "Intricate multi-light centerpiece lighting for grand rooms and foyers.",
+    description:
+      "Intricate multi-light centerpiece lighting for grand rooms and foyers.",
     image: "/4.png",
     designsCount: 19,
   },
@@ -78,7 +80,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "floor-lamp",
     name: "Floor Lamp",
     slug: "floor-lamp",
-    description: "Versatile standing lamps for cozy reading corners and living rooms.",
+    description:
+      "Versatile standing lamps for cozy reading corners and living rooms.",
     image: "/2.png",
     designsCount: 41,
   },
@@ -94,7 +97,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "ceiling-lights",
     name: "Ceiling Lights",
     slug: "ceiling-lights",
-    description: "Flush and semi-flush mounted architectural overhead fixtures.",
+    description:
+      "Flush and semi-flush mounted architectural overhead fixtures.",
     image: "/products/2.png",
     designsCount: 32,
   },
@@ -102,7 +106,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "table-lamps",
     name: "Table Lamps",
     slug: "table-lamps",
-    description: "Accent lighting designed for nightstands, consoles, and desks.",
+    description:
+      "Accent lighting designed for nightstands, consoles, and desks.",
     image: "/products/3.png",
     designsCount: 24,
   },
@@ -110,7 +115,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "outdoor-lights",
     name: "Outdoor Lights",
     slug: "outdoor-lights",
-    description: "Weather-resistant fixtures for gardens, gates, and patio spaces.",
+    description:
+      "Weather-resistant fixtures for gardens, gates, and patio spaces.",
     image: "/projects/oak-residence.png",
     designsCount: 16,
   },
@@ -118,7 +124,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "commercial-lights",
     name: "Commercial Lights",
     slug: "commercial-lights",
-    description: "High-performance illumination tailored for offices, retail, and hospitality.",
+    description:
+      "High-performance illumination tailored for offices, retail, and hospitality.",
     image: "/projects/aurora-penthouse.png",
     designsCount: 35,
   },
@@ -126,7 +133,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "spot-lights",
     name: "Spot Lights",
     slug: "spot-lights",
-    description: "Directional accent lights to highlight art and architectural details.",
+    description:
+      "Directional accent lights to highlight art and architectural details.",
     image: "/projects/skyline-bedroom.png",
     designsCount: 22,
   },
@@ -150,7 +158,8 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     id: "linear-lights",
     name: "Linear Lights",
     slug: "linear-lights",
-    description: "Minimalist continuous light bars ideal for offices and kitchen spaces.",
+    description:
+      "Minimalist continuous light bars ideal for offices and kitchen spaces.",
     image: "/blogs/3.png",
     designsCount: 10,
   },
@@ -250,8 +259,10 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     categoryName: "Table Lamps",
     categorySlug: "table-lamps",
     price: 16900,
-    shortDescription: "Hand-carved Italian marble pedestal with an etched globe glass shade.",
-    description: "The Marble Aura Table Lamp showcases a solid marble base topped with a frosted glass sphere that emits a continuous 360-degree halo of soft light.",
+    shortDescription:
+      "Hand-carved Italian marble pedestal with an etched globe glass shade.",
+    description:
+      "The Marble Aura Table Lamp showcases a solid marble base topped with a frosted glass sphere that emits a continuous 360-degree halo of soft light.",
     images: ["/products/2.png", "/products/1.png", "/products/3.png"],
     finishes: [
       { name: "White Marble", hex: "#F5F5F0" },
@@ -270,7 +281,8 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     },
     reviews: [],
     content: {
-      materialsAndCare: "Hand-carved Carrara marble base with blown glass globe.",
+      materialsAndCare:
+        "Hand-carved Carrara marble base with blown glass globe.",
       shippingAndReturns: "Ships in 3-5 business days across Pakistan.",
       payment: "All major credit cards, JazzCash, EasyPaisa, COD.",
       installationAndBulbs: "Requires 1x G9 LED bulb (included).",
@@ -292,8 +304,10 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     categoryName: "Floor Lamp",
     categorySlug: "floor-lamp",
     price: 28900,
-    shortDescription: "Sweeping brass arch with an oversized dome shade for living room lounge seating.",
-    description: "Graceful proportions and architectural height make the Luna Arc Floor Lamp an understated statement fixture for spacious living rooms.",
+    shortDescription:
+      "Sweeping brass arch with an oversized dome shade for living room lounge seating.",
+    description:
+      "Graceful proportions and architectural height make the Luna Arc Floor Lamp an understated statement fixture for spacious living rooms.",
     images: ["/products/3.png", "/products/4.png", "/products/1.png"],
     finishes: [
       { name: "Brass", hex: "#D4AF37" },
@@ -309,7 +323,8 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     },
     reviews: [],
     content: {
-      materialsAndCare: "Heavy steel weighted base with hand-brushed brass finish.",
+      materialsAndCare:
+        "Heavy steel weighted base with hand-brushed brass finish.",
       shippingAndReturns: "Delivery within 5 business days nationwide.",
       payment: "Credit Card, COD in Karachi & Lahore.",
       installationAndBulbs: "Simple assembly required. Takes E27 bulb.",
@@ -330,12 +345,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     categoryName: "Floor Lamp",
     categorySlug: "floor-lamp",
     price: 34900,
-    shortDescription: "Dramatic gold palm structure adorned with natural ostrich plume feathers.",
-    description: "Elysian Feather Floor Lamp combines organic glamour with gentle ambient illumination.",
+    shortDescription:
+      "Dramatic gold palm structure adorned with natural ostrich plume feathers.",
+    description:
+      "Elysian Feather Floor Lamp combines organic glamour with gentle ambient illumination.",
     images: ["/products/4.png", "/products/1.png", "/products/2.png"],
-    finishes: [
-      { name: "Gold", hex: "#D4AF37" },
-    ],
+    finishes: [{ name: "Gold", hex: "#D4AF37" }],
     ratings: {
       average: 5.0,
       count: 9,
@@ -343,7 +358,8 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     },
     reviews: [],
     content: {
-      materialsAndCare: "Natural ethically sourced ostrich feathers and brass electroplated tripod.",
+      materialsAndCare:
+        "Natural ethically sourced ostrich feathers and brass electroplated tripod.",
       shippingAndReturns: "Specialist shipping within 7 business days.",
       payment: "Bank Transfer, Credit Card.",
       installationAndBulbs: "Bulbs included.",
@@ -364,12 +380,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     categoryName: "Table Lamps",
     categorySlug: "table-lamps",
     price: 22900,
-    shortDescription: "Facet-cut K9 crystal base with gold leaf details and a pleated silk shade.",
-    description: "Casts delicate prismatic refractions across your space when illuminated.",
+    shortDescription:
+      "Facet-cut K9 crystal base with gold leaf details and a pleated silk shade.",
+    description:
+      "Casts delicate prismatic refractions across your space when illuminated.",
     images: ["/products/5.png", "/products/2.png", "/products/3.png"],
-    finishes: [
-      { name: "Gold & Crystal", hex: "#E5C158" },
-    ],
+    finishes: [{ name: "Gold & Crystal", hex: "#E5C158" }],
     ratings: {
       average: 4.8,
       count: 12,
@@ -401,12 +417,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     categoryName: "Floor Lamp",
     categorySlug: "floor-lamp",
     price: 31900,
-    shortDescription: "Minimalist brass rod mounted on a heavy Nero Marquina black marble base.",
-    description: "Clean geometric symmetry providing versatile reading and mood lighting.",
+    shortDescription:
+      "Minimalist brass rod mounted on a heavy Nero Marquina black marble base.",
+    description:
+      "Clean geometric symmetry providing versatile reading and mood lighting.",
     images: ["/products/6.png", "/products/1.png", "/products/4.png"],
-    finishes: [
-      { name: "Brass & Black Marble", hex: "#1F1F1F" },
-    ],
+    finishes: [{ name: "Brass & Black Marble", hex: "#1F1F1F" }],
     ratings: {
       average: 4.6,
       count: 8,
@@ -435,7 +451,9 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
 export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
   try {
     await connectToDatabase();
-    const categoriesFromDb = await CategoryModel.find({ isActive: true }).lean();
+    const categoriesFromDb = await CategoryModel.find({
+      isActive: true,
+    }).lean();
     if (categoriesFromDb && categoriesFromDb.length > 0) {
       return categoriesFromDb.map((c) => ({
         id: String(c._id),
@@ -447,7 +465,10 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
       }));
     }
   } catch (error) {
-    console.warn("MongoDB query failed for categories, falling back to mock data:", error);
+    console.warn(
+      "MongoDB query failed for categories, falling back to mock data:",
+      error,
+    );
   }
   return FALLBACK_CATEGORIES;
 }
@@ -481,7 +502,10 @@ export async function fetchStoreProducts(
       products = dbProducts.map((p) => {
         const minPrice = p.priceRange?.min || 15000;
         const defaultVar = p.variants?.[0];
-        const origPrice = defaultVar?.price && defaultVar?.salePrice ? defaultVar.price : undefined;
+        const origPrice =
+          defaultVar?.price && defaultVar?.salePrice
+            ? defaultVar.price
+            : undefined;
         return {
           id: String(p._id),
           name: p.name,
@@ -491,34 +515,53 @@ export async function fetchStoreProducts(
           categorySlug: p.category?.slug || "pendant-lights",
           price: minPrice,
           originalPrice: origPrice,
-          discountPercentage: origPrice ? Math.round(((origPrice - minPrice) / origPrice) * 100) : undefined,
-          shortDescription: p.shortDescription || p.description?.slice(0, 120) || "",
+          discountPercentage: origPrice
+            ? Math.round(((origPrice - minPrice) / origPrice) * 100)
+            : undefined,
+          shortDescription:
+            p.shortDescription || p.description?.slice(0, 120) || "",
           description: p.description || "",
           images: p.images?.length ? p.images : ["/products/1.png"],
           finishes: [
             { name: "Brass", hex: "#D4AF37" },
             { name: "Black", hex: "#1A1A1A" },
           ],
-          ratings: p.ratings?.count ? {
-            average: p.ratings.average || 4.8,
-            count: p.ratings.count || 12,
-            distribution: [
-              { stars: 5, count: Math.round((p.ratings.count || 12) * 0.8) },
-              { stars: 4, count: Math.round((p.ratings.count || 12) * 0.2) },
-            ],
-          } : {
-            average: 4.8,
-            count: 15,
-            distribution: [{ stars: 5, count: 12 }, { stars: 4, count: 3 }],
-          },
+          ratings: p.ratings?.count
+            ? {
+                average: p.ratings.average || 4.8,
+                count: p.ratings.count || 12,
+                distribution: [
+                  {
+                    stars: 5,
+                    count: Math.round((p.ratings.count || 12) * 0.8),
+                  },
+                  {
+                    stars: 4,
+                    count: Math.round((p.ratings.count || 12) * 0.2),
+                  },
+                ],
+              }
+            : {
+                average: 4.8,
+                count: 15,
+                distribution: [
+                  { stars: 5, count: 12 },
+                  { stars: 4, count: 3 },
+                ],
+              },
           reviews: [],
           content: {
-            materialsAndCare: p.content?.materialsAndCare || "Solid brass construction.",
-            shippingAndReturns: p.content?.shippingAndReturns || "Delivery in 3-5 business days.",
+            materialsAndCare:
+              p.content?.materialsAndCare || "Solid brass construction.",
+            shippingAndReturns:
+              p.content?.shippingAndReturns || "Delivery in 3-5 business days.",
             payment: p.content?.payment || "All major credit cards accepted.",
-            installationAndBulbs: p.content?.installationAndBulbs || "Standard E27 fitting.",
+            installationAndBulbs:
+              p.content?.installationAndBulbs || "Standard E27 fitting.",
           },
-          specifications: p.specifications || [{ key: "Brand", value: p.brand?.name || "Lighthouse" }],
+          specifications: p.specifications || [
+            { key: "Brand", value: p.brand?.name || "Lighthouse" },
+          ],
           designStyle: "Modern",
           material: "Brass",
           inStock: p.inStock ?? true,
@@ -532,7 +575,8 @@ export async function fetchStoreProducts(
   // Filter in memory for search/category/price/material/design
   if (options.categorySlug && options.categorySlug !== "all") {
     products = products.filter(
-      (p) => p.categorySlug.toLowerCase() === options.categorySlug?.toLowerCase(),
+      (p) =>
+        p.categorySlug.toLowerCase() === options.categorySlug?.toLowerCase(),
     );
   }
 
@@ -548,13 +592,17 @@ export async function fetchStoreProducts(
 
   if (options.material && options.material.length > 0) {
     products = products.filter((p) =>
-      options.material!.some((m) => p.material.toLowerCase() === m.toLowerCase()),
+      options.material!.some(
+        (m) => p.material.toLowerCase() === m.toLowerCase(),
+      ),
     );
   }
 
   if (options.designStyle && options.designStyle.length > 0) {
     products = products.filter((p) =>
-      options.designStyle!.some((d) => p.designStyle.toLowerCase() === d.toLowerCase()),
+      options.designStyle!.some(
+        (d) => p.designStyle.toLowerCase() === d.toLowerCase(),
+      ),
     );
   }
 
@@ -581,7 +629,9 @@ export async function fetchStoreProducts(
   return { products, total: products.length };
 }
 
-export async function fetchProductBySlug(slug: string): Promise<ShopProductItem | null> {
+export async function fetchProductBySlug(
+  slug: string,
+): Promise<ShopProductItem | null> {
   const { products } = await fetchStoreProducts();
   const found = products.find((p) => p.slug === slug);
   if (found) return found;

@@ -8,9 +8,13 @@ import {
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useMemo, useState, useCallback } from "react";
-import { ImageDropzone, type UploadedImage, type UploadImageResult } from "@/components/shared/image-dropzone";
+import { useCallback, useMemo, useState } from "react";
 import { ColorSwatch } from "@/components/shared/color-picker";
+import {
+  ImageDropzone,
+  type UploadedImage,
+  type UploadImageResult,
+} from "@/components/shared/image-dropzone";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,7 +98,12 @@ export function VariantTable({
   const updateVariant = (
     index: number,
     field: keyof VariantRow,
-    value: string | number | boolean | Record<string, string> | Array<{ url: string; publicId: string }>,
+    value:
+      | string
+      | number
+      | boolean
+      | Record<string, string>
+      | Array<{ url: string; publicId: string }>,
   ) => {
     const next = variants.map((v, i) =>
       i === index ? { ...v, [field]: value } : v,
@@ -199,9 +208,7 @@ export function VariantTable({
             Add variant
           </Button>
           {selected.size > 0 && (
-            <Badge variant="secondary">
-              {selected.size} selected
-            </Badge>
+            <Badge variant="secondary">{selected.size} selected</Badge>
           )}
           {selected.size > 0 && (
             <Button
@@ -362,7 +369,15 @@ function VariantRow({
   isExpanded: boolean;
   onToggleSelect: () => void;
   onToggleExpand: () => void;
-  onUpdate: (field: keyof VariantRow, value: string | number | boolean | Record<string, string> | Array<{ url: string; publicId: string }>) => void;
+  onUpdate: (
+    field: keyof VariantRow,
+    value:
+      | string
+      | number
+      | boolean
+      | Record<string, string>
+      | Array<{ url: string; publicId: string }>,
+  ) => void;
   onRemove?: () => void;
   upload?: (formData: FormData) => Promise<UploadImageResult>;
   deleteImage?: (publicId: string) => Promise<{ ok: boolean }>;
@@ -401,7 +416,10 @@ function VariantRow({
               <Select
                 value={variant.attributes[key] ?? ""}
                 onValueChange={(value) => {
-                  const newAttrs = { ...variant.attributes, [key]: String(value ?? "") };
+                  const newAttrs = {
+                    ...variant.attributes,
+                    [key]: String(value ?? ""),
+                  };
                   onUpdate("attributes", newAttrs);
                 }}
               >
@@ -441,7 +459,9 @@ function VariantRow({
               className={`h-8 min-w-24 w-full font-mono text-xs ${skuError ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             {skuError && (
-              <p className="text-[11px] text-destructive leading-tight">{skuError}</p>
+              <p className="text-[11px] text-destructive leading-tight">
+                {skuError}
+              </p>
             )}
           </div>
         </td>
@@ -581,7 +601,9 @@ function VariantRow({
                             if (deleteImage && img.publicId) {
                               await deleteImage(img.publicId);
                             }
-                            const nextImages = variant.images.filter((_, i) => i !== imgIndex);
+                            const nextImages = variant.images.filter(
+                              (_, i) => i !== imgIndex,
+                            );
                             onUpdate("images", nextImages);
                           }}
                           className="absolute -top-1.5 -right-1.5 size-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"

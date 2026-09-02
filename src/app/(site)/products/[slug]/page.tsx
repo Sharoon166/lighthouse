@@ -1,16 +1,16 @@
+import { PlusSignIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PlusSignIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { CTA } from "@/components/hero/cta";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductDetailTabs } from "@/components/shop/product-detail-tabs";
 import { ProductImageGallery } from "@/components/shop/product-image-gallery";
 import { ProductPurchasePanel } from "@/components/shop/product-purchase-panel";
-import { fetchProductBySlug, fetchStoreProducts } from "@/lib/shop-data";
 import { formatCurrency } from "@/lib/format";
+import { fetchProductBySlug, fetchStoreProducts } from "@/lib/shop-data";
 
 interface ProductPageProps {
   params: Promise<{
@@ -18,7 +18,9 @@ interface ProductPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const product = await fetchProductBySlug(resolvedParams.slug);
 
@@ -43,7 +45,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
   }
 
   const { products: allProducts } = await fetchStoreProducts();
-  const relatedProducts = allProducts.filter((p) => p.id !== product.id).slice(0, 4);
+  const relatedProducts = allProducts
+    .filter((p) => p.id !== product.id)
+    .slice(0, 4);
 
   return (
     <main className="min-h-screen bg-background">

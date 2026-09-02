@@ -10,6 +10,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
+import { BLOG_CATEGORIES } from "@/lib/constants";
 import {
   type BlogPostListItem,
   type BlogPostListResult,
@@ -35,16 +36,20 @@ function SkeletonGrid() {
   );
 }
 
+const allCategories = [
+  { label: "All Blogs", value: "all" },
+  ...BLOG_CATEGORIES,
+] as const;
+
 interface BlogGridProps {
   initialData: BlogPostListResult;
-  tags: string[];
   featuredPost: BlogPostListItem | null;
 }
 
-export function BlogGrid({ initialData, tags, featuredPost }: BlogGridProps) {
+export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [activeTag, setActiveTag] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
   const [page, setPage] = useState(1);
   const [pageSize] = useState(9);
   const [data, setData] = useState<BlogPostListResult>(initialData);
@@ -76,7 +81,7 @@ export function BlogGrid({ initialData, tags, featuredPost }: BlogGridProps) {
       pageSize,
       search: debouncedSearch,
       status: "published",
-      tag: activeTag,
+      category: activeCategory === "all" ? "" : activeCategory,
     })
       .then((result) => {
         if (!cancelled) setData(result);
@@ -92,10 +97,10 @@ export function BlogGrid({ initialData, tags, featuredPost }: BlogGridProps) {
     return () => {
       cancelled = true;
     };
-  }, [page, pageSize, debouncedSearch, activeTag]);
+  }, [page, pageSize, debouncedSearch, activeCategory]);
 
-  const handleTagChange = (tag: string) => {
-    setActiveTag(tag);
+  const handleCategoryChange = (cat: string) => {
+    setActiveCategory(cat);
     setPage(1);
   };
 
@@ -105,29 +110,21 @@ export function BlogGrid({ initialData, tags, featuredPost }: BlogGridProps) {
 
   return (
     <>
-      {/* Search + Tag Filters */}
+      {/* Search + Category Filters */}
       <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <nav
           aria-label="Blog categories"
           className="flex flex-wrap items-center gap-2"
         >
-          <Button
-            variant={activeTag === "" ? "secondary" : "default"}
-            size="sm"
-            className="rounded-full"
-            onClick={() => handleTagChange("")}
-          >
-            All Blogs
-          </Button>
-          {tags.map((tag) => (
+          {allCategories.map((cat) => (
             <Button
-              key={tag}
-              variant={activeTag === tag ? "default" : "outline"}
+              key={cat.value}
+              variant={activeCategory === cat.value ? "default" : "outline"}
               size="sm"
               className="rounded-full"
-              onClick={() => handleTagChange(tag)}
+              onClick={() => handleCategoryChange(cat.value)}
             >
-              {tag}
+              {cat.label}
             </Button>
           ))}
         </nav>
@@ -163,7 +160,7 @@ export function BlogGrid({ initialData, tags, featuredPost }: BlogGridProps) {
       ) : gridPosts.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
           <p className="text-muted-foreground">
-            {debouncedSearch || activeTag
+            {debouncedSearch || activeCategory !== "all"
               ? "No articles found. Try a different search or filter."
               : "No articles published yet. Check back soon!"}
           </p>

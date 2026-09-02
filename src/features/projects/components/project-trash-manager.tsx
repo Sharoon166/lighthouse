@@ -19,25 +19,31 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
-import { cn } from "@/lib/utils";
 import { formatDate } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 import {
+  listTrashedProjects,
   type ProjectListItem,
   type ProjectListResult,
-  listTrashedProjects,
   permanentlyDeleteProject,
   restoreProject,
 } from "../actions";
 
 const SKELETON_KEYS = ["one", "two", "three", "four", "five"];
 
-export function ProjectTrashManager({ initialData }: { initialData?: ProjectListResult }) {
+export function ProjectTrashManager({
+  initialData,
+}: {
+  initialData?: ProjectListResult;
+}) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(12);
-  const [data, setData] = useState<ProjectListResult | null>(initialData ?? null);
+  const [data, setData] = useState<ProjectListResult | null>(
+    initialData ?? null,
+  );
   const [isLoading, setIsLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -258,7 +264,9 @@ export function ProjectTrashManager({ initialData }: { initialData?: ProjectList
                         <StatusBadge status={project.status} />
                         <span className="text-xs text-muted-foreground">
                           Trashed{" "}
-                          {project.deletedAt ? formatDate(project.deletedAt) : ""}
+                          {project.deletedAt
+                            ? formatDate(project.deletedAt)
+                            : ""}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">

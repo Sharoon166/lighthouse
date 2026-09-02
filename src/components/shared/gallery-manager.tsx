@@ -23,7 +23,9 @@ export interface GalleryImage {
 interface GalleryManagerProps {
   images: GalleryImage[];
   onChange: (images: GalleryImage[]) => void;
-  upload: (formData: FormData) => Promise<{ ok: boolean; image?: GalleryImage; message?: string }>;
+  upload: (
+    formData: FormData,
+  ) => Promise<{ ok: boolean; image?: GalleryImage; message?: string }>;
   deleteImage?: (publicId: string) => Promise<{ ok: boolean }>;
   maxImages?: number;
   label?: string;
@@ -53,7 +55,7 @@ export function GalleryManager({
       if (!currentCrop) return;
 
       setIsUploading(true);
-      
+
       try {
         // Create a File from the blob with the original filename
         const file = new File([blob], currentCrop.name, {
@@ -75,9 +77,9 @@ export function GalleryManager({
         alert("Failed to upload image");
       } finally {
         setIsUploading(false);
-        
+
         // Process next file in queue
-        setCropQueue(prev => {
+        setCropQueue((prev) => {
           if (prev.length > 0) {
             const [nextItem, ...rest] = prev;
             setCurrentCrop(nextItem.file);
@@ -112,7 +114,7 @@ export function GalleryManager({
       }
 
       // Store files directly without creating object URLs yet
-      const fileItems = filesToProcess.map(file => ({ file }));
+      const fileItems = filesToProcess.map((file) => ({ file }));
 
       // Start cropping the first file, queue the rest
       const [firstItem, ...restItems] = fileItems;
@@ -140,10 +142,10 @@ export function GalleryManager({
 
   const handleRemove = async (index: number) => {
     const imageToRemove = images[index];
-    
+
     // Optimistically update UI
     onChange(images.filter((_, i) => i !== index));
-    
+
     // Delete from Cloudinary if deleteImage function is provided
     if (deleteImage && imageToRemove.publicId) {
       try {
@@ -201,7 +203,9 @@ export function GalleryManager({
           accept="image/*"
           onChange={handleFileSelect}
           className="absolute inset-0 cursor-pointer opacity-0"
-          disabled={isUploading || currentCrop !== null || images.length >= maxImages}
+          disabled={
+            isUploading || currentCrop !== null || images.length >= maxImages
+          }
         />
         <HugeiconsIcon
           icon={dragOver ? DragDropIcon : ImageUploadIcon}

@@ -30,10 +30,7 @@ export function Breadcrumb({ items, className }: BreadcrumbProps) {
                 />
               )}
               {item.href && !isLast ? (
-                <Link
-                  href={item.href}
-                  className="transition-colors text-gold"
-                >
+                <Link href={item.href} className="transition-colors text-gold">
                   {item.label}
                 </Link>
               ) : (

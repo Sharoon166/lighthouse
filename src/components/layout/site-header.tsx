@@ -67,9 +67,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
     <header
       className={cn(
         "z-50 w-full",
-        isHero
-          ? "absolute top-0 py-4"
-          : "static bg-background py-3",
+        isHero ? "absolute top-0 py-4" : "static bg-background py-3",
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
@@ -221,7 +219,11 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           {/* Integrated Search */}
           <div className="relative mb-6">
             <div className="flex items-center gap-2 rounded-full bg-muted/40 px-4 py-2.5">
-              <HugeiconsIcon icon={Search01Icon} size={18} className="text-muted-foreground" />
+              <HugeiconsIcon
+                icon={Search01Icon}
+                size={18}
+                className="text-muted-foreground"
+              />
               <input
                 type="text"
                 placeholder="Search...."
@@ -246,14 +248,23 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               >
                 <span>{label}</span>
                 {isActive(href) && (
-                  <HugeiconsIcon icon={Idea01Icon} size={30} className="text-gold" />
+                  <HugeiconsIcon
+                    icon={Idea01Icon}
+                    size={30}
+                    className="text-gold"
+                  />
                 )}
               </Link>
             ))}
           </nav>
 
           {/* Bottom CTA Row */}
-          <div className={cn("pt-6 border-t border-border/40 grid grid-cols-2 gap-3 mt-auto", !IS_PHASE_2 && "hidden")}>
+          <div
+            className={cn(
+              "pt-6 border-t border-border/40 grid grid-cols-2 gap-3 mt-auto",
+              !IS_PHASE_2 && "hidden",
+            )}
+          >
             <Link
               href="/cart"
               onClick={() => setMobileOpen(false)}

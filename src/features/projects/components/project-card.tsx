@@ -1,3 +1,5 @@
+import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -34,13 +36,17 @@ export function ProjectCard({
         className={`object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${imageClassName ?? ""}`}
       />
       <div
-        className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent ${overlayClassName ?? ""}`}
+        className={`absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent ${overlayClassName ?? ""}`}
       />
       <div className="absolute inset-x-0 bottom-0 p-5">
         <h3 className="font-heading text-xl font-bold text-white leading-snug">
           {project.title}
         </h3>
-        <p className="mt-1 text-sm text-white/70">{project.subtitle}</p>
+        <div className="flex gap-1 items-center text-gold ">
+          
+          <p className="mt-1 text-sm truncate">{project.subtitle}</p>
+          <HugeiconsIcon icon={ArrowRight02Icon} />
+        </div>
       </div>
     </Link>
   );

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-
-import { ProjectTrashManager } from "@/features/projects/components/project-trash-manager";
 import { listTrashedProjects } from "@/features/projects/actions";
+import { ProjectTrashManager } from "@/features/projects/components/project-trash-manager";
 
 export const metadata: Metadata = {
   title: "Trash · Lighthouse",

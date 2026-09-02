@@ -5,13 +5,12 @@ import { ProjectCard, type ProjectItem } from "./project-card";
 import { ProjectFilters } from "./project-filters";
 
 export function ProjectGrid({ projects }: { projects: ProjectItem[] }) {
-  const [category, setCategory] = useState("All Projects");
+  const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
 
   const filtered = projects.filter((p) => {
     const matchesCategory =
-      category === "All Projects" ||
-      p.category.toLowerCase() === category.toLowerCase();
+      category === "all" || p.category.toLowerCase() === category.toLowerCase();
     const matchesSearch =
       search === "" ||
       p.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -35,7 +34,7 @@ export function ProjectGrid({ projects }: { projects: ProjectItem[] }) {
               <ProjectCard
                 key={project.id}
                 project={project}
-                className="aspect-[3/2]"
+                className="aspect-3/2"
               />
             ))}
           </div>

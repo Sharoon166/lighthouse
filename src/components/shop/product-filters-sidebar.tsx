@@ -29,7 +29,13 @@ const PRICE_OPTIONS = [
   { label: "Rs. 100,000+", value: "100k-plus" },
 ];
 
-const MATERIAL_OPTIONS = ["Brass", "Ceramic", "Hand-blown Glass", "Steel", "Wood"];
+const MATERIAL_OPTIONS = [
+  "Brass",
+  "Ceramic",
+  "Hand-blown Glass",
+  "Steel",
+  "Wood",
+];
 
 export function ProductFiltersSidebar() {
   const router = useRouter();
@@ -104,7 +110,9 @@ export function ProductFiltersSidebar() {
                 }`}
               >
                 <span>{cat.name}</span>
-                <span className="text-xs text-muted-foreground">({cat.count})</span>
+                <span className="text-xs text-muted-foreground">
+                  ({cat.count})
+                </span>
               </button>
             );
           })}

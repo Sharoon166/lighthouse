@@ -1,5 +1,11 @@
 import { z } from "zod";
+import { BLOG_CATEGORIES } from "@/lib/constants";
 import { FIELD_LIMITS } from "@/lib/field-limits";
+
+const blogCategoryValues = BLOG_CATEGORIES.map((c) => c.value) as [
+  string,
+  ...string[],
+];
 
 export const blogPostInputSchema = z
   .object({
@@ -8,7 +14,10 @@ export const blogPostInputSchema = z
       .string()
       .trim()
       .min(1, "Slug is required")
-      .max(FIELD_LIMITS.slug, `Slug must be ${FIELD_LIMITS.slug} characters or fewer`)
+      .max(
+        FIELD_LIMITS.slug,
+        `Slug must be ${FIELD_LIMITS.slug} characters or fewer`,
+      )
       .regex(
         /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
         "Slug must contain only lowercase letters, numbers and hyphens",
@@ -17,16 +26,33 @@ export const blogPostInputSchema = z
       .string()
       .trim()
       .min(1, "Title is required")
-      .max(FIELD_LIMITS.name.medium, `Title must be ${FIELD_LIMITS.name.medium} characters or fewer`),
+      .max(
+        FIELD_LIMITS.name.medium,
+        `Title must be ${FIELD_LIMITS.name.medium} characters or fewer`,
+      ),
     summary: z
       .string()
       .trim()
-      .max(FIELD_LIMITS.description.long, `Summary must be ${FIELD_LIMITS.description.long} characters or fewer`),
+      .max(
+        FIELD_LIMITS.description.long,
+        `Summary must be ${FIELD_LIMITS.description.long} characters or fewer`,
+      ),
+    category: z.string().trim().default(""),
     tags: z
       .array(
-        z.string().trim().min(1).max(FIELD_LIMITS.tag.name, `Tags must be ${FIELD_LIMITS.tag.name} characters or fewer`),
+        z
+          .string()
+          .trim()
+          .min(1)
+          .max(
+            FIELD_LIMITS.tag.name,
+            `Tags must be ${FIELD_LIMITS.tag.name} characters or fewer`,
+          ),
       )
-      .max(FIELD_LIMITS.tag.maxCount, `Up to ${FIELD_LIMITS.tag.maxCount} tags allowed`),
+      .max(
+        FIELD_LIMITS.tag.maxCount,
+        `Up to ${FIELD_LIMITS.tag.maxCount} tags allowed`,
+      ),
     content: z.record(z.string(), z.unknown()),
     heroImage: z
       .object({
@@ -40,8 +66,17 @@ export const blogPostInputSchema = z
       designation: z
         .string()
         .trim()
-        .max(FIELD_LIMITS.name.short, `Designation must be ${FIELD_LIMITS.name.short} characters or fewer`),
-      bio: z.string().trim().max(FIELD_LIMITS.description.medium, `Bio must be ${FIELD_LIMITS.description.medium} characters or fewer`),
+        .max(
+          FIELD_LIMITS.name.short,
+          `Designation must be ${FIELD_LIMITS.name.short} characters or fewer`,
+        ),
+      bio: z
+        .string()
+        .trim()
+        .max(
+          FIELD_LIMITS.description.medium,
+          `Bio must be ${FIELD_LIMITS.description.medium} characters or fewer`,
+        ),
     }),
     featured: z.boolean().optional(),
     publishedAt: z.string().nullable().optional(),
@@ -50,17 +85,26 @@ export const blogPostInputSchema = z
         metaTitle: z
           .string()
           .trim()
-          .max(FIELD_LIMITS.seo.metaTitle, `Meta title must be ${FIELD_LIMITS.seo.metaTitle} characters or fewer`)
+          .max(
+            FIELD_LIMITS.seo.metaTitle,
+            `Meta title must be ${FIELD_LIMITS.seo.metaTitle} characters or fewer`,
+          )
           .optional(),
         metaDescription: z
           .string()
           .trim()
-          .max(FIELD_LIMITS.seo.metaDescription, `Meta description must be ${FIELD_LIMITS.seo.metaDescription} characters or fewer`)
+          .max(
+            FIELD_LIMITS.seo.metaDescription,
+            `Meta description must be ${FIELD_LIMITS.seo.metaDescription} characters or fewer`,
+          )
           .optional(),
         focusKeyword: z
           .string()
           .trim()
-          .max(FIELD_LIMITS.seo.focusKeyword, `Focus keyword must be ${FIELD_LIMITS.seo.focusKeyword} characters or fewer`)
+          .max(
+            FIELD_LIMITS.seo.focusKeyword,
+            `Focus keyword must be ${FIELD_LIMITS.seo.focusKeyword} characters or fewer`,
+          )
           .optional(),
         noIndex: z.boolean().optional(),
       })
@@ -68,6 +112,14 @@ export const blogPostInputSchema = z
   })
   .superRefine((data, context) => {
     if (data.intent !== "publish") return;
+
+    if (!data.category) {
+      context.addIssue({
+        code: "custom",
+        path: ["category"],
+        message: "A category is required to publish",
+      });
+    }
 
     if (!data.summary) {
       context.addIssue({

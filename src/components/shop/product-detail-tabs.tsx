@@ -11,7 +11,9 @@ interface ProductDetailTabsProps {
 }
 
 export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
-  const [activeTab, setActiveTab] = useState<"description" | "specifications" | "reviews">("reviews");
+  const [activeTab, setActiveTab] = useState<
+    "description" | "specifications" | "reviews"
+  >("reviews");
 
   const totalReviewsCount = product.ratings.count || 24;
 
@@ -70,7 +72,9 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
               {product.description}
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Each piece is meticulously inspected for quality, ensuring smooth movement across all joints and flawless luster across the lacquered metal surfaces.
+              Each piece is meticulously inspected for quality, ensuring smooth
+              movement across all joints and flawless luster across the
+              lacquered metal surfaces.
             </p>
           </div>
           <div className="lg:col-span-5 relative aspect-square rounded-xl overflow-hidden bg-muted">
@@ -90,7 +94,10 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
           <table className="w-full text-left text-sm">
             <tbody className="divide-y divide-border/60">
               {product.specifications.map((spec) => (
-                <tr key={spec.key} className="hover:bg-muted/30 transition-colors">
+                <tr
+                  key={spec.key}
+                  className="hover:bg-muted/30 transition-colors"
+                >
                   <td className="w-1/3 py-3.5 px-6 font-semibold text-foreground bg-muted/20">
                     {spec.key}
                   </td>
@@ -116,7 +123,12 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
               </span>
               <div className="flex items-center text-amber-500 my-2">
                 {[...Array(5)].map((_, i) => (
-                  <HugeiconsIcon key={i} icon={StarIcon} size={16} className="fill-amber-400 text-amber-400" />
+                  <HugeiconsIcon
+                    key={i}
+                    icon={StarIcon}
+                    size={16}
+                    className="fill-amber-400 text-amber-400"
+                  />
                 ))}
               </div>
               <span className="text-xs text-muted-foreground">
@@ -127,18 +139,31 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
             {/* Star Distribution bars matching Image 4 */}
             <div className="flex-1 space-y-2 justify-center flex flex-col">
               {product.ratings.distribution.map((dist) => {
-                const percent = Math.round((dist.count / totalReviewsCount) * 100);
+                const percent = Math.round(
+                  (dist.count / totalReviewsCount) * 100,
+                );
                 return (
-                  <div key={dist.stars} className="flex items-center gap-3 text-xs">
-                    <span className="w-3 text-right font-medium text-foreground">{dist.stars}</span>
-                    <HugeiconsIcon icon={StarIcon} size={12} className="fill-amber-400 text-amber-400 shrink-0" />
+                  <div
+                    key={dist.stars}
+                    className="flex items-center gap-3 text-xs"
+                  >
+                    <span className="w-3 text-right font-medium text-foreground">
+                      {dist.stars}
+                    </span>
+                    <HugeiconsIcon
+                      icon={StarIcon}
+                      size={12}
+                      className="fill-amber-400 text-amber-400 shrink-0"
+                    />
                     <div className="h-2 flex-1 rounded-full bg-muted overflow-hidden">
                       <div
                         className="h-full rounded-full bg-gold"
                         style={{ width: `${percent}%` }}
                       />
                     </div>
-                    <span className="w-6 text-right text-muted-foreground">{dist.count}</span>
+                    <span className="w-6 text-right text-muted-foreground">
+                      {dist.count}
+                    </span>
                   </div>
                 );
               })}

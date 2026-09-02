@@ -113,11 +113,7 @@ const productBaseSchema = z.object({
 
         values: z
           .array(
-            z
-              .string()
-              .trim()
-              .min(1)
-              .max(FIELD_LIMITS.variant.attributeValue),
+            z.string().trim().min(1).max(FIELD_LIMITS.variant.attributeValue),
           )
           .min(1, "At least one value is required"),
 
@@ -164,10 +160,7 @@ const productBaseSchema = z.object({
     .optional()
     .default(""),
 
-  variantDimensions: z
-    .array(z.string().trim().min(1))
-    .optional()
-    .default([]),
+  variantDimensions: z.array(z.string().trim().min(1)).optional().default([]),
 
   variants: z
     .array(variantInputSchema)
@@ -254,13 +247,11 @@ export const productInputSchema = productBaseSchema.superRefine(
     }
 
     const comboKeys = data.variants.map((variant) => {
-      const entries = Object.entries(variant.attributes).sort(
-        ([a], [b]) => a.localeCompare(b),
+      const entries = Object.entries(variant.attributes).sort(([a], [b]) =>
+        a.localeCompare(b),
       );
 
-      return entries
-        .map(([key, value]) => `${key}=${value}`)
-        .join("|");
+      return entries.map(([key, value]) => `${key}=${value}`).join("|");
     });
 
     const uniqueCombos = new Set(comboKeys);

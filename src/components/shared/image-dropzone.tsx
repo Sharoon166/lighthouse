@@ -189,16 +189,19 @@ export function ImageDropzone({
                 disabled={isUploading}
                 onClick={async () => {
                   setError(null);
-                  
+
                   // Optimistically update UI
                   onChange(null);
-                  
+
                   // Delete from Cloudinary if deleteImage function is provided
                   if (deleteImage && value.publicId) {
                     try {
                       await deleteImage(value.publicId);
                     } catch (error) {
-                      console.error("Failed to delete image from cloud:", error);
+                      console.error(
+                        "Failed to delete image from cloud:",
+                        error,
+                      );
                       // Image is already removed from UI, so we don't revert
                     }
                   }

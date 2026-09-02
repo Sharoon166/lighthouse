@@ -46,13 +46,16 @@ export function ColorPicker({
   });
 
   const normalizedValue = colorToHex(value);
-  const isCustom = normalizedValue && !PRESET_COLORS.some((c) => c.hex.toUpperCase() === normalizedValue);
+  const isCustom =
+    normalizedValue &&
+    !PRESET_COLORS.some((c) => c.hex.toUpperCase() === normalizedValue);
 
   return (
     <div className={className}>
       <div className="flex flex-wrap gap-1.5">
         {PRESET_COLORS.map((color) => {
-          const isSelected = normalizedValue.toUpperCase() === color.hex.toUpperCase();
+          const isSelected =
+            normalizedValue.toUpperCase() === color.hex.toUpperCase();
           const isLight =
             color.hex === "#FFFFFF" ||
             color.hex === "#C0C0C0" ||
@@ -97,7 +100,9 @@ export function ColorPicker({
           <Input
             value={hexInput}
             onChange={(e) => {
-              const val = e.target.value.replace(/[^0-9A-Fa-f]/g, "").slice(0, 6);
+              const val = e.target.value
+                .replace(/[^0-9A-Fa-f]/g, "")
+                .slice(0, 6);
               setHexInput(val);
               if (isValidHex(`#${val}`)) {
                 onChange(`#${val}`);

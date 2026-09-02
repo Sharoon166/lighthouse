@@ -9,6 +9,7 @@ import { type Brand, BrandModel } from "@/models/brand";
 import { ProductModel } from "@/models/product";
 
 export type { Brand };
+
 import { brandInputSchema } from "../validation/brand";
 
 export type BrandActionResult =
@@ -42,9 +43,7 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export async function createBrand(
-  input: unknown,
-): Promise<BrandActionResult> {
+export async function createBrand(input: unknown): Promise<BrandActionResult> {
   const parsed = brandInputSchema.safeParse(input);
 
   if (!parsed.success) {
@@ -112,8 +111,10 @@ export async function updateBrand(
       };
     }
 
-    const nextSlug =
-      await uniqueSlug(data.slug || data.name, String(existing._id));
+    const nextSlug = await uniqueSlug(
+      data.slug || data.name,
+      String(existing._id),
+    );
 
     existing.set({
       name: data.name,
@@ -263,9 +264,7 @@ export async function getAllBrands(): Promise<
   }));
 }
 
-export async function getBrandById(
-  id: string,
-): Promise<Brand | null> {
+export async function getBrandById(id: string): Promise<Brand | null> {
   await connectToDatabase();
   return BrandModel.findById(id).lean();
 }

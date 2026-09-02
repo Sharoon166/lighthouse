@@ -1,10 +1,18 @@
 "use client";
 
-import { Delete02Icon, PlusSignIcon, SaveIcon, CheckIcon, ArrowLeft02Icon, Warning } from "@hugeicons/core-free-icons";
+import {
+  ArrowLeft02Icon,
+  CheckIcon,
+  Delete02Icon,
+  PlusSignIcon,
+  SaveIcon,
+  Warning,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
+import { ColorSwatch, PRESET_COLORS } from "@/components/shared/color-picker";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +25,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { FIELD_LIMITS } from "@/lib/field-limits";
-import { ColorSwatch, PRESET_COLORS } from "@/components/shared/color-picker";
 import {
   type AttributeDefinition,
   type AttributeDefinitionActionResult,
@@ -273,10 +280,15 @@ export function AttributeDefinitionForm({
             {formErrors.length > 0 ? (
               formErrors.map((message) => <p key={message}>{message}</p>)
             ) : (
-              <p>
-                Could not save your attribute. Please check the highlighted
-                fields.
-              </p>
+              <ul className="list-disc pl-4">
+                {Object.entries(fieldErrors)
+                  .filter(([, errors]) => errors && errors.length > 0)
+                  .map(([field, errors]) =>
+                    errors!.map((message) => (
+                      <li key={`${field}-${message}`}>{message}</li>
+                    )),
+                  )}
+              </ul>
             )}
           </div>
         </div>
@@ -446,7 +458,10 @@ export function AttributeDefinitionForm({
                         title={`${color.name}${alreadyAdded ? " (added)" : ""}`}
                         disabled={alreadyAdded}
                         onClick={() => {
-                          if (options.length >= FIELD_LIMITS.attributeDefinition.maxOptions) {
+                          if (
+                            options.length >=
+                            FIELD_LIMITS.attributeDefinition.maxOptions
+                          ) {
                             setFieldErrors((prev) => ({
                               ...prev,
                               options: [
@@ -591,7 +606,7 @@ export function AttributeDefinitionForm({
           </Button>
         </div>
       )}
-      
+
       {/* Sticky bottom bar */}
       {!compact && (
         <div className="fixed inset-x-0 bottom-0 border-t border-border bg-background/95 backdrop-blur-md">

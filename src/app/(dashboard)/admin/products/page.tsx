@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-
-import { ProductsManager } from "@/features/shop/components/products-manager";
 import { listProducts } from "@/features/shop/actions/product-actions";
+import { ProductsManager } from "@/features/shop/components/products-manager";
 
 export const metadata: Metadata = {
   title: "Products · Lighthouse",

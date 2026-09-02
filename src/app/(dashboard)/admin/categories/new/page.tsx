@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
-
-import { CategoryForm } from "@/features/shop/components/category-form";
-import {
-  getAllCategoriesAdmin,
-} from "@/features/shop/actions/category-actions";
 import { getAllActiveAttributeDefinitions } from "@/features/shop/actions/attribute-definition-actions";
+import { getAllCategoriesAdmin } from "@/features/shop/actions/category-actions";
+import { CategoryForm } from "@/features/shop/components/category-form";
 
 export const metadata: Metadata = {
   title: "New category · Lighthouse",

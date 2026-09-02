@@ -122,7 +122,7 @@ export function ImageZoom({ open, src, alt, onClose }: ImageZoomProps) {
       />
 
       {/* top scrim + caption + close, floats over the image rather than boxing it in */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/60 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-linear-to-b from-black/60 to-transparent" />
       <div className="relative z-10 flex items-start justify-between gap-4 p-4 sm:p-5">
         <div className="min-w-0 pt-1">
           <p className="truncate text-sm font-medium text-white/90">{alt}</p>
@@ -159,8 +159,7 @@ export function ImageZoom({ open, src, alt, onClose }: ImageZoomProps) {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         style={{
-          cursor:
-            scale > 1 ? (isDragging ? "grabbing" : "grab") : "zoom-in",
+          cursor: scale > 1 ? (isDragging ? "grabbing" : "grab") : "zoom-in",
         }}
       >
         <div className="relative size-full max-h-full max-w-full">

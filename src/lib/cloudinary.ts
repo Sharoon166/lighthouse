@@ -20,7 +20,7 @@ export const CLOUDINARY_DEFAULT_FOLDER = "lighthouse/blog";
 /**
  * Cloudinary delivery transformations.
  * These are applied when serving images to the browser, not on upload.
- * 
+ *
  * Note: We store already-optimized images, so these transformations
  * should primarily handle responsive delivery, not aggressive resizing.
  */
@@ -53,7 +53,7 @@ export const CLOUDINARY_TRANSFORMATIONS = {
 } as const;
 
 // Deprecated: Use CLOUDINARY_TRANSFORMATIONS instead
-export const HERO_IMAGE_TRANSFORMATION: TransformationOptions = 
+export const HERO_IMAGE_TRANSFORMATION: TransformationOptions =
   CLOUDINARY_TRANSFORMATIONS.hero;
 
 export type CloudinaryImage = {
@@ -113,11 +113,11 @@ export async function deleteImage(publicId: string): Promise<void> {
 
 /**
  * Generate an optimized Cloudinary URL with automatic format and quality.
- * 
+ *
  * @param publicId - Cloudinary public ID
  * @param options - Transformation options
  * @returns Optimized image URL
- * 
+ *
  * @example
  * ```typescript
  * const url = getOptimizedImageUrl(publicId, { width: 800, height: 600 });

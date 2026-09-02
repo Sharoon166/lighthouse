@@ -20,14 +20,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  InputGroupTextarea,
   InputGroupText,
+  InputGroupTextarea,
 } from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { FIELD_LIMITS } from "@/lib/field-limits";
@@ -37,10 +37,7 @@ import {
   createBrand,
   updateBrand,
 } from "../actions/brand-actions";
-import {
-  uploadShopImage,
-  deleteShopImage,
-} from "../actions/image-actions";
+import { deleteShopImage, uploadShopImage } from "../actions/image-actions";
 import { type BrandInput, brandInputSchema } from "../validation/brand";
 
 interface BrandFormProps {
@@ -179,10 +176,7 @@ export function BrandForm({
 
       setSavedNotice("Brand saved.");
       if (savedNoticeTimer.current) clearTimeout(savedNoticeTimer.current);
-      savedNoticeTimer.current = setTimeout(
-        () => setSavedNotice(null),
-        3000,
-      );
+      savedNoticeTimer.current = setTimeout(() => setSavedNotice(null), 3000);
 
       if (!isEdit) {
         router.replace("/admin/brands");
@@ -251,10 +245,15 @@ export function BrandForm({
             {formErrors.length > 0 ? (
               formErrors.map((message) => <p key={message}>{message}</p>)
             ) : (
-              <p>
-                Could not save your brand. Please check the highlighted
-                fields.
-              </p>
+              <ul className="list-disc pl-4">
+                {Object.entries(fieldErrors)
+                  .filter(([, errors]) => errors && errors.length > 0)
+                  .map(([field, errors]) =>
+                    errors!.map((message) => (
+                      <li key={`${field}-${message}`}>{message}</li>
+                    )),
+                  )}
+              </ul>
             )}
           </div>
         </div>
@@ -285,7 +284,9 @@ export function BrandForm({
                     maxLength={FIELD_LIMITS.name.short}
                   />
                   <InputGroupAddon align="inline-end">
-                    <InputGroupText>{name.length}/{FIELD_LIMITS.name.short}</InputGroupText>
+                    <InputGroupText>
+                      {name.length}/{FIELD_LIMITS.name.short}
+                    </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
                 {fieldError("name") && (
@@ -343,7 +344,10 @@ export function BrandForm({
                     aria-invalid={Boolean(fieldError("description"))}
                     maxLength={FIELD_LIMITS.description.medium}
                   />
-                  <InputGroupAddon align="block-end" className="border-t border-border">
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
                     <InputGroupText>
                       {description.length}/{FIELD_LIMITS.description.medium}
                     </InputGroupText>
@@ -460,9 +464,7 @@ export function BrandForm({
               </div>
 
               <div className="space-y-2" data-field="seo.metaDescription">
-                <Label htmlFor="seo-meta-description">
-                  Meta Description
-                </Label>
+                <Label htmlFor="seo-meta-description">Meta Description</Label>
                 <InputGroup className="min-h-[5rem]">
                   <InputGroupTextarea
                     id="seo-meta-description"
@@ -476,13 +478,15 @@ export function BrandForm({
                       "Auto-generated from description"
                     }
                     maxLength={FIELD_LIMITS.seo.metaDescription}
-                    aria-invalid={Boolean(
-                      fieldError("seo.metaDescription"),
-                    )}
+                    aria-invalid={Boolean(fieldError("seo.metaDescription"))}
                   />
-                  <InputGroupAddon align="block-end" className="border-t border-border">
+                  <InputGroupAddon
+                    align="block-end"
+                    className="border-t border-border"
+                  >
                     <InputGroupText>
-                      {seoMetaDescription.length}/{FIELD_LIMITS.seo.metaDescription}
+                      {seoMetaDescription.length}/
+                      {FIELD_LIMITS.seo.metaDescription}
                     </InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>

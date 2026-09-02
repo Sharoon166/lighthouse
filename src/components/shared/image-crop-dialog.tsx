@@ -11,9 +11,9 @@ import { useCallback, useEffect, useState } from "react";
 import Cropper, { type Area } from "react-easy-crop";
 import { Button } from "@/components/ui/button";
 import {
-  optimizeImage,
   IMAGE_OPTIMIZATION_PRESETS,
   type OptimizationConfig,
+  optimizeImage,
 } from "@/lib/image-optimizer";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +38,7 @@ async function getCroppedBlob(
       }
       blob = await source.blob();
     }
-    
+
     const bitmap = await createImageBitmap(blob, {
       imageOrientation: "from-image",
     });
@@ -176,31 +176,44 @@ export function ImageCropDialog({
 
   const handleConfirm = useCallback(async () => {
     if (!croppedAreaPixels || isProcessingCrop) return;
-    
+
     setIsProcessingCrop(true);
     try {
       // Use File directly if available, otherwise use URL
       const imageSource = imageFile || imageUrl;
-      
+
       // Step 1: Crop (uncompressed)
-      const croppedBlob = await getCroppedBlob(imageSource, croppedAreaPixels, rotation);
-      
+      const croppedBlob = await getCroppedBlob(
+        imageSource,
+        croppedAreaPixels,
+        rotation,
+      );
+
       // Step 2: Optimize (if preset provided)
       let finalBlob = croppedBlob;
       if (optimizationPreset) {
         const config = IMAGE_OPTIMIZATION_PRESETS[optimizationPreset];
         finalBlob = await optimizeImage(croppedBlob, config);
       }
-      
+
       onConfirm(finalBlob);
     } catch (error) {
       console.error("Crop/optimization error:", error);
-      const message = error instanceof Error ? error.message : "Failed to process image";
+      const message =
+        error instanceof Error ? error.message : "Failed to process image";
       alert(`${message}. Please try again.`);
     } finally {
       setIsProcessingCrop(false);
     }
-  }, [imageFile, imageUrl, croppedAreaPixels, rotation, optimizationPreset, onConfirm, isProcessingCrop]);
+  }, [
+    imageFile,
+    imageUrl,
+    croppedAreaPixels,
+    rotation,
+    optimizationPreset,
+    onConfirm,
+    isProcessingCrop,
+  ]);
 
   if (!open || !imageUrl) return null;
 
@@ -227,7 +240,11 @@ export function ImageCropDialog({
         {/* Header */}
         <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3.5">
           <div className="flex items-center gap-2.5">
-            <HugeiconsIcon icon={CropIcon} size={18} className="text-muted-foreground" />
+            <HugeiconsIcon
+              icon={CropIcon}
+              size={18}
+              className="text-muted-foreground"
+            />
             <div>
               <h2
                 id="image-crop-dialog-title"
@@ -313,34 +330,33 @@ export function ImageCropDialog({
             </div>
           )}
 
-          
           {/* Actions */}
           <div className="flex items-center justify-between gap-3 pt-1">
-          {/* Zoom */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label
-                htmlFor="crop-zoom"
-                className="text-xs font-medium text-muted-foreground"
-              >
-                Zoom
-              </label>
-              <span className="text-xs text-muted-foreground">
-                {Math.round((zoom - 1) * 100)}%
-              </span>
+            {/* Zoom */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="crop-zoom"
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  Zoom
+                </label>
+                <span className="text-xs text-muted-foreground">
+                  {Math.round((zoom - 1) * 100)}%
+                </span>
+              </div>
+              <input
+                id="crop-zoom"
+                type="range"
+                min={1}
+                max={4}
+                step={0.01}
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                disabled={isBusy}
+                className="w-full accent-foreground disabled:opacity-50"
+              />
             </div>
-            <input
-              id="crop-zoom"
-              type="range"
-              min={1}
-              max={4}
-              step={0.01}
-              value={zoom}
-              onChange={(e) => setZoom(Number(e.target.value))}
-              disabled={isBusy}
-              className="w-full accent-foreground disabled:opacity-50"
-            />
-          </div>
             <div className="flex items-center gap-2">
               <Button
                 type="button"

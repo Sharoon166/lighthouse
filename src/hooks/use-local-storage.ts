@@ -3,34 +3,40 @@ import { useEffect, useState } from "react";
 /**
  * Persists a value to localStorage with JSON serialization.
  *
- * - Reads lazily so a corrupt or missing entry falls back to `initialValue`.
+ * - Returns `initialValue` on the server and until hydration completes,
+ *   preventing SSR / client mismatches.
+ * - Reads lazily after mount so a corrupt or missing entry falls back
+ *   to `initialValue`.
  * - Writes on every change.
  * - Syncs across tabs via the `storage` event.
  * - Never throws when storage is unavailable (private mode, quota, SSR).
  */
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  const [value, setValue] = useState<T>(() => {
-    if (typeof window === "undefined") return initialValue;
-    try {
-      const raw = window.localStorage.getItem(key);
-      return raw === null ? initialValue : (JSON.parse(raw) as T);
-    } catch {
-      return initialValue;
-    }
-  });
+  const [value, setValue] = useState<T>(initialValue);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(key);
+      if (raw !== null) {
+        setValue(JSON.parse(raw) as T);
+      }
+    } catch {
+      // Corrupt or unavailable — keep initialValue.
+    }
+    setHydrated(true);
+  }, [key]);
+
+  useEffect(() => {
+    if (!hydrated) return;
     try {
       window.localStorage.setItem(key, JSON.stringify(value));
     } catch {
       // Storage unavailable — the value stays in memory for this session.
     }
-  }, [key, value]);
+  }, [key, value, hydrated]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     const onStorage = (event: StorageEvent) => {
       if (event.key !== key) return;
       try {

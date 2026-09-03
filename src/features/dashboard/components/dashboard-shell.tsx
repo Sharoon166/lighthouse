@@ -6,20 +6,9 @@ import { cn } from "@/lib/utils";
 import { DashboardHeader } from "./dashboard-header";
 import { SidebarNav } from "./sidebar-nav";
 
-export function DashboardShell({
-  children,
-  adminName,
-  adminEmail,
-}: {
-  children: ReactNode;
-  adminName: string;
-  adminEmail: string;
-}) {
+export function DashboardShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [collapsed, setCollapsed] = useLocalStorage(
-    "lighthouse:dashboard-sidebar-collapsed",
-    true,
-  );
+  const [collapsed] = useLocalStorage("lighthouse:sidebar-collapsed", true);
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
@@ -30,19 +19,11 @@ export function DashboardShell({
             collapsed ? "w-16" : "w-60",
           )}
         >
-          <SidebarNav
-            adminName={adminName}
-            adminEmail={adminEmail}
-            collapsed={collapsed}
-            onToggleCollapse={() => setCollapsed((value) => !value)}
-          />
+          <SidebarNav />
         </aside>
 
         <div className="min-w-0 flex-1">
-          <DashboardHeader
-            adminName={adminName}
-            onMenuClick={() => setMobileOpen(true)}
-          />
+          <DashboardHeader menuClick={() => setMobileOpen(true)} />
           <main className="mt-8 pb-16">{children}</main>
         </div>
       </div>
@@ -56,11 +37,7 @@ export function DashboardShell({
             onClick={() => setMobileOpen(false)}
           />
           <div className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card shadow-xl">
-            <SidebarNav
-              adminName={adminName}
-              adminEmail={adminEmail}
-              onNavigate={() => setMobileOpen(false)}
-            />
+            <SidebarNav navigate={() => setMobileOpen(false)} />
           </div>
         </div>
       )}

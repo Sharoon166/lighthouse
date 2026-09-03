@@ -289,11 +289,11 @@ function StockStatus({
       </svg>
       <div className="mt-4 flex items-center gap-5 text-xs text-muted-foreground">
         <span className="flex items-center gap-2">
-          <span className="inline-block size-2 rounded-full bg-[var(--chart-2)]" />
+          <span className="inline-block size-2 rounded-full bg-chart-2" />
           In stock
         </span>
         <span className="flex items-center gap-2">
-          <span className="inline-block size-2 rounded-full bg-[var(--destructive)]" />
+          <span className="inline-block size-2 rounded-full bg-destructive" />
           Out of stock
         </span>
       </div>

@@ -1,15 +1,11 @@
 "use client";
 
-import { BellIcon, Menu01Icon, Search01Icon } from "@hugeicons/core-free-icons";
+import { Menu01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname } from "next/navigation";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import { CommandPaletteTrigger } from "@/components/shared/command-palette";
 
 const TITLES: Record<string, string> = {
   "/admin": "Dashboard",
@@ -21,26 +17,26 @@ const TITLES: Record<string, string> = {
   "/admin/settings": "Settings",
 };
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-export function DashboardHeader({
-  adminName,
-  onMenuClick,
-}: {
-  adminName: string;
-  onMenuClick: () => void;
-}) {
+export function DashboardHeader({ menuClick }: { menuClick: () => void }) {
   const pathname = usePathname();
-  const isHome = pathname === "/dashboard";
-  const firstName = adminName.split(" ")[0];
-  const title = isHome ? "Good morning, " : (TITLES[pathname] ?? "Dashboard");
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const firstName = user?.name?.split(" ")[0] || "Admin";
+
+  const hour = new Date().getHours();
+  const greeting =
+    hour < 5
+      ? "Good night"
+      : hour < 12
+        ? "Good morning"
+        : hour < 17
+          ? "Good afternoon"
+          : hour < 21
+            ? "Good evening"
+            : "Good night";
+
+  const isHome = pathname === "/admin";
+  const title = isHome ? `${greeting}, ` : (TITLES[pathname] ?? "Dashboard");
 
   return (
     <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -49,7 +45,7 @@ export function DashboardHeader({
           variant="outline"
           size="icon"
           className="lg:hidden"
-          onClick={onMenuClick}
+          onClick={menuClick}
           aria-label="Open navigation"
         >
           <HugeiconsIcon icon={Menu01Icon} size={18} />
@@ -78,22 +74,7 @@ export function DashboardHeader({
       </div>
 
       <div className="flex items-center gap-3">
-        <InputGroup className="h-11 w-full rounded-full bg-card md:w-80 pl-2">
-          <InputGroupAddon>
-            <HugeiconsIcon icon={Search01Icon} size={18} />
-          </InputGroupAddon>
-          <InputGroupInput placeholder="Search content…" className="h-11" />
-        </InputGroup>
-
-        <button
-          type="button"
-          aria-label="Profile"
-          className="rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <Avatar className="size-11">
-            <AvatarFallback>{initials(adminName)}</AvatarFallback>
-          </Avatar>
-        </button>
+        <CommandPaletteTrigger />
       </div>
     </header>
   );

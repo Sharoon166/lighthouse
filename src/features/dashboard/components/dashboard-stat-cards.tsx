@@ -8,8 +8,8 @@ import type { DashboardStats } from "../actions";
 function Dot({ active }: { active: boolean }) {
   return (
     <span
-      className={`inline-block size-[7px] rounded-full ${
-        active ? "bg-[var(--chart-2)]" : "bg-[var(--destructive)]/30"
+      className={`inline-block size-2 rounded-full ${
+        active ? "bg-chart-2" : "bg-destructive/30"
       }`}
     />
   );
@@ -70,10 +70,10 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
       {/* ── Hero: Products ── */}
       <Link
         href="/admin/products"
-        className="group relative col-span-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:border-[var(--ring)] lg:col-span-5"
+        className="group relative col-span-full overflow-hidden rounded-2xl border border-border bg-card p-6 transition-all hover:border-ring lg:col-span-5"
       >
         {/* Background decoration */}
-        <div className="absolute -bottom-16 -right-16 size-48 rounded-full bg-[var(--chart-2)]/[0.04] blur-2xl transition-transform duration-500 group-hover:scale-150" />
+        <div className="absolute -bottom-16 -right-16 size-48 rounded-full bg-chart-2/4 blur-2xl transition-transform duration-500 group-hover:scale-150" />
 
         <div className="relative">
           <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
@@ -98,7 +98,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
           </div>
 
           {/* Stock dots */}
-          <div className="mt-4 flex flex-wrap gap-[5px]">
+          <div className="mt-4 flex flex-wrap gap-1">
             {Array.from(
               { length: Math.min(stats.products.total, 30) },
               (_, i) => (
@@ -115,9 +115,9 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
             href="/admin/projects"
-            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all hover:border-[var(--ring)]"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all hover:border-ring"
           >
-            <div className="absolute -bottom-10 -right-10 size-32 rounded-full bg-[var(--chart-3)]/[0.04] blur-2xl transition-transform duration-500 group-hover:scale-150" />
+            <div className="absolute -bottom-10 -right-10 size-32 rounded-full bg-chart-3/4 blur-2xl transition-transform duration-500 group-hover:scale-150" />
             <div className="relative flex items-start justify-between">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
@@ -142,9 +142,9 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
 
           <Link
             href="/admin/blog"
-            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all hover:border-[var(--ring)]"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all hover:border-ring"
           >
-            <div className="absolute -bottom-10 -right-10 size-32 rounded-full bg-[var(--chart-4)]/[0.04] blur-2xl transition-transform duration-500 group-hover:scale-150" />
+            <div className="absolute -bottom-10 -right-10 size-32 rounded-full bg-chart-4/4 blur-2xl transition-transform duration-500 group-hover:scale-150" />
             <div className="relative flex items-start justify-between">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
@@ -172,16 +172,16 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
         <div className="grid gap-3 sm:grid-cols-3">
           <Link
             href="/admin/products"
-            className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3.5 transition-all hover:border-[var(--destructive)]/30 hover:bg-[var(--destructive)]/[0.02]"
+            className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3.5 transition-all hover:border-destructive/30 hover:bg-destructive/2"
           >
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--destructive)]/10">
-              <span className="size-2 rounded-full bg-[var(--destructive)]" />
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-destructive/10">
+              <span className="size-2 rounded-full bg-destructive" />
             </span>
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                 Out of stock
               </p>
-              <p className="text-xl font-bold tabular-nums text-[var(--destructive)]">
+              <p className="text-xl font-bold tabular-nums text-destructive">
                 {stats.products.outOfStock}
               </p>
             </div>
@@ -207,7 +207,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
 
           <Link
             href="/admin/categories"
-            className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3.5 transition-all hover:border-[var(--ring)]"
+            className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3.5 transition-all hover:border-ring"
           >
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">

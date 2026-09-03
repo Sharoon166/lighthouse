@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  serverExternalPackages: ["mongoose"],
+  serverExternalPackages: ["mongoose", "mongodb"],
   experimental: {
     serverActions: {
       bodySizeLimit: "8mb",

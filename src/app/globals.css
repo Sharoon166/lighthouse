@@ -97,7 +97,7 @@
 
    /*Vibrant primary for clear CTAs */
   /*--primary: oklch(0.55 0.22 264); /* Bold blue */
-  --primary: #2a1b45; /* Bold blue */ 
+  --primary: #2a1b45; /* Bold blue */
   --primary-foreground: oklch(0.99 0 0);
 
   /* Clean secondary */
@@ -147,7 +147,7 @@
   --sidebar-ring: oklch(0.55 0.22 264);
 
   --font-fraunces: var(--font-poiret-one);
-  
+
 }
 
 /* Dashboard Dark Mode - Optional high contrast dark theme */
@@ -207,6 +207,10 @@
   background-size: cover;
 }
 
+@utility bg-opple-banner {
+    @apply bg-cover bg-center bg-[url('/brands/opple-distribution-banner.png')] max-sm:bg-[url('/brands/opple-distribution-banner-mobile.png')];
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -223,7 +227,7 @@
   h2,
   h3 {
     @apply text-primary-foreground ;
-    font-size: clamp(30px, 5vw, 40px);
+    font-size: clamp(30px, 4vw, 40px);
   }
 
   h1 {
@@ -372,7 +376,7 @@
 
 /**
  * SEAMLESS MARQUEE ANIMATION
- * 
+ *
  * Why it works:
  * - Content is duplicated exactly twice (copy 1 + copy 2)
  * - Total width = content_width * 2 + gap

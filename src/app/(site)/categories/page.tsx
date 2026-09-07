@@ -29,7 +29,7 @@ export default async function CategoriesPage() {
       </section>
 
       {/* CTA Banner Section */}
-      <div className="mt-8">
+      <div className="container">
         <CTA />
       </div>
     </main>

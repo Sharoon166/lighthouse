@@ -65,7 +65,7 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
             <span className="text-xs font-semibold uppercase tracking-widest text-gold">
               DESIGN &amp; CRAFTSMANSHIP
             </span>
-            <h3 className="font-serif leading-[1] font-normal text-foreground">
+            <h3 className="font-serif leading-none font-normal text-foreground">
               Crafted for the spaces that matter most
             </h3>
             <p className="text-muted-foreground leading-relaxed">

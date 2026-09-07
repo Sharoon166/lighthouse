@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
@@ -23,7 +23,7 @@ function FloatingOrb({ className }: { className?: string }) {
   );
 }
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from") || "/admin";
 
@@ -56,6 +56,128 @@ export default function AdminLoginPage() {
     }
   }
 
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-2">
+        <Label
+          htmlFor="email"
+          className={`transition-colors ${focused === "email" ? "text-foreground" : ""}`}
+        >
+          Email
+        </Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="admin@lighthouse.pk"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onFocus={() => setFocused("email")}
+          onBlur={() => setFocused(null)}
+          required
+          autoComplete="email"
+          disabled={loading}
+          className="h-11 transition-shadow focus-visible:shadow-[0_0_0_3px_rgba(42,27,69,0.08)]"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label
+          htmlFor="password"
+          className={`transition-colors ${focused === "password" ? "text-foreground" : ""}`}
+        >
+          Password
+        </Label>
+        <InputGroup className="h-11">
+          <InputGroupInput
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onFocus={() => setFocused("password")}
+            onBlur={() => setFocused(null)}
+            required
+            autoComplete="current-password"
+            disabled={loading}
+          />
+          <InputGroupAddon align="inline-end">
+            <InputGroupButton
+              size="icon-xs"
+              onClick={() => setShowPassword((s) => !s)}
+              tabIndex={-1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              )}
+            </InputGroupButton>
+          </InputGroupAddon>
+        </InputGroup>
+      </div>
+
+      {error && (
+        <div className="rounded-lg border border-destructive/20 bg-destructive/4 px-4 py-3">
+          <p className="text-sm text-destructive">{error}</p>
+        </div>
+      )}
+
+      <Button
+        type="submit"
+        className="h-11 w-full rounded-lg bg-primary text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98]"
+        disabled={loading}
+      >
+        {loading ? (
+          <span className="inline-flex items-center gap-2">
+            <svg
+              className="size-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                className="opacity-25"
+              />
+              <path
+                d="M12 2a10 10 0 0 1 10 10"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            </svg>
+            Signing in…
+          </span>
+        ) : (
+          "Sign in"
+        )}
+      </Button>
+    </form>
+  );
+}
+
+function LoginLoading() {
+  return (
+    <div className="w-full max-w-sm space-y-5">
+      <div className="space-y-2">
+        <div className="h-4 w-12 bg-muted animate-pulse rounded" />
+        <div className="h-11 w-full bg-muted animate-pulse rounded" />
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 w-16 bg-muted animate-pulse rounded" />
+        <div className="h-11 w-full bg-muted animate-pulse rounded" />
+      </div>
+      <div className="h-11 w-full bg-muted animate-pulse rounded" />
+    </div>
+  );
+}
+
+export default function AdminLoginPage() {
   return (
     <div data-theme="dashboard" className="flex min-h-dvh bg-background p-6">
       {/* ── Left: Brand panel ── */}
@@ -127,107 +249,9 @@ export default function AdminLoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className={`transition-colors ${focused === "email" ? "text-foreground" : ""}`}
-              >
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="admin@lighthouse.pk"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onFocus={() => setFocused("email")}
-                onBlur={() => setFocused(null)}
-                required
-                autoComplete="email"
-                disabled={loading}
-                className="h-11 transition-shadow focus-visible:shadow-[0_0_0_3px_rgba(42,27,69,0.08)]"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label
-                htmlFor="password"
-                className={`transition-colors ${focused === "password" ? "text-foreground" : ""}`}
-              >
-                Password
-              </Label>
-              <InputGroup className="h-11">
-                <InputGroupInput
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onFocus={() => setFocused("password")}
-                  onBlur={() => setFocused(null)}
-                  required
-                  autoComplete="current-password"
-                  disabled={loading}
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    size="icon-xs"
-                    onClick={() => setShowPassword((s) => !s)}
-                    tabIndex={-1}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    {showPassword ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    )}
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
-            </div>
-
-            {error && (
-              <div className="rounded-lg border border-destructive/20 bg-destructive/4 px-4 py-3">
-                <p className="text-sm text-destructive">{error}</p>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              className="h-11 w-full rounded-lg bg-primary text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98]"
-              disabled={loading}
-            >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <svg
-                    className="size-4 animate-spin"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      className="opacity-25"
-                    />
-                    <path
-                      d="M12 2a10 10 0 0 1 10 10"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  Signing in…
-                </span>
-              ) : (
-                "Sign in"
-              )}
-            </Button>
-          </form>
+          <Suspense fallback={<LoginLoading />}>
+            <LoginForm />
+          </Suspense>
 
           <p className="mt-8 text-center text-xs text-muted-foreground">
             Contact your team lead if you need access.

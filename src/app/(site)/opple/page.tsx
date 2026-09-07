@@ -3,7 +3,7 @@ import { CTA } from "@/components/hero/cta";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
-import { fetchStoreProducts } from "@/lib/shop-data";
+import { fetchStoreProducts, fetchFilterMetadata } from "@/lib/shop-data";
 
 export const metadata: Metadata = {
   title: "OPPLE Collection · Light House",
@@ -15,8 +15,6 @@ interface OpplePageProps {
   searchParams: Promise<{
     category?: string;
     search?: string;
-    design?: string | string[];
-    material?: string | string[];
     price?: string | string[];
     sort?: "featured" | "price_asc" | "price_desc" | "newest";
   }>;
@@ -27,16 +25,6 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
 
   const categorySlug = params.category;
   const search = params.search;
-  const designStyle = Array.isArray(params.design)
-    ? params.design
-    : params.design
-      ? [params.design]
-      : undefined;
-  const material = Array.isArray(params.material)
-    ? params.material
-    : params.material
-      ? [params.material]
-      : undefined;
   const priceRange = Array.isArray(params.price)
     ? params.price
     : params.price
@@ -44,15 +32,16 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
       : undefined;
   const sortBy = params.sort;
 
-  const { products: rawProducts, total } = await fetchStoreProducts({
-    categorySlug,
-    brandSlug: "opple",
-    search,
-    designStyle,
-    material,
-    priceRange,
-    sortBy,
-  });
+  const [{ products: rawProducts, total }, filterMeta] = await Promise.all([
+    fetchStoreProducts({
+      categorySlug,
+      brandSlug: "opple",
+      search,
+      priceRange,
+      sortBy,
+    }),
+    fetchFilterMetadata(),
+  ]);
 
   const products = JSON.parse(JSON.stringify(rawProducts));
 
@@ -63,12 +52,19 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
 
       {/* Main Collection Container */}
       <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl flex flex-col lg:flex-row gap-8">
-          {/* Left Sidebar */}
-          <ProductFiltersSidebar />
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col lg:flex-row gap-8">
+            <ProductFiltersSidebar
+              categories={filterMeta.categories}
+              brands={filterMeta.brands}
+              priceRange={filterMeta.priceRange}
+              products={products}
+            />
 
-          {/* Right Product Grid */}
-          <ProductGridToolbar products={products} total={total} />
+            <div className="flex-1 min-w-0 mt-6 lg:mt-0">
+              <ProductGridToolbar products={products} total={total} />
+            </div>
+          </div>
         </div>
       </section>
 

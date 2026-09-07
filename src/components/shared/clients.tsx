@@ -9,7 +9,7 @@ export function Clients() {
         description="From residential homes to commercial projects, our clients trust us to bring every space to life with premium lighting."
         noCta
       />
-      <div className="flex items-center max-md:justify-center flex-wrap gap-x-18 gap-y-10">
+      <div className="flex items-center flex-wrap gap-6 sm:gap-x-18 sm:gap-y-10">
         {clients.map((client) => (
           <img
             key={client.id}

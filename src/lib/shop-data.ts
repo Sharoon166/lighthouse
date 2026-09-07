@@ -2,6 +2,21 @@ import { connectToDatabase } from "@/lib/db";
 import { CategoryModel } from "@/models/category";
 import { ProductModel } from "@/models/product";
 
+const COLOR_NAME_TO_HEX: Record<string, string> = {
+  Black: "#000000",
+  White: "#FFFFFF",
+  Gray: "#6B7280",
+  Silver: "#C0C0C0",
+  Chrome: "#D9D9D9",
+  Gold: "#D4AF37",
+  Brass: "#B5A642",
+  Bronze: "#CD7F32",
+  Copper: "#B87333",
+  Nickel: "#A8A9AD",
+  Brown: "#795548",
+  Beige: "#D6C6A8",
+};
+
 export interface ShopCategoryItem {
   id: string;
   name: string;
@@ -16,6 +31,7 @@ export interface ShopProductVariant {
   sku: string;
   title: string;
   attributes: Record<string, string>;
+  colorHex: string;
   price: number;
   salePrice?: number;
   images: string[];
@@ -213,6 +229,7 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
         sku: "ABL-BRASS",
         title: "Brass",
         attributes: { finish: "Brass" },
+        colorHex: "#B5A642",
         price: 21000,
         salePrice: 18900,
         images: [],
@@ -225,6 +242,7 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
         sku: "ABL-BLACK",
         title: "Black",
         attributes: { finish: "Black" },
+        colorHex: "#000000",
         price: 21000,
         salePrice: 18900,
         images: [],
@@ -237,6 +255,7 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
         sku: "ABL-SILVER",
         title: "Silver",
         attributes: { finish: "Silver" },
+        colorHex: "#C0C0C0",
         price: 21000,
         salePrice: 18900,
         images: [],
@@ -325,24 +344,26 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     variantAttributes: ["finish"],
     variants: [
       {
-        id: "v4",
-        sku: "MAT-WM",
+        id: "ma-v1",
+        sku: "MA-WHITE",
         title: "White Marble",
         attributes: { finish: "White Marble" },
+        colorHex: "#F5F5F0",
         price: 16900,
         images: [],
-        stock: 10,
+        stock: 12,
         availability: "in_stock",
         isDefault: true,
       },
       {
-        id: "v5",
-        sku: "MAT-BM",
+        id: "ma-v2",
+        sku: "MA-BLACK",
         title: "Black Marble",
         attributes: { finish: "Black Marble" },
-        price: 16900,
+        colorHex: "#222222",
+        price: 17900,
         images: [],
-        stock: 7,
+        stock: 6,
         availability: "in_stock",
         isDefault: false,
       },
@@ -395,22 +416,24 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     variantAttributes: ["finish"],
     variants: [
       {
-        id: "v6",
-        sku: "LAF-BRASS",
+        id: "la-v1",
+        sku: "LA-BRASS",
         title: "Brass",
         attributes: { finish: "Brass" },
+        colorHex: "#D4AF37",
         price: 28900,
         images: [],
-        stock: 6,
+        stock: 9,
         availability: "in_stock",
         isDefault: true,
       },
       {
-        id: "v7",
-        sku: "LAF-BLACK",
+        id: "la-v2",
+        sku: "LA-BLACK",
         title: "Matte Black",
         attributes: { finish: "Matte Black" },
-        price: 28900,
+        colorHex: "#1A1A1A",
+        price: 29900,
         images: [],
         stock: 4,
         availability: "in_stock",
@@ -458,10 +481,11 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     variantAttributes: ["finish"],
     variants: [
       {
-        id: "v8",
-        sku: "EFF-GOLD",
+        id: "ef-v1",
+        sku: "EF-GOLD",
         title: "Gold",
         attributes: { finish: "Gold" },
+        colorHex: "#D4AF37",
         price: 34900,
         images: [],
         stock: 3,
@@ -507,13 +531,14 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     variantAttributes: ["finish"],
     variants: [
       {
-        id: "v9",
-        sku: "CBT-GOLD",
+        id: "ob-v1",
+        sku: "OB-GOLDCRYSTAL",
         title: "Gold & Crystal",
         attributes: { finish: "Gold & Crystal" },
+        colorHex: "#E5C158",
         price: 22900,
         images: [],
-        stock: 8,
+        stock: 7,
         availability: "in_stock",
         isDefault: true,
       },
@@ -558,10 +583,11 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     variantAttributes: ["finish"],
     variants: [
       {
-        id: "v10",
-        sku: "GMF-BM",
+        id: "gm-v1",
+        sku: "GM-BRASSMARBLE",
         title: "Brass & Black Marble",
         attributes: { finish: "Brass & Black Marble" },
+        colorHex: "#1F1F1F",
         price: 31900,
         images: [],
         stock: 5,
@@ -619,6 +645,76 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
   return FALLBACK_CATEGORIES;
 }
 
+export interface FilterMetadata {
+  categories: { name: string; slug: string; count: number }[];
+  brands: { name: string; slug: string; logo: string; count: number }[];
+  priceRange: { min: number; max: number };
+}
+
+export async function fetchFilterMetadata(): Promise<FilterMetadata> {
+  const meta: FilterMetadata = {
+    categories: [],
+    brands: [],
+    priceRange: { min: 0, max: 200000 },
+  };
+
+  try {
+    await connectToDatabase();
+
+    const [categories, brandAgg, priceAgg] = await Promise.all([
+      CategoryModel.find({ isActive: true })
+        .select({ name: 1, slug: 1, productCount: 1 })
+        .lean(),
+      (ProductModel as any).aggregate([
+        { $match: { status: { $ne: "archived" } } },
+        {
+          $group: {
+            _id: { name: "$brand.name", slug: "$brand.slug", logo: "$brand.logo" },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { count: -1 } },
+      ]),
+      ProductModel.aggregate([
+        { $match: { status: { $ne: "archived" } } },
+        {
+          $group: {
+            _id: null,
+            min: { $min: "$priceRange.min" },
+            max: { $max: "$priceRange.max" },
+          },
+        },
+      ]),
+    ]);
+
+    meta.categories = categories.map((c) => ({
+      name: c.name,
+      slug: c.slug,
+      count: c.productCount || 0,
+    }));
+
+    meta.brands = brandAgg
+      .filter((b: any) => b._id?.name)
+      .map((b: any) => ({
+        name: b._id.name,
+        slug: b._id.slug || "",
+        logo: b._id.logo || "",
+        count: b.count,
+      }));
+
+    if (priceAgg[0]) {
+      meta.priceRange = {
+        min: priceAgg[0].min || 0,
+        max: priceAgg[0].max || 200000,
+      };
+    }
+  } catch (error) {
+    console.warn("Failed to fetch filter metadata:", error);
+  }
+
+  return meta;
+}
+
 export interface FetchProductsOptions {
   categorySlug?: string;
   brandSlug?: string;
@@ -632,11 +728,11 @@ export interface FetchProductsOptions {
 export async function fetchStoreProducts(
   options: FetchProductsOptions = {},
 ): Promise<{ products: ShopProductItem[]; total: number }> {
-  let products = [...FALLBACK_PRODUCTS];
+  let products: ShopProductItem[] = [];
 
   try {
     await connectToDatabase();
-    const query: Record<string, unknown> = { status: "active" };
+    const query: Record<string, unknown> = { status: { $ne: "archived" } };
     if (options.categorySlug && options.categorySlug !== "all") {
       query["category.slug"] = options.categorySlug;
     }
@@ -667,6 +763,7 @@ export async function fetchStoreProducts(
             attributes: v.attributes instanceof Map
               ? Object.fromEntries(v.attributes)
               : (v.attributes as Record<string, string> || {}),
+            colorHex: v.colorHex || "",
             price: v.salePrice || v.price,
             salePrice: v.salePrice && v.salePrice < v.price ? v.salePrice : undefined,
             images: v.images?.length ? v.images : [],
@@ -687,11 +784,9 @@ export async function fetchStoreProducts(
             const val = v.attributes[finishAttrKey];
             if (val && !seen.has(val)) {
               seen.add(val);
-              // Try to extract hex from value if it contains color info
-              const hexMatch = val.match(/#[0-9a-fA-F]{6}/);
               finishes.push({
-                name: val.replace(/#[0-9a-fA-F]{6}/, "").trim() || val,
-                hex: hexMatch?.[0] || "#D4AF37",
+                name: val,
+                hex: v.colorHex || COLOR_NAME_TO_HEX[val] || "#888888",
               });
             }
           }
@@ -699,8 +794,8 @@ export async function fetchStoreProducts(
         // Fallback finishes if none extracted
         if (finishes.length === 0) {
           finishes.push(
-            { name: "Brass", hex: "#D4AF37" },
-            { name: "Black", hex: "#1A1A1A" },
+            { name: "Brass", hex: COLOR_NAME_TO_HEX["Brass"] },
+            { name: "Black", hex: COLOR_NAME_TO_HEX["Black"] },
           );
         }
 

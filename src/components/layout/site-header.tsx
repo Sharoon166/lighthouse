@@ -117,9 +117,10 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         >
           {/* Search bar — Phase 1 */}
           {!IS_PHASE_2 && (
-            <div
+            <form
+              action={`/products${typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('search') ? `?search=${encodeURIComponent(new URLSearchParams(window.location.search).get('search') || '')}` : ''}`}
               className={cn(
-                "flex items-center  rounded-full px-2",
+                "flex items-center rounded-full px-2",
                 isHero
                   ? "bg-background/10 text-background"
                   : "bg-muted text-foreground",
@@ -128,6 +129,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               <HugeiconsIcon icon={Search01Icon} size={18} />
               <input
                 type="text"
+                name="search"
                 placeholder="Search...."
                 className={cn(
                   "w-40 bg-transparent text-sm outline-none placeholder:text-current/50 px-4 pl-2 py-2",
@@ -136,7 +138,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                     : "text-foreground placeholder:text-foreground/50",
                 )}
               />
-            </div>
+            </form>
           )}
 
           {/* Search button — Phase 2 */}
@@ -215,10 +217,18 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
             : "opacity-0 pointer-events-none -translate-y-4",
         )}
       >
-        <div className="flex flex-col justify-between h-full max-w-md mx-auto w-full">
+        <div className="flex flex-col h-full max-w-md mx-auto w-full">
           {/* Integrated Search */}
-          <div className="relative mb-6">
-            <div className="flex items-center gap-2 rounded-full bg-muted/40 px-4 py-2.5">
+          <form 
+            action={(formData) => {
+              const search = formData.get('search');
+              if (search && String(search).trim().length >= 2) {
+                window.location.href = `/products?search=${encodeURIComponent(String(search).trim())}`;
+              }
+            }}
+            className="relative mb-6"
+          >
+            <div className="flex items-center gap-2 rounded-full bg-muted/40 px-4 py-2.5 border">
               <HugeiconsIcon
                 icon={Search01Icon}
                 size={18}
@@ -226,11 +236,12 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               />
               <input
                 type="text"
+                name="search"
                 placeholder="Search...."
                 className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>
-          </div>
+          </form>
 
           {/* Navigation Links */}
           <nav className="flex flex-col gap-1.5">

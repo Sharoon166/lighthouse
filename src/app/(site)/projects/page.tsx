@@ -26,7 +26,7 @@ export default async function ProjectsPage() {
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Projects" }]}
       />
 
-      <div className="py-12 md:py-16">
+      <div>
         {featured.length > 0 && <FeaturedProjects featured={featured} />}
         <ProjectGrid projects={remaining} />
       </div>

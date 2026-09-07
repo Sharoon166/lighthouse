@@ -112,6 +112,7 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
       gtin: "",
       mpn: "",
       attributes: new Map(Object.entries(v.attributes)),
+      colorHex: v.colorHex || "",
       title: v.name,
       price: v.price,
       salePrice: v.salePrice != null ? v.salePrice : undefined,

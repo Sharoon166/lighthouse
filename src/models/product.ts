@@ -8,6 +8,7 @@ export interface ProductVariant {
   gtin: string;
   mpn: string;
   attributes: Map<string, string>;
+  colorHex: string;
   title: string;
   price: number;
   salePrice: number;
@@ -84,6 +85,7 @@ const variantSchema = new Schema<ProductVariant>(
     gtin: { type: String, default: "" },
     mpn: { type: String, default: "" },
     attributes: { type: Map, of: String, required: true },
+    colorHex: { type: String, default: "" },
     title: { type: String, required: true, trim: true },
     price: { type: Number, required: true, min: 0 },
     salePrice: { type: Number, min: 0 },

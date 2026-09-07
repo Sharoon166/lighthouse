@@ -58,7 +58,7 @@ export function SiteFooter() {
             <a
               href="https://synctom.com"
               target="_blank"
-              className="text-gold"
+              className="text-gold hover:underline"
               rel="noopener"
             >
               Synctom

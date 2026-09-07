@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { CTA } from "@/components/hero/cta";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
-import { fetchStoreProducts } from "@/lib/shop-data";
+import { fetchStoreProducts, fetchFilterMetadata, type ShopProductItem } from "@/lib/shop-data";
+import { PageHero } from "@/components/shared/page-hero";
 
 export const metadata: Metadata = {
   title: "Our Collection · Light House",
@@ -14,9 +14,8 @@ export const metadata: Metadata = {
 interface ProductsPageProps {
   searchParams: Promise<{
     category?: string;
+    brand?: string | string[];
     search?: string;
-    design?: string | string[];
-    material?: string | string[];
     price?: string | string[];
     sort?: "featured" | "price_asc" | "price_desc" | "newest";
   }>;
@@ -29,15 +28,10 @@ export default async function ProductsPage({
 
   const categorySlug = params.category;
   const search = params.search;
-  const designStyle = Array.isArray(params.design)
-    ? params.design
-    : params.design
-      ? [params.design]
-      : undefined;
-  const material = Array.isArray(params.material)
-    ? params.material
-    : params.material
-      ? [params.material]
+  const brandSlug = Array.isArray(params.brand)
+    ? params.brand
+    : params.brand
+      ? [params.brand]
       : undefined;
   const priceRange = Array.isArray(params.price)
     ? params.price
@@ -46,46 +40,74 @@ export default async function ProductsPage({
       : undefined;
   const sortBy = params.sort;
 
-  const { products: rawProducts, total } = await fetchStoreProducts({
-    categorySlug,
-    search,
-    designStyle,
-    material,
-    priceRange,
-    sortBy,
-  });
+  const [{ products: rawProducts, total }, filterMeta, newArrivalsResult] =
+    await Promise.all([
+      fetchStoreProducts({
+        categorySlug,
+        search,
+        brandSlug: brandSlug?.[0],
+        priceRange,
+        sortBy,
+      }),
+      fetchFilterMetadata(),
+      fetchStoreProducts({ sortBy: "newest" }),
+    ]);
 
   const products = JSON.parse(JSON.stringify(rawProducts));
+  const newArrivals: ShopProductItem[] = JSON.parse(
+    JSON.stringify(newArrivalsResult.products.slice(0, 20)),
+  );
+
+  const showNewArrivals = !categorySlug && !search && !brandSlug?.length && !priceRange?.length && !sortBy;
 
   return (
     <main className="min-h-screen bg-background">
       {/* Dark Navy Hero Header */}
-      <section className="bg-noise py-12 md:py-16 px-4 sm:px-6 lg:px-8 border-b border-border/40">
-        <div className="mx-auto max-w-7xl space-y-4">
-          <Breadcrumb
-            items={[{ label: "Home", href: "/" }, { label: "Products" }]}
-          />
-          <div className="max-w-2xl space-y-3 pt-2">
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal tracking-tight text-white">
-              Our Collection
-            </h1>
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed font-sans">
-              Explore our curated lighting collections, thoughtfully selected to
-              bring warmth, character, and style to every space.
-            </p>
+      <PageHero
+        title="Our Collection"
+        description="Explore our curated lighting collections, thoughtfully selected to bring warmth, character, and style to every space."
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Products" }]}
+      />
+
+      {/* New Arrivals */}
+      {/*{showNewArrivals && newArrivals.length > 0 && (
+        <section className="py-10 md:py-14 px-4 sm:px-6 lg:px-8 border-b border-border/40">
+          <div className="mx-auto max-w-7xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-serif text-2xl sm:text-3xl text-secondary">
+                New Arrivals
+              </h2>
+              <Link
+                href="/products?sort=newest"
+                className="text-sm text-gold hover:underline"
+              >
+                View all
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {newArrivals.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}*/}
 
       {/* Main Collection Container */}
-      <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl flex flex-col lg:flex-row gap-8">
-          {/* Left Sidebar */}
-          <ProductFiltersSidebar />
+      <section className="container">
+          <div className="flex flex-col lg:flex-row gap-8">
+            <ProductFiltersSidebar
+              categories={filterMeta.categories}
+              brands={filterMeta.brands}
+              priceRange={filterMeta.priceRange}
+              products={products}
+            />
 
-          {/* Right Product Grid */}
-          <ProductGridToolbar products={products} total={total} />
-        </div>
+            {/* Product Grid */}
+            <div className="flex-1 min-w-0 mt-6 lg:mt-0">
+              <ProductGridToolbar products={products} total={total} />
+            </div>
+          </div>
       </section>
 
       {/* CTA Banner */}

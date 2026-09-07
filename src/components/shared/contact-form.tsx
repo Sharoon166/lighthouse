@@ -2,7 +2,7 @@
 
 import {
   Call02Icon,
-  Facebook01Icon,
+  Facebook02Icon,
   InstagramIcon,
   Linkedin01Icon,
   Mail01Icon,
@@ -18,8 +18,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { contactInfo, socialLinks } from "@/lib/constants";
 
-const socialIconMap: Record<string, typeof Facebook01Icon> = {
-  Facebook: Facebook01Icon,
+const socialIconMap: Record<string, typeof Facebook02Icon> = {
+  Facebook: Facebook02Icon,
   Instagram: InstagramIcon,
   Twitter: NewTwitterIcon,
   Linkedin: Linkedin01Icon,
@@ -147,7 +147,7 @@ export function ContactForm() {
             />
           </div>
 
-          <Button type="submit" variant="secondary" size="lg">
+          <Button type="submit" variant="secondary" size="lg" className="max-sm:w-full">
             Send a Message
           </Button>
         </form>
@@ -223,7 +223,7 @@ export function ContactForm() {
                   key={link.name}
                   href={link.url}
                   aria-label={link.name}
-                  className="flex size-9 items-center justify-center rounded-full bg-secondary-foreground/10 transition-colors hover:bg-secondary-foreground/20"
+                  className="flex size-9 items-center justify-center rounded-full bg-secondary-foreground/10 text-muted transition-colors hover:bg-secondary-foreground/20"
                 >
                   {Icon && <HugeiconsIcon icon={Icon} size={16} />}
                 </a>

@@ -53,7 +53,7 @@ export default function AboutPage() {
       {/* Stats Section */}
       <section className="py-8">
         <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x max-md:divide-y divide-border border">
             {aboutStats.map((stat) => (
               <div
                 key={stat.label}
@@ -147,13 +147,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Our Partners */}
-      <section className="container">
-        <Partners />
-      </section>
-
-      {/* CTA */}
       <div className="container">
+        <Partners />
         <CTA />
       </div>
     </main>

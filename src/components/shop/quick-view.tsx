@@ -7,8 +7,6 @@ import {
   DeliveryTruck01Icon,
   CheckmarkBadge01Icon,
   ArrowReloadVerticalIcon,
-  MinusSignIcon,
-  PlusSignIcon,
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -80,7 +78,6 @@ function QuickViewPanel({
   const [selectedFinish, setSelectedFinish] = useState(
     product.finishes[0]?.name || "",
   );
-  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -91,7 +88,7 @@ function QuickViewPanel({
   }, [onClose]);
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
       {/* Backdrop */}
       <button
         type="button"
@@ -106,7 +103,7 @@ function QuickViewPanel({
         aria-modal="true"
         aria-label={product.name}
         className={cn(
-          "relative z-10 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-card shadow-2xl",
+          "relative z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-background shadow-2xl",
           "animate-in fade-in-0 zoom-in-95 duration-200",
         )}
       >
@@ -115,77 +112,80 @@ function QuickViewPanel({
           type="button"
           aria-label="Close"
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-1.5 text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground"
+          className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-1.5 text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground border border-border"
         >
           <HugeiconsIcon icon={Cancel01Icon} size={18} />
         </button>
 
-        <div className="grid md:grid-cols-2 gap-0">
-          {/* Left: Image gallery */}
-          <div className="relative bg-muted">
-            {/* Main image */}
-            <div className="relative aspect-square overflow-hidden">
-              <Image
-                src={product.images[selectedImage] || product.images[0]}
-                alt={product.name}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-              />
-            </div>
-
-            {/* Thumbnail strip */}
+        {/* Top section: Image gallery + Product info (matches detail page layout) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+          {/* Left: Image gallery — mirrors ProductImageGallery */}
+          <div className="flex flex-col-reverse gap-3 p-4 md:p-6 border-b md:border-b-0 md:border-r border-border">
+            {/* Thumbnail strip — vertical on desktop, horizontal on mobile */}
             {product.images.length > 1 && (
-              <div className="flex gap-2 p-3 overflow-x-auto">
+              <div className="flex md:flex-col gap-2 shrink-0 overflow-x-auto md:overflow-y-auto md:max-h-[500px]">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setSelectedImage(i)}
                     className={cn(
-                      "relative size-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
+                      "relative size-16 md:size-20 shrink-0 overflow-hidden border-2 bg-muted/20 transition-all",
                       i === selectedImage
                         ? "border-gold"
-                        : "border-border hover:border-muted-foreground/50",
+                        : "border-border/60 hover:border-border",
                     )}
                   >
                     <Image
                       src={img}
                       alt={`${product.name} ${i + 1}`}
                       fill
-                      className="object-contain p-1"
-                      sizes="64px"
+                      sizes="80px"
+                      className="object-contain"
                     />
                   </button>
                 ))}
               </div>
             )}
+
+            {/* Main image */}
+            <div className="relative flex-1 aspect-square overflow-hidden">
+              <Image
+                src={product.images[selectedImage] || product.images[0]}
+                alt={product.name}
+                fill
+                className="object-contain transition-all duration-300"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            </div>
           </div>
 
-          {/* Right: Product info */}
+          {/* Right: Product info — mirrors ProductPurchasePanel */}
           <div className="flex flex-col gap-5 p-6 md:p-8">
-            {/* Category */}
+            {/* Category tag */}
             <span className="text-xs font-semibold uppercase tracking-widest text-gold">
               {product.tag}
             </span>
 
-            {/* Name */}
+            {/* Product name */}
             <h2 className="font-serif text-2xl md:text-3xl font-normal tracking-tight text-foreground">
               {product.name}
             </h2>
 
             {/* Rating */}
             <div className="flex items-center gap-2 text-sm">
-              <div className="flex items-center text-amber-500">
+              <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <HugeiconsIcon
                     key={i}
                     icon={StarIcon}
                     size={14}
                     className={cn(
-                      "fill-amber-400 text-amber-400",
-                      i < Math.round(product.ratings.average) ? "fill-amber-400" : "fill-muted text-muted",
+                      "text-amber-400",
+                      i < Math.round(product.ratings.average)
+                        ? "fill-amber-400"
+                        : "fill-muted text-muted",
                     )}
                   />
                 ))}
@@ -215,6 +215,9 @@ function QuickViewPanel({
               )}
             </div>
 
+            {/* Divider */}
+            <div className="h-px bg-border" />
+
             {/* Description */}
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
               {product.shortDescription}
@@ -222,7 +225,7 @@ function QuickViewPanel({
 
             {/* Finishes */}
             {product.finishes.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   Finish: <span className="text-foreground">{selectedFinish}</span>
                 </label>
@@ -233,7 +236,7 @@ function QuickViewPanel({
                       type="button"
                       onClick={() => setSelectedFinish(finish.name)}
                       className={cn(
-                        "flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all",
+                        "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
                         selectedFinish === finish.name
                           ? "border-gold bg-gold/10 text-foreground ring-1 ring-gold"
                           : "border-border bg-background text-muted-foreground hover:border-foreground",
@@ -250,48 +253,21 @@ function QuickViewPanel({
               </div>
             )}
 
-            {/* Quantity + Add to Cart */}
-            <div className="flex items-center gap-3 pt-1">
-              <div className="flex items-center rounded-lg border border-border bg-background">
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="flex size-9 items-center justify-center text-foreground hover:bg-muted rounded-l-lg transition-colors"
-                >
-                  <HugeiconsIcon icon={MinusSignIcon} size={14} />
-                </button>
-                <span className="w-9 text-center text-sm font-semibold text-foreground">
-                  {quantity}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="flex size-9 items-center justify-center text-foreground hover:bg-muted rounded-r-lg transition-colors"
-                >
-                  <HugeiconsIcon icon={PlusSignIcon} size={14} />
-                </button>
-              </div>
+            {/* Divider */}
+            <div className="h-px bg-border" />
 
-              <button
-                type="button"
-                className="flex-1 rounded-lg bg-slate-950 py-3 text-center text-xs font-bold tracking-widest text-white uppercase transition-colors hover:bg-gold hover:text-slate-950"
-              >
-                ADD TO CART
-              </button>
-            </div>
-
-            {/* Value badges */}
-            <div className="space-y-2 rounded-xl border border-border/60 bg-muted/20 p-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={DeliveryTruck01Icon} size={14} className="text-gold" />
+            {/* Trust badges */}
+            <div className="grid grid-cols-1 gap-2.5 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2.5">
+                <HugeiconsIcon icon={DeliveryTruck01Icon} size={15} className="text-gold shrink-0" />
                 <span>3–5 business days delivery</span>
               </div>
-              <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={ArrowReloadVerticalIcon} size={14} className="text-gold" />
+              <div className="flex items-center gap-2.5">
+                <HugeiconsIcon icon={ArrowReloadVerticalIcon} size={15} className="text-gold shrink-0" />
                 <span>7 days easy return guarantee</span>
               </div>
-              <div className="flex items-center gap-2">
-                <HugeiconsIcon icon={CheckmarkBadge01Icon} size={14} className="text-gold" />
+              <div className="flex items-center gap-2.5">
+                <HugeiconsIcon icon={CheckmarkBadge01Icon} size={15} className="text-gold shrink-0" />
                 <span>2-year warranty on electrics</span>
               </div>
             </div>
@@ -299,9 +275,10 @@ function QuickViewPanel({
             {/* View full details link */}
             <Link
               href={`/products/${product.slug}`}
-              className="text-center text-xs font-semibold uppercase tracking-wider text-gold hover:underline pt-1"
+              className="mt-2 flex items-center justify-center gap-2 rounded-lg border border-border py-3 text-xs font-bold uppercase tracking-widest text-foreground transition-colors hover:bg-muted"
             >
-              View Full Details &rarr;
+              View Full Details
+              <span className="text-gold">&rarr;</span>
             </Link>
           </div>
         </div>

@@ -3,6 +3,8 @@
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { PROJECT_CATEGORIES } from "@/lib/constants";
+import { ScrollBlurContainer } from "@/components/shared/scroll-blur-container";
+import { Button } from "@/components/ui/button";
 
 const allCategories = [
   { label: "All Projects", value: "all" },
@@ -25,22 +27,26 @@ export function ProjectFilters({
   count,
 }: ProjectFiltersProps) {
   return (
-    <div className="container flex flex-col gap-4 py-8 md:flex-row md:items-center md:justify-between">
-      <div className="flex flex-wrap items-center gap-2">
-        {allCategories.map((cat) => (
-          <button
-            key={cat.value}
-            type="button"
-            onClick={() => onCategoryChange(cat.value)}
-            className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-              activeCategory === cat.value
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
+    <div className="container flex flex-col-reverse gap-4 py-8 md:flex-row md:items-center md:justify-between">
+      <div className="w-full min-w-0 lg:flex-1">
+        <ScrollBlurContainer>
+          <nav
+              aria-label="Blog categories"
+              className="grow flex flex-wrap items-center gap-2"
+            >
+              {allCategories.map((cat) => (
+                <Button
+                  key={cat.value}
+                  variant={activeCategory === cat.value ? "secondary" : "outline"}
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => onCategoryChange(cat.value)}
+                >
+                  {cat.label}
+                </Button>
+              ))}
+          </nav>
+         </ScrollBlurContainer>
       </div>
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium text-muted-foreground">

@@ -1,13 +1,14 @@
 "use client";
 
-import { ViewIcon } from "@hugeicons/core-free-icons";
+import { ExpandIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useQuickView } from "./quick-view";
 import type { ShopProductItem } from "@/lib/shop-data";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatPriceRange } from "@/lib/format";
 
 interface ProductCardProps {
   product: ShopProductItem;
@@ -19,6 +20,17 @@ export function ProductCard({
   showQuickView = true,
 }: ProductCardProps) {
   const { open } = useQuickView();
+
+  const priceDisplay = useMemo(() => {
+    if (product.variants.length <= 1) {
+      return formatCurrency(product.price);
+    }
+    const prices = product.variants.map((v) => v.salePrice || v.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+    if (min === max) return formatCurrency(min);
+    return formatPriceRange(min, max);
+  }, [product.variants, product.price]);
 
   return (
     <div className="group border">
@@ -41,7 +53,7 @@ export function ProductCard({
         </Link>
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground font-semibold uppercase font-heading">
-            {formatCurrency(product.price)}
+            {priceDisplay}
           </p>
           {showQuickView && (
             <Button
@@ -65,7 +77,7 @@ export function ProductCard({
               }
               aria-label={`Quick view ${product.name}`}
             >
-              <HugeiconsIcon icon={ViewIcon} size={18} />
+              <HugeiconsIcon icon={ExpandIcon} size={18} />
             </Button>
           )}
         </div>

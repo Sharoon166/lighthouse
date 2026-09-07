@@ -1,12 +1,15 @@
 "use client";
 
-import { Search01Icon } from "@hugeicons/core-free-icons";
+import { ListViewIcon, Search01Icon, Grid3X3Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Pagination } from "@/components/shared/pagination";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 import type { ShopProductItem } from "@/lib/shop-data";
 import { ProductCard } from "./product-card";
+import { ProductListItem } from "./product-list-item";
+import { cn } from "@/lib/utils";
 
 interface ProductGridToolbarProps {
   products: ShopProductItem[];
@@ -14,6 +17,8 @@ interface ProductGridToolbarProps {
 }
 
 const PAGE_SIZE = 12;
+
+type ViewMode = "grid" | "list";
 
 export function ProductGridToolbar({
   products,
@@ -27,6 +32,7 @@ export function ProductGridToolbar({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const [searchVal, setSearchVal] = useState(searchParams.get("search") || "");
+  const [view, setView] = useLocalStorage<ViewMode>("lighthouse:products-view", "grid");
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,8 +60,8 @@ export function ProductGridToolbar({
 
   return (
     <div className="flex-1 space-y-6">
-      {/* Top bar: Search input + Stats counter + Sort dropdown */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border-b border-border pb-4">
+      {/* Top bar: Search input + View toggle + Stats counter + Sort dropdown */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
         {/* Search bar */}
         <form
           onSubmit={handleSearchSubmit}
@@ -75,10 +81,11 @@ export function ProductGridToolbar({
           />
         </form>
 
-        {/* Counter and Sort */}
-        <div className="flex items-center justify-between md:justify-end gap-4 text-xs text-muted-foreground">
+        {/* View Toggle, Counter and Sort */}
+        <div className="flex items-center justify-between md:justify-end gap-4 text-sm text-muted-foreground">
+
           <span>
-            {total} products | Page {currentPage} of {totalPages}
+            {total} products
           </span>
           <select
             onChange={handleSortChange}
@@ -90,16 +97,53 @@ export function ProductGridToolbar({
             <option value="price_desc">Price: High to Low</option>
             <option value="newest">Newest Arrivals</option>
           </select>
+          {/* View Toggle */}
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-1">
+            <button
+              type="button"
+              onClick={() => setView("grid")}
+              aria-label="Grid view"
+              className={cn(
+                "flex size-7 items-center justify-center rounded-sm transition-colors",
+                view === "grid"
+                  ? "bg-secondary text-secondary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <HugeiconsIcon icon={Grid3X3Icon} size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              aria-label="List view"
+              className={cn(
+                "flex size-7 items-center justify-center rounded-md transition-colors",
+                view === "list"
+                  ? "bg-secondary text-secondary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <HugeiconsIcon icon={ListViewIcon} size={16} />
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Product Grid */}
+      {/* Product Grid or List */}
       {products.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        view === "grid" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {products.map((product) => (
+              <ProductListItem key={product.id} product={product} />
+            ))}
+          </div>
+        )
       ) : (
         <div className="rounded-xl border border-dashed border-border p-16 text-center text-muted-foreground">
           No products matched your criteria. Try clearing filters.

@@ -23,7 +23,7 @@ import {
   useState,
   useTransition,
 } from "react";
-import { ColorPicker, ColorSwatch } from "@/components/shared/color-picker";
+import { ColorPicker, ColorSwatch, PRESET_COLORS } from "@/components/shared/color-picker";
 import { ImageDropzone } from "@/components/shared/image-dropzone";
 import { RichTextEditor } from "@/components/shared/rich-text-editor";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -389,6 +389,7 @@ export function ProductForm({
     useState(initialData?.content?.installationAndBulbs ?? "");
 
   // ── Options (variant-generating attributes) ──
+  const COLOR_OPTION_NAMES = ["color", "finish", "colour", "colours"];
   const [options, setOptions] = useState<OptionDraft[]>(() => {
     if (!initialData?.variantAttributes?.length) return [];
     return initialData.variantAttributes.map((attrName) => {
@@ -396,13 +397,59 @@ export function ProductForm({
         initialData.baseAttributes,
         String(attrName),
       );
+      const rawValues = baseVal
+        ? baseVal.split(",").map((v) => v.trim())
+        : [];
+      // Detect color options: name matches known keywords OR all values are hex codes
+      const isColor =
+        COLOR_OPTION_NAMES.includes(attrName.toLowerCase()) ||
+        (rawValues.length > 0 && rawValues.every((v) => /^#[0-9A-Fa-f]{6}$/i.test(v)));
+      // If color option with hex values, convert to preset names
+      const values = isColor
+        ? rawValues.map((hex) => {
+            const preset = PRESET_COLORS.find(
+              (c) => c.hex.toUpperCase() === hex.toUpperCase(),
+            );
+            return preset?.name || hex;
+          })
+        : rawValues;
       return {
         name: String(attrName),
-        values: baseVal ? baseVal.split(",").map((v) => v.trim()) : [],
+        values,
+        isColor,
       };
     });
   });
   const previousOptionsRef = useRef<string[]>(options.map((o) => o.name));
+
+  // ── Color hex map: maps color name → hex code for color-type options ──
+  const [colorHexMap, setColorHexMap] = useState<Record<string, string>>(() => {
+    const map: Record<string, string> = {};
+    if (initialData?.variants) {
+      for (const v of initialData.variants) {
+        const attrs =
+          v.attributes instanceof Map
+            ? Object.fromEntries(v.attributes.entries())
+            : typeof v.attributes === "object" && v.attributes !== null
+              ? (v.attributes as Record<string, string>)
+              : {};
+        const colorHex = v.colorHex || "";
+        if (colorHex) {
+          for (const val of Object.values(attrs)) {
+            if (!map[val]) map[val] = colorHex;
+          }
+        }
+      }
+    }
+    return map;
+  });
+
+  // ── Pending color: tracks hex waiting for a custom name ──
+  const [pendingColor, setPendingColor] = useState<{
+    optionIndex: number;
+    hex: string;
+    name: string;
+  } | null>(null);
 
   // ── Specifications (non-variant attributes) ──
   const [specifications, setSpecifications] = useState<SpecEntry[]>(() => {
@@ -433,6 +480,7 @@ export function ProductForm({
           sku: v.sku,
           name: v.title ?? "",
           attributes: attrs,
+          colorHex: v.colorHex || "",
           price: v.price,
           salePrice: v.salePrice ?? undefined,
           costPrice: v.costPrice ?? undefined,
@@ -546,13 +594,27 @@ export function ProductForm({
         const existing = prev.find(
           (v) => optionKey(v.attributes, optionNames) === key,
         );
+
+        // Find colorHex from color-type options
+        let colorHex = "";
+        for (const opt of options) {
+          if (opt.isColor) {
+            const val = attrs[opt.name];
+            if (val && colorHexMap[val]) {
+              colorHex = colorHexMap[val];
+              break;
+            }
+          }
+        }
+
         if (existing) {
-          return { ...existing, name: buildVariantName(attrs) };
+          return { ...existing, name: buildVariantName(attrs), colorHex: colorHex || existing.colorHex };
         }
         return {
           sku: "",
           name: buildVariantName(attrs),
           attributes: attrs,
+          colorHex,
           price: 0,
           salePrice: undefined,
           costPrice: undefined,
@@ -669,6 +731,7 @@ export function ProductForm({
       sku: v.sku,
       name: v.name,
       attributes: v.attributes,
+      colorHex: v.colorHex || "",
       price: v.price,
       salePrice: v.salePrice || undefined,
       costPrice: v.costPrice || undefined,
@@ -1067,7 +1130,7 @@ export function ProductForm({
 
               <div className="space-y-2" data-field="description">
                 <Label htmlFor="description">Description</Label>
-                <InputGroup className="min-h-[8rem]">
+                <InputGroup className="min-h-32">
                   <InputGroupTextarea
                     id="description"
                     value={description}
@@ -1289,14 +1352,102 @@ export function ProductForm({
 
                     {option.isColor ? (
                       <div className="space-y-3">
-                        <ColorPicker
-                          value=""
-                          onChange={(hex) => {
-                            if (hex && !option.values.includes(hex)) {
-                              addValueToOption(index, hex);
-                            }
-                          }}
-                        />
+                        {pendingColor?.optionIndex === index ? (
+                          <div className="flex items-center gap-2">
+                            <ColorSwatch
+                              color={pendingColor.hex}
+                              size="sm"
+                            />
+                            <input
+                              type="text"
+                              value={pendingColor.name}
+                              onChange={(e) =>
+                                setPendingColor((prev) =>
+                                  prev
+                                    ? { ...prev, name: e.target.value }
+                                    : null,
+                                )
+                              }
+                              onKeyDown={(e) => {
+                                if (
+                                  e.key === "Enter" &&
+                                  pendingColor.name.trim()
+                                ) {
+                                  e.preventDefault();
+                                  const trimmed = pendingColor.name.trim();
+                                  if (!option.values.includes(trimmed)) {
+                                    addValueToOption(index, trimmed);
+                                  }
+                                  setColorHexMap((prev) => ({
+                                    ...prev,
+                                    [trimmed]: pendingColor.hex,
+                                  }));
+                                  setPendingColor(null);
+                                }
+                              }}
+                              placeholder="Type a color name..."
+                              className="flex-1 rounded-md border bg-background px-3 py-1.5 text-sm"
+                              autoFocus
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              disabled={!pendingColor.name.trim()}
+                              onClick={() => {
+                                if (!pendingColor.name.trim()) return;
+                                const trimmed = pendingColor.name.trim();
+                                if (!option.values.includes(trimmed)) {
+                                  addValueToOption(index, trimmed);
+                                }
+                                setColorHexMap((prev) => ({
+                                  ...prev,
+                                  [trimmed]: pendingColor.hex,
+                                }));
+                                setPendingColor(null);
+                              }}
+                            >
+                              Add
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setPendingColor(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : (
+                          <ColorPicker
+                            value=""
+                            onColorChange={(hex) => {
+                              if (!hex) return;
+                              // Check if it matches a preset
+                              const preset = PRESET_COLORS.find(
+                                (c) =>
+                                  c.hex.toUpperCase() === hex.toUpperCase(),
+                              );
+                              if (preset) {
+                                // Preset: add immediately with preset name
+                                if (!option.values.includes(preset.name)) {
+                                  addValueToOption(index, preset.name);
+                                }
+                                setColorHexMap((prev) => ({
+                                  ...prev,
+                                  [preset.name]: hex,
+                                }));
+                              } else {
+                                // Custom: show name input
+                                setPendingColor({
+                                  optionIndex: index,
+                                  hex,
+                                  name: "",
+                                });
+                              }
+                            }}
+                          />
+                        )}
                         {option.values.length > 0 && (
                           <div className="flex flex-wrap gap-2">
                             {option.values.map((value, vi) => (
@@ -1304,13 +1455,18 @@ export function ProductForm({
                                 key={value}
                                 className="inline-flex items-center gap-1.5 rounded-full border bg-muted pl-1 pr-2.5 py-0.5 text-xs"
                               >
-                                <ColorSwatch color={value} size="xs" />
+                                <ColorSwatch color={colorHexMap[value] || value} size="xs" />
                                 {value}
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    removeValueFromOption(index, vi)
-                                  }
+                                  onClick={() => {
+                                    removeValueFromOption(index, vi);
+                                    setColorHexMap((prev) => {
+                                      const next = { ...prev };
+                                      delete next[value];
+                                      return next;
+                                    });
+                                  }}
                                   className="ml-0.5 text-muted-foreground hover:text-destructive"
                                 >
                                   ×
@@ -1423,6 +1579,7 @@ export function ProductForm({
                 optionLabels={optionLabels}
                 optionValues={optionValues}
                 colorOptions={colorOptions}
+                colorHexMap={colorHexMap}
                 onChange={setVariants}
                 upload={uploadShopImage}
                 deleteImage={deleteShopImage}
@@ -1534,7 +1691,7 @@ export function ProductForm({
                 <Label htmlFor="content-materials-care">
                   Materials &amp; Care
                 </Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="content-materials-care"
                     value={contentMaterialsAndCare}
@@ -1572,7 +1729,7 @@ export function ProductForm({
                 <Label htmlFor="content-shipping-returns">
                   Shipping &amp; Returns
                 </Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="content-shipping-returns"
                     value={contentShippingAndReturns}
@@ -1605,7 +1762,7 @@ export function ProductForm({
 
               <div className="space-y-2" data-field="content.payment">
                 <Label htmlFor="content-payment">Payment</Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="content-payment"
                     value={contentPayment}
@@ -1640,7 +1797,7 @@ export function ProductForm({
                 <Label htmlFor="content-installation-bulbs">
                   Installation &amp; Bulbs
                 </Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="content-installation-bulbs"
                     value={contentInstallationAndBulbs}
@@ -1713,7 +1870,7 @@ export function ProductForm({
 
               <div className="space-y-2" data-field="seo.metaDescription">
                 <Label htmlFor="seo-meta-description">Meta Description</Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="seo-meta-description"
                     value={seoMetaDescription}

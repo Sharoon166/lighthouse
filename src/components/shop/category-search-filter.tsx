@@ -23,13 +23,9 @@ export function CategorySearchFilter({
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 container">
       {/* Header bar: Count & Search bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-border pb-4">
-        <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
-          {filtered.length} {filtered.length === 1 ? "category" : "categories"}
-        </span>
-
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div className="relative w-full sm:w-80">
           <input
             type="text"
@@ -44,29 +40,31 @@ export function CategorySearchFilter({
             className="absolute left-3 top-2.5 text-muted-foreground pointer-events-none"
           />
         </div>
+        
+        <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+          {filtered.length} {filtered.length === 1 ? "category" : "categories"}
+        </span>
       </div>
 
       {/* Grid of Categories matching Image 0 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((category) => (
           <Link
             key={category.id}
             href={`/products?category=${category.slug}`}
-            className="group relative flex flex-col justify-end overflow-hidden rounded-xl bg-slate-900 p-6 min-h-65 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl border border-white/10"
+            className="group relative flex flex-col justify-end overflow-hidden bg-noise p-6 aspect-3/2"
           >
             {/* Background Image */}
             <Image
-              src={category.image}
+              src="/wall-lights.png"
               alt={category.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover object-center opacity-70 transition-transform duration-500 group-hover:scale-105 group-hover:opacity-80"
+              className="object-cover object-center transition-transform duration-500 group-hover:scale-105 brightness-170"
             />
-            {/* Dark gradient overlay */}
-            <div className="absolute inset-0 bg-linear-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
 
             {/* Content overlay */}
-            <div className="relative z-10 space-y-1">
+            <div className="relative z-10 space-y-1 mb-auto">
               <h3 className="font-heading text-2xl font-semibold tracking-tight text-white group-hover:text-gold transition-colors">
                 {category.name}
               </h3>

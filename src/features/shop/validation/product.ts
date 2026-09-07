@@ -19,6 +19,7 @@ const variantInputSchema = z.object({
       `Name must be ${FIELD_LIMITS.name.medium} characters or fewer`,
     ),
   attributes: z.record(z.string(), z.string()),
+  colorHex: z.string().optional().default(""),
   price: z.number().min(0, "Price must be 0 or greater"),
   salePrice: z.number().min(0).nullable().optional(),
   costPrice: z.number().min(0).nullable().optional(),
@@ -47,6 +48,7 @@ const variantDraftInputSchema = z.object({
     .optional()
     .default(""),
   attributes: z.record(z.string(), z.string()).optional().default({}),
+  colorHex: z.string().optional().default(""),
   price: z.number().min(0).optional().default(0),
   salePrice: z.number().min(0).nullable().optional(),
   costPrice: z.number().min(0).nullable().optional(),

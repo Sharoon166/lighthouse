@@ -33,11 +33,11 @@ function isValidHex(hex: string): boolean {
 
 export function ColorPicker({
   value,
-  onChange,
+  onColorChange,
   className,
 }: {
   value: string;
-  onChange: (hex: string) => void;
+  onColorChange: (hex: string) => void;
   className?: string;
 }) {
   const [hexInput, setHexInput] = useState(() => {
@@ -69,7 +69,7 @@ export function ColorPicker({
               key={color.hex}
               type="button"
               title={color.name}
-              onClick={() => onChange(color.hex)}
+              onClick={() => onColorChange(color.hex)}
               className={`relative size-7 shrink-0 rounded-full border-2 transition-all ${
                 isSelected
                   ? "border-foreground ring-2 ring-foreground/20 scale-110"
@@ -104,8 +104,8 @@ export function ColorPicker({
                 .replace(/[^0-9A-Fa-f]/g, "")
                 .slice(0, 6);
               setHexInput(val);
-              if (isValidHex(`#${val}`)) {
-                onChange(`#${val}`);
+              if (val.length === 6 && isValidHex(`#${val}`)) {
+                onColorChange(`#${val}`);
               }
             }}
             placeholder="000000"
@@ -116,6 +116,12 @@ export function ColorPicker({
       </div>
     </div>
   );
+}
+
+export function hexToColorName(hex: string): string {
+  const normalized = hex.toUpperCase();
+  const found = PRESET_COLORS.find((c) => c.hex.toUpperCase() === normalized);
+  return found?.name || hex;
 }
 
 export function ColorSwatch({

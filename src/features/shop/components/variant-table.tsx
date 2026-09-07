@@ -1,14 +1,12 @@
 "use client";
 
 import {
-  Cancel01Icon,
   Delete02Icon,
   ExpandIcon,
-  MinusSignIcon,
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { ColorSwatch } from "@/components/shared/color-picker";
 import {
   ImageDropzone,
@@ -33,6 +31,7 @@ export interface VariantRow {
   sku: string;
   name: string;
   attributes: Record<string, string>;
+  colorHex: string;
   price: number;
   salePrice?: number;
   costPrice?: number;
@@ -49,6 +48,7 @@ interface VariantTableProps {
   optionLabels: Record<string, string>;
   optionValues: Record<string, string[]>;
   colorOptions?: Set<string>;
+  colorHexMap?: Record<string, string>;
   onChange: (variants: VariantRow[]) => void;
   onRemoveManual?: () => void;
   upload?: (formData: FormData) => Promise<UploadImageResult>;
@@ -62,6 +62,7 @@ export function VariantTable({
   optionLabels,
   optionValues,
   colorOptions = new Set(),
+  colorHexMap = {},
   onChange,
   upload,
   deleteImage,
@@ -134,6 +135,7 @@ export function VariantTable({
       sku: "",
       name: "",
       attributes: {},
+      colorHex: "",
       price: 0,
       salePrice: undefined,
       costPrice: undefined,
@@ -321,6 +323,7 @@ export function VariantTable({
                   optionKeys={optionKeys}
                   optionValues={optionValues}
                   colorOptions={colorOptions}
+                  colorHexMap={colorHexMap}
                   isSelected={selected.has(index)}
                   isExpanded={isExpanded}
                   onToggleSelect={() => toggleRow(index)}
@@ -350,6 +353,7 @@ function VariantRow({
   optionKeys,
   optionValues,
   colorOptions,
+  colorHexMap,
   isSelected,
   isExpanded,
   onToggleSelect,
@@ -365,6 +369,7 @@ function VariantRow({
   optionKeys: string[];
   optionValues: Record<string, string[]>;
   colorOptions: Set<string>;
+  colorHexMap: Record<string, string>;
   isSelected: boolean;
   isExpanded: boolean;
   onToggleSelect: () => void;
@@ -431,7 +436,7 @@ function VariantRow({
                     <SelectItem key={val} value={val}>
                       <span className="flex items-center gap-1.5">
                         {colorOptions.has(key) && (
-                          <ColorSwatch color={val} size="xs" />
+                          <ColorSwatch color={colorHexMap[val] || val} size="xs" />
                         )}
                         {val}
                       </span>
@@ -442,7 +447,7 @@ function VariantRow({
             ) : (
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 {colorOptions.has(key) && variant.attributes[key] && (
-                  <ColorSwatch color={variant.attributes[key]} size="xs" />
+                  <ColorSwatch color={colorHexMap[variant.attributes[key]] || variant.attributes[key]} size="xs" />
                 )}
                 {variant.attributes[key] ?? "\u2014"}
               </span>

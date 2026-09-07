@@ -17,6 +17,7 @@ import {
   listBlogPosts,
 } from "../actions";
 import { BlogCard } from "./blog-card";
+import { ScrollBlurContainer } from "@/components/shared/scroll-blur-container";
 
 const SKELETON_KEYS = ["one", "two", "three", "four", "five", "six"];
 
@@ -112,23 +113,26 @@ export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
     <>
       {/* Search + Category Filters */}
       <div className="mb-10 flex flex-col-reverse gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <nav
-          aria-label="Blog categories"
-          className="flex flex-wrap items-center gap-2"
-        >
-          {allCategories.map((cat) => (
-            <Button
-              key={cat.value}
-              variant={activeCategory === cat.value ? "default" : "outline"}
-              size="sm"
-              className="rounded-full"
-              onClick={() => handleCategoryChange(cat.value)}
+        <div className="w-full min-w-0 lg:flex-1">
+          <ScrollBlurContainer>
+            <nav
+              aria-label="Blog categories"
+              className="grow flex flex-wrap items-center gap-2"
             >
-              {cat.label}
-            </Button>
-          ))}
-        </nav>
-
+              {allCategories.map((cat) => (
+                <Button
+                  key={cat.value}
+                  variant={activeCategory === cat.value ? "secondary" : "outline"}
+                  size="sm"
+                  className="rounded-full"
+                  onClick={() => handleCategoryChange(cat.value)}
+                >
+                  {cat.label}
+                </Button>
+              ))}
+            </nav>
+          </ScrollBlurContainer>
+        </div>
         <div className="flex items-center gap-4">
           <InputGroup className="h-10 w-full max-w-xs rounded-full bg-card sm:w-64">
             <InputGroupAddon>

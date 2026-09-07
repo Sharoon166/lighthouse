@@ -6,9 +6,19 @@ import { Button } from "../ui/button";
 
 export function OppelDistributorBanner() {
   return (
-    <section style={{
-      backgroundImage: "url('/brands/opple-distribution-banner.png')"
-    }} className="bg-cover bg-center h-155">
+    <section className="bg-opple-banner relative h-[155dvh] sm:h-155">
+      {/*<picture className="absolute inset-0 -z-10">
+          <source
+            media="(max-width: 639px)"
+            srcSet="/brands/opple-distribution-banner-mobile.png"
+          />
+          <img
+            src="/brands/opple-distribution-banner.png"
+            alt=""
+            className="h-full w-full object-cover"
+          />
+      </picture>*/}
+
       <div className="container flex max-lg:flex-col items-center gap-y-10 justify-between py-10">
         <header className="flex flex-col gap-6">
           {/* Logo section */}
@@ -25,6 +35,13 @@ export function OppelDistributorBanner() {
 
           {/* Main content */}
           <div className="space-y-6">
+            <Image
+              src="/exciting-news-badge.png"
+              alt="OPPLE brand logo"
+              height={50}
+              width={180}
+              className="-rotate-6 sm:hidden"
+            />
             <h2 className="heading-underline text-primary uppercase max-w-3xl leading-snug">
               We are now the official distributor of{" "}
               <span className="text-gold">Opple</span>
@@ -42,7 +59,7 @@ export function OppelDistributorBanner() {
               </div>
             </address>
 
-            <Button size="lg" className="group">
+            <Button size="lg" className="group max-sm:w-full">
               View Opple Collection{" "}
               <HugeiconsIcon
                 icon={ArrowRight02Icon}

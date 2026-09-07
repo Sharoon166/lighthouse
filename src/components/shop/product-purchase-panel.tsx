@@ -15,6 +15,7 @@ import { useMemo, useState } from "react";
 import { RollingNumber } from "@kitlangton/rolling-number/react";
 import "@kitlangton/rolling-number/styles.css";
 import { formatCurrency } from "@/lib/format";
+import { PRESET_COLORS } from "@/components/shared/color-picker";
 import type { ShopProductItem, ShopProductVariant } from "@/lib/shop-data";
 
 interface ProductPurchasePanelProps {
@@ -76,7 +77,18 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
     : product.originalPrice;
 
   const handleAttributeChange = (key: string, value: string) => {
-    setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+    setSelectedAttributes((prev) => {
+      const next = { ...prev, [key]: value };
+      // Find the variant that matches the new attribute combination
+      const nextVariant = product.variants.find((v) =>
+        Object.entries(next).every(([k, val]) => v.attributes[k] === val),
+      );
+      // Clamp quantity: if new stock is lower, drop down; otherwise keep current
+      if (nextVariant) {
+        setQuantity((q) => Math.min(q, Math.max(1, nextVariant.stock)));
+      }
+      return next;
+    });
   };
 
   const isColorAttribute = (key: string) =>
@@ -95,7 +107,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
         </h1>
 
         {/* Rating Row */}
-        <div className="hidden flex items-center gap-2 text-sm">
+        <div className="hidden flexs items-center gap-2 text-sm">
           <div className="flex items-center text-amber-500">
             {[...Array(5)].map((_, i) => (
               <HugeiconsIcon
@@ -168,16 +180,26 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
                   {options.map((value) => {
                     const isSelected = currentValue === value;
                     const isAvailable = product.variants.some((v) =>
-                      Object.entries({
-                        ...selectedAttributes,
-                        [attrKey]: value,
-                      }).every(([k, val]) => v.attributes[k] === val),
+                      product.variantAttributes.every((k) => {
+                        const val = k === attrKey ? value : selectedAttributes[k];
+                        return v.attributes[k] === val;
+                      }),
                     );
-                    // Try to find hex from finishes or use a default
-                    const finishData = product.finishes.find(
-                      (f) => f.name === value,
+                    // Find the matching variant to get its colorHex
+                    const matchingVariant = product.variants.find((v) =>
+                      product.variantAttributes.every((k) => {
+                        const val = k === attrKey ? value : selectedAttributes[k];
+                        return v.attributes[k] === val;
+                      }),
                     );
-                    const hexColor = finishData?.hex || "#D4AF37";
+                    const hexColor =
+                      matchingVariant?.colorHex ||
+                      product.finishes.find((f) => f.name === value)?.hex ||
+                      PRESET_COLORS.find(
+                        (c) =>
+                          c.name.toLowerCase() === value.toLowerCase(),
+                      )?.hex ||
+                      "#888888";
 
                     return (
                       <button
@@ -216,10 +238,10 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
                   {options.map((value) => {
                     const isSelected = currentValue === value;
                     const isAvailable = product.variants.some((v) =>
-                      Object.entries({
-                        ...selectedAttributes,
-                        [attrKey]: value,
-                      }).every(([k, val]) => v.attributes[k] === val),
+                      product.variantAttributes.every((k) => {
+                        const val = k === attrKey ? value : selectedAttributes[k];
+                        return v.attributes[k] === val;
+                      }),
                     );
 
                     return (
@@ -257,12 +279,20 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
                   : "bg-red-500"
               }`}
             />
-            <span className="text-muted-foreground">
-              {selectedVariant.availability === "in_stock" &&
-              selectedVariant.stock > 0
-                ? `In Stock (${selectedVariant.stock} available)`
-                : "Out of Stock"}
-            </span>
+            {selectedVariant.availability === "in_stock" &&
+            selectedVariant.stock > 0 ? (
+              <span className="text-muted-foreground">
+                In Stock (
+                <RollingNumber
+                  value={selectedVariant.stock}
+                  duration={500}
+                  className="inline-block font-semibold text-foreground tabular-nums"
+                />
+                {" "}available)
+              </span>
+            ) : (
+              <span className="text-muted-foreground">Out of Stock</span>
+            )}
           </div>
         )}
 
@@ -276,12 +306,18 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             >
               <HugeiconsIcon icon={MinusSignIcon} size={16} />
             </button>
-            <span className="w-10 text-center text-base font-semibold text-foreground tabular-nums">
-              {String(quantity).padStart(2, "0")}
-            </span>
+            <RollingNumber
+              value={quantity}
+              duration={300}
+              className="w-10 text-center text-base font-semibold text-foreground tabular-nums"
+            />
             <button
               type="button"
-              onClick={() => setQuantity((q) => q + 1)}
+              onClick={() =>
+                setQuantity((q) =>
+                  Math.min(q + 1, Math.max(1, selectedVariant?.stock ?? Infinity)),
+                )
+              }
               className="flex size-12 items-center justify-center text-foreground hover:bg-muted rounded-r-full transition-colors"
             >
               <HugeiconsIcon icon={PlusSignIcon} size={16} />

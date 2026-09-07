@@ -6,6 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import HeroImage from "@/assets/hero-img.webp";
+import MobileHeroImage from "@/assets/hero-img-mobile.png";
 import { HeroLinks } from "@/components/hero/hero-links";
 import { CTA } from "@/components/hero/cta";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
@@ -34,13 +35,19 @@ export default function Home() {
           priority
           className="absolute top-0 right-0 -z-10 h-full w-full object-cover"
         />
-        <div className="space-y-8 container">
+        <Image
+          src={MobileHeroImage}
+          alt="hero image"
+          priority
+          className="absolute inset-0 -z-10 block w-full object-cover object-top sm:hidden"
+        />
+        <div className="space-y-6 sm:space-y-8 container max-sm:mt-auto max-sm:mb-[24%]">
           <div className="lg:w-[65%] space-y-4">
             <h1 className="text-pretty max-sm:text-5xl">
               A house is only as warm as its{" "}
               <span className="text-gold">light</span>
             </h1>
-            <p className="lg:text-lg">
+            <p className="max-sm:hidden lg:text-lg">
               Pendants, chandeliers, and architectural fixtures for homes and
               commercial spaces across Pakistan. Chosen for how a room feels
               once the switch is on, not just how the fixture looks when
@@ -48,7 +55,7 @@ export default function Home() {
             </p>
           </div>
 
-          <Button size="lg" className="group py-8 gap-4 font-bold">
+          <Button size="lg" className="group sm:py-8 gap-4 font-bold">
             Shop Collection
             <HugeiconsIcon
               icon={ArrowUpRight01FreeIcons}
@@ -85,10 +92,11 @@ export default function Home() {
                   {
                     "row-span-1 col-span-12 md:col-span-6 lg:col-span-8":
                       index === 0,
-                    "lg:row-span-2 col-span-12 md:col-span-6 lg:col-span-4":
+                    "lg:row-span-2 col-span-6 md:col-span-6 lg:col-span-4":
                       index === 1,
-                    "row-span-1 col-span-12 md:col-span-6 lg:col-span-4":
-                      index === 2 || index === 3,
+                    "row-span-1 col-span-6 md:col-span-6 lg:col-span-4":
+                      index === 2,
+                     "row-span-1 col-span-12 md:col-span-6 lg:col-span-4": index === 3,
                   },
                 )}
               >
@@ -229,7 +237,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <div className="container space-y-32">
+      <div className="container">
         <Partners />
         <CTA />
       </div>

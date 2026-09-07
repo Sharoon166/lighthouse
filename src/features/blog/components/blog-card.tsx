@@ -28,7 +28,7 @@ export function BlogCard({ post }: { post: BlogPostListItem }) {
           </div>
         )}
       </div>
-      <div className="border border-t-0 border-border pt-5 pb-2 p-4">
+      <div className="pt-5 pb-2 p-4">
         {post.category && (
           <span className="uppercase text-sm font-semibold tracking-[0.2em] text-gold">
             {getCategoryLabel(post.category)}

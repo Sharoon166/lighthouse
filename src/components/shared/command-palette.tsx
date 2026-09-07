@@ -188,7 +188,7 @@ function CommandPaletteDialog() {
       </Command.List>
 
       <div className="border-t border-border px-4 py-2">
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-xs text-muted-foreground">
           <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">↑↓</kbd> to navigate{" "}
           <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">↵</kbd> to select{" "}
           <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">esc</kbd> to close

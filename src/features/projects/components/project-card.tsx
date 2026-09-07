@@ -39,12 +39,12 @@ export function ProjectCard({
         className={`absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent ${overlayClassName ?? ""}`}
       />
       <div className="absolute inset-x-0 bottom-0 p-5">
-        <h3 className="font-heading text-xl font-bold text-white leading-snug">
+        <h3 className="font-heading text-2xl text-white leading-snug truncate">
           {project.title}
         </h3>
         <div className="flex gap-1 items-center text-gold ">
           
-          <p className="mt-1 text-sm truncate">{project.subtitle}</p>
+          <p className="mt-1 text-xs truncate">{project.subtitle}</p>
           <HugeiconsIcon icon={ArrowRight02Icon} />
         </div>
       </div>

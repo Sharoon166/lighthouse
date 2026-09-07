@@ -217,7 +217,9 @@ const productSchema = new Schema<Product>(
 productSchema.index({ "category._id": 1, status: 1, "priceRange.min": 1 });
 productSchema.index({ "brand._id": 1, status: 1 });
 productSchema.index({ "variants.sku": 1 }, { unique: true });
-productSchema.index({ "variants.slug": 1 }, { unique: true });
+// Note: variants.slug should NOT have a unique index across all products
+// Different products can have the same variant slug (e.g., "matte-black" for different fixtures)
+// Uniqueness within a product is enforced by the application logic
 productSchema.index({ name: "text", description: "text", tags: "text" });
 productSchema.index({ "category._id": 1, inStock: 1, status: 1 });
 
@@ -227,6 +229,16 @@ productSchema.pre("save", function () {
   }
 
   if (this.isModified("variants")) {
+    // Check for duplicate variant slugs within this product
+    const slugCounts = new Map<string, number>();
+    for (const variant of this.variants) {
+      const count = slugCounts.get(variant.slug) || 0;
+      slugCounts.set(variant.slug, count + 1);
+      if (count > 0) {
+        throw new Error(`Duplicate variant slug "${variant.slug}" found. Each variant within a product must have a unique slug.`);
+      }
+    }
+
     const activeVariants = this.variants.filter((v) => v.isActive);
 
     if (activeVariants.length > 0) {

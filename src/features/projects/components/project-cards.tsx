@@ -108,12 +108,12 @@ export function ProjectCards({
           <div className="flex flex-1 flex-col gap-2 p-4">
             <div className="flex flex-wrap gap-1.5">
               {project.categories.slice(0, 2).map((cat) => (
-                <Badge key={cat} variant="secondary" className="text-[11px]">
+                <Badge key={cat} variant="secondary" className="text-xs">
                   {cat}
                 </Badge>
               ))}
               {project.categories.length > 2 && (
-                <Badge variant="outline" className="text-[11px]">
+                <Badge variant="outline" className="text-xs">
                   +{project.categories.length - 2}
                 </Badge>
               )}
@@ -143,7 +143,7 @@ export function ProjectCards({
               {project.location && (
                 <span className="truncate">{project.location}</span>
               )}
-              <time className="ml-auto shrink-0 text-[11px]">
+              <time className="ml-auto shrink-0 text-xs">
                 {formatDate(project.updatedAt)}
               </time>
             </div>

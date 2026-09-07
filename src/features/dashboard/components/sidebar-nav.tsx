@@ -65,7 +65,7 @@ function Tooltip({ label, className }: { label: string; className?: string }) {
     <span
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1.5 text-xs font-medium text-background opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100",
+        "pointer-events-none absolute left-full top-1/2 ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1.5 text-xs font-medium text-background opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 z-100",
         className,
       )}
     >
@@ -74,16 +74,19 @@ function Tooltip({ label, className }: { label: string; className?: string }) {
   );
 }
 
-export function SidebarNav({ navigate }: { navigate?: () => void }) {
+export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMobile?: boolean }) {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const name = user?.name || "Admin";
   const email = user?.email || "";
-  const [collapsed, setCollapsed] = useLocalStorage(
+  const [collapsedStorage, setCollapsedStorage] = useLocalStorage(
     "lighthouse:sidebar-collapsed",
     true,
   );
+  
+  // On mobile, always show expanded sidebar
+  const collapsed = isMobile ? false : collapsedStorage;
 
   const isActive = (href: string) =>
     href === "/admin" ? pathname === href : pathname.startsWith(href);
@@ -99,11 +102,11 @@ export function SidebarNav({ navigate }: { navigate?: () => void }) {
   }
 
   return (
-    <div className="flex h-full flex-col gap-6 p-3">
+    <div className="flex h-full flex-col gap-6 p-2">
       <div
         className={cn(
-          "flex items-center gap-2 pt-1",
-          collapsed ? "flex-col gap-5" : "justify-between px-2",
+          "flex items-center gap-2 pt-1 transition-[width] duration-300 ease-in-out",
+          collapsed ? "flex-col gap-5 w-14" : "justify-between px-2 w-60",
         )}
       >
         {!collapsed && (
@@ -116,17 +119,19 @@ export function SidebarNav({ navigate }: { navigate?: () => void }) {
             Lighthouse
           </Link>
         )}
-        <button
-          type="button"
-          onClick={() => setCollapsed((v) => !v)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="flex size-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <HugeiconsIcon
-            icon={collapsed ? PanelLeftOpenIcon : PanelLeftCloseIcon}
-            size={18}
-          />
-        </button>
+        {!isMobile && (
+          <button
+            type="button"
+            onClick={() => setCollapsedStorage((v) => !v)}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="flex size-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <HugeiconsIcon
+              icon={collapsed ? PanelLeftOpenIcon : PanelLeftCloseIcon}
+              size={18}
+            />
+          </button>
+        )}
       </div>
 
       <nav className="flex flex-col gap-1">

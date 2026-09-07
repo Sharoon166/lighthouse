@@ -117,12 +117,12 @@ export function BlogPostCards({
           <div className="flex flex-1 flex-col gap-2 p-4">
             <div className="flex flex-wrap gap-1.5">
               {post.category && (
-                <Badge variant="secondary" className="text-[11px]">
+                <Badge variant="secondary" className="text-xs">
                   {post.category}
                 </Badge>
               )}
               {post.tags.slice(0, 2).map((tag) => (
-                <Badge key={tag} variant="outline" className="text-[11px]">
+                <Badge key={tag} variant="outline" className="text-xs">
                   {tag}
                 </Badge>
               ))}
@@ -149,7 +149,7 @@ export function BlogPostCards({
                 </Avatar>
                 <span className="truncate">{post.authorName || "Anonymous"}</span>
               </div>
-              <time className="ml-auto shrink-0 text-[11px]">
+              <time className="ml-auto shrink-0 text-xs">
                 {formatDate(post.updatedAt)}
               </time>
             </div>

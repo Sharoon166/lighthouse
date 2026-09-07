@@ -226,6 +226,17 @@ export async function updateProduct(
     return { ok: true, slug: nextSlug };
   } catch (error) {
     console.error("Failed to update product:", error);
+    
+    // Handle duplicate variant slug within product
+    if (error instanceof Error && error.message.includes("Duplicate variant slug")) {
+      return {
+        ok: false,
+        fieldErrors: {},
+        formErrors: [error.message],
+      };
+    }
+    
+    // Handle MongoDB duplicate key errors
     const message =
       (error as { code?: number }).code === 11000
         ? "A product with this slug or a variant with this SKU already exists. Please use unique values."

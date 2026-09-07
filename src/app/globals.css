@@ -95,14 +95,14 @@
   --background: oklch(1 0 0);
   --foreground: oklch(0.2 0 0); /* Much darker text */
 
-  /* Vibrant primary for clear CTAs */
+   /*Vibrant primary for clear CTAs */
   /*--primary: oklch(0.55 0.22 264); /* Bold blue */
-  --primary: #2a1b45; /* Bold blue */
+  --primary: #2a1b45; /* Bold blue */ 
   --primary-foreground: oklch(0.99 0 0);
 
   /* Clean secondary */
   --secondary: #702f5c;
-  /*--secondary: oklch(0.65 0.22 914);*/
+  --secondary: #282b4a;
   --secondary-foreground: oklch(0.9 0 0);
 
   /* Better muted contrast */
@@ -145,6 +145,9 @@
   --sidebar-accent-foreground: oklch(0.25 0 0);
   --sidebar-border: oklch(0.9 0 0);
   --sidebar-ring: oklch(0.55 0.22 264);
+
+  --font-fraunces: var(--font-poiret-one);
+  
 }
 
 /* Dashboard Dark Mode - Optional high contrast dark theme */
@@ -196,7 +199,7 @@
   margin-inline: auto;
   /*padding-inline: 1rem;*/
 
-  @apply px-4 sm:px-16;
+  @apply px-4 md:px-16;
 }
 
 @utility bg-noise {
@@ -214,12 +217,12 @@
   h1,
   h2,
   h3 {
-    @apply font-heading text-primary;
+    @apply font-heading text-primary text-pretty;
   }
 
   h2,
   h3 {
-    @apply text-primary-foreground font-semibold;
+    @apply text-primary-foreground ;
     font-size: clamp(30px, 5vw, 40px);
   }
 
@@ -234,9 +237,6 @@
 
   section {
     @apply py-18;
-    & + section {
-      @apply mb-32;
-    }
   }
 
   button:not(:disabled),
@@ -362,5 +362,77 @@
     color: var(--secondary-foreground);
     font-size: 1.0625rem;
     font-weight: 700;
+  }
+}
+
+/**
+ * Marquee Component Styles - Tailwind v4
+ * Add this to your global CSS file (before @tailwind imports or in a layer)
+ */
+
+/**
+ * SEAMLESS MARQUEE ANIMATION
+ * 
+ * Why it works:
+ * - Content is duplicated exactly twice (copy 1 + copy 2)
+ * - Total width = content_width * 2 + gap
+ * - Animation translates -50% = moves exactly one content copy
+ * - When second copy reaches the left edge, first copy is back at start (seamless loop)
+ * - Linear timing ensures consistent speed
+ */
+
+@keyframes marquee {
+  0% {
+    /* Start: copy 1 visible, copy 2 off-screen to the right */
+    transform: translateX(0%);
+  }
+  100% {
+    /* End: copy 2 visible, copy 1 wrapped (seamlessly) back to right */
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    /* Start: copy 1 visible, copy 2 off-screen to the left */
+    transform: translateX(-50%);
+  }
+  100% {
+    /* End: copy 2 visible, copy 1 wrapped (seamlessly) back to left */
+    transform: translateX(0%);
+  }
+}
+
+@layer utilities {
+  /* Marquee animation utilities */
+  .animate-marquee {
+    animation: marquee var(--marquee-duration, 20s) linear infinite;
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  .animate-marquee-reverse {
+    animation: marquee-reverse var(--marquee-duration, 20s) linear infinite;
+    will-change: transform;
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
+
+  /* Pause animation on hover */
+  .hover\:pause-animation:hover {
+    animation-play-state: paused;
+  }
+
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee,
+    .animate-marquee-reverse {
+      animation: none;
+    }
+
+    .hover\:pause-animation {
+      animation-play-state: auto;
+    }
   }
 }

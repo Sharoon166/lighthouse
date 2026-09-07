@@ -28,7 +28,7 @@ export function ShowroomTabs() {
         ))}
       </div>
 
-      <div className="relative h-96 w-full overflow-hidden rounded-lg border border-border bg-muted">
+      <div className="relative min-h-96 aspect-2/1 w-full overflow-hidden rounded-lg border border-border bg-muted">
         <iframe
           src={active.embedUrl}
           className="absolute inset-0 h-full w-full border-0"

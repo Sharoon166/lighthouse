@@ -15,6 +15,8 @@ export default async function ProjectsPage() {
   const projects = await getPublishedProjects();
 
   const featured = projects.filter((p) => p.featured).slice(0, 3);
+  const featuredIds = new Set(featured.map((p) => p.slug));
+  const remaining = projects.filter((p) => !featuredIds.has(p.slug));
 
   return (
     <>
@@ -26,7 +28,7 @@ export default async function ProjectsPage() {
 
       <div className="py-12 md:py-16">
         {featured.length > 0 && <FeaturedProjects featured={featured} />}
-        <ProjectGrid projects={projects} />
+        <ProjectGrid projects={remaining} />
       </div>
 
       <div className="container">

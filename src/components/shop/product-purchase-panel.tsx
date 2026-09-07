@@ -3,6 +3,7 @@
 import {
   ArrowReloadVerticalIcon,
   CheckmarkBadge01Icon,
+  ChevronDownIcon,
   DeliveryTruck01Icon,
   FavouriteIcon,
   MinusSignIcon,
@@ -10,18 +11,24 @@ import {
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { RollingNumber } from "@kitlangton/rolling-number/react";
+import "@kitlangton/rolling-number/styles.css";
 import { formatCurrency } from "@/lib/format";
-import type { ShopProductItem } from "@/lib/shop-data";
+import type { ShopProductItem, ShopProductVariant } from "@/lib/shop-data";
 
 interface ProductPurchasePanelProps {
   product: ShopProductItem;
 }
 
 export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
-  const [selectedFinish, setSelectedFinish] = useState(
-    product.finishes[0]?.name || "Brass",
-  );
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, string>
+  >(() => {
+    const defaultVariant =
+      product.variants.find((v) => v.isDefault) || product.variants[0];
+    return defaultVariant?.attributes || {};
+  });
   const [quantity, setQuantity] = useState(1);
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(
     {
@@ -36,132 +43,272 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
     setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const selectedVariant: ShopProductVariant | undefined = useMemo(() => {
+    if (product.variants.length === 0) return undefined;
+    return (
+      product.variants.find((v) =>
+        Object.entries(selectedAttributes).every(
+          ([key, val]) => v.attributes[key] === val,
+        ),
+      ) ||
+      product.variants.find((v) => v.isDefault) ||
+      product.variants[0]
+    );
+  }, [product.variants, selectedAttributes]);
+
+  const attributeOptions = useMemo(() => {
+    const options: Record<string, string[]> = {};
+    for (const attrKey of product.variantAttributes) {
+      const values = new Set<string>();
+      for (const v of product.variants) {
+        if (v.attributes[attrKey]) {
+          values.add(v.attributes[attrKey]);
+        }
+      }
+      options[attrKey] = Array.from(values);
+    }
+    return options;
+  }, [product.variantAttributes, product.variants]);
+
+  const currentPrice = selectedVariant?.price || product.price;
+  const currentOriginalPrice = selectedVariant?.salePrice
+    ? selectedVariant.price
+    : product.originalPrice;
+
+  const handleAttributeChange = (key: string, value: string) => {
+    setSelectedAttributes((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const isColorAttribute = (key: string) =>
+    ["color", "colour", "finish"].includes(key.toLowerCase());
+
   return (
-    <div className="space-y-6">
+    <div>
       {/* Category Tag */}
       <span className="text-xs font-semibold uppercase tracking-widest text-gold">
         {product.tag}
       </span>
+      <div className="space-y-6">
+        {/* Product Title */}
+        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-secondary">
+          {product.name}
+        </h1>
 
-      {/* Product Title */}
-      <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-foreground">
-        {product.name}
-      </h1>
-
-      {/* Rating Row */}
-      <div className="flex items-center gap-2 text-sm">
-        <div className="flex items-center text-amber-500">
-          {[...Array(5)].map((_, i) => (
-            <HugeiconsIcon
-              key={i}
-              icon={StarIcon}
-              size={16}
-              className="fill-amber-400 text-amber-400"
-            />
-          ))}
-        </div>
-        <span className="font-semibold text-foreground">
-          {product.ratings.average.toFixed(1)}
-        </span>
-        <span className="text-muted-foreground">
-          ({product.ratings.count} reviews)
-        </span>
-      </div>
-
-      {/* Pricing Row */}
-      <div className="flex items-center gap-3">
-        <span className="font-serif text-2xl sm:text-3xl font-semibold text-foreground">
-          {formatCurrency(product.price)}
-        </span>
-        {product.originalPrice && (
-          <span className="text-base text-muted-foreground line-through">
-            {formatCurrency(product.originalPrice)}
-          </span>
-        )}
-        {product.discountPercentage && (
-          <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-600">
-            -{product.discountPercentage}%
-          </span>
-        )}
-      </div>
-
-      {/* Short Description */}
-      <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-        {product.shortDescription}
-      </p>
-
-      {/* Finish Swatches */}
-      {product.finishes && product.finishes.length > 0 && (
-        <div className="space-y-2 pt-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            FINISH: <span className="text-foreground">{selectedFinish}</span>
-          </label>
-          <div className="flex items-center gap-3">
-            {product.finishes.map((finish) => {
-              const isSelected = selectedFinish === finish.name;
-              return (
-                <button
-                  key={finish.name}
-                  type="button"
-                  onClick={() => setSelectedFinish(finish.name)}
-                  className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
-                    isSelected
-                      ? "border-gold bg-gold/10 text-foreground ring-1 ring-gold"
-                      : "border-border bg-background text-muted-foreground hover:border-foreground"
-                  }`}
-                >
-                  <span
-                    className="size-3.5 rounded-full border border-black/20"
-                    style={{ backgroundColor: finish.hex }}
-                  />
-                  <span>{finish.name}</span>
-                </button>
-              );
-            })}
+        {/* Rating Row */}
+        <div className="hidden flex items-center gap-2 text-sm">
+          <div className="flex items-center text-amber-500">
+            {[...Array(5)].map((_, i) => (
+              <HugeiconsIcon
+                key={i}
+                icon={StarIcon}
+                size={16}
+                className="fill-amber-400 text-amber-400"
+              />
+            ))}
           </div>
-        </div>
-      )}
-
-      {/* Quantity Counter & Add to Cart */}
-      <div className="flex items-center gap-4 pt-2">
-        <div className="flex items-center rounded-lg border border-border bg-background">
-          <button
-            type="button"
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="flex size-10 items-center justify-center text-foreground hover:bg-muted rounded-l-lg transition-colors"
-          >
-            <HugeiconsIcon icon={MinusSignIcon} size={16} />
-          </button>
-          <span className="w-10 text-center text-sm font-semibold text-foreground">
-            {quantity}
+          <span className="font-semibold text-foreground">
+            {product.ratings.average.toFixed(1)}
           </span>
+          <span className="text-muted-foreground">
+            ({product.ratings.count} reviews)
+          </span>
+        </div>
+
+        {/* Pricing Row */}
+        <div className="-mt-4 flex items-center gap-3">
+          <RollingNumber
+            value={currentPrice}
+            locales="en-PK"
+            format={{ style: "currency", currency: "PKR" }}
+            duration={500}
+            className="font-heading text-2xl sm:text-3xl font-semibold text-secondary tabular-nums"
+          />
+          {currentOriginalPrice && (
+            <span className="text-base text-muted-foreground line-through">
+              {formatCurrency(currentOriginalPrice)}
+            </span>
+          )}
+          {selectedVariant?.salePrice &&
+            selectedVariant.salePrice < selectedVariant.price && (
+              <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-600">
+                -
+                {Math.round(
+                  ((selectedVariant.price - selectedVariant.salePrice) /
+                    selectedVariant.price) *
+                    100,
+                )}
+                %
+              </span>
+            )}
+        </div>
+
+        {/* Short Description */}
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed pb-4 border-b-2">
+          {product.shortDescription}
+        </p>
+      </div>
+
+      <div className="space-y-8">
+        {/* Variant Attributes */}
+        {product.variantAttributes.map((attrKey) => {
+          const options = attributeOptions[attrKey];
+          if (!options || options.length === 0) return null;
+          const currentValue = selectedAttributes[attrKey] || options[0];
+          const isColor = isColorAttribute(attrKey);
+
+          return (
+            <div key={attrKey} className="space-y-3 pt-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                {attrKey}
+              </label>
+
+              {isColor ? (
+                /* Color swatches - circular with label below */
+                <div className="flex items-start gap-4">
+                  {options.map((value) => {
+                    const isSelected = currentValue === value;
+                    const isAvailable = product.variants.some((v) =>
+                      Object.entries({
+                        ...selectedAttributes,
+                        [attrKey]: value,
+                      }).every(([k, val]) => v.attributes[k] === val),
+                    );
+                    // Try to find hex from finishes or use a default
+                    const finishData = product.finishes.find(
+                      (f) => f.name === value,
+                    );
+                    const hexColor = finishData?.hex || "#D4AF37";
+
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => handleAttributeChange(attrKey, value)}
+                        disabled={!isAvailable}
+                        className={`flex flex-col items-center gap-2 ${
+                          !isAvailable ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        <span
+                          className={`size-12 rounded-full border-2 transition-all ${
+                            isSelected
+                              ? "border-gold ring-2 ring-gold/30"
+                              : "border-border hover:border-foreground"
+                          }`}
+                          style={{ backgroundColor: hexColor }}
+                        />
+                        <span
+                          className={`text-xs ${
+                            isSelected
+                              ? "text-foreground font-medium"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {value}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* Other attributes - pill buttons */
+                <div className="flex flex-wrap items-center gap-3">
+                  {options.map((value) => {
+                    const isSelected = currentValue === value;
+                    const isAvailable = product.variants.some((v) =>
+                      Object.entries({
+                        ...selectedAttributes,
+                        [attrKey]: value,
+                      }).every(([k, val]) => v.attributes[k] === val),
+                    );
+
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => handleAttributeChange(attrKey, value)}
+                        disabled={!isAvailable}
+                        className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                          isSelected
+                            ? "border-gold bg-gold/10 text-foreground ring-1 ring-gold"
+                            : isAvailable
+                              ? "border-border bg-background text-muted-foreground hover:border-foreground"
+                              : "border-border bg-background text-muted-foreground opacity-50 cursor-not-allowed"
+                        }`}
+                      >
+                        {value}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {/* Stock Status */}
+        {selectedVariant && (
+          <div className="flex items-center gap-2 text-sm">
+            <span
+              className={`size-2 rounded-full ${
+                selectedVariant.availability === "in_stock" &&
+                selectedVariant.stock > 0
+                  ? "bg-green-500"
+                  : "bg-red-500"
+              }`}
+            />
+            <span className="text-muted-foreground">
+              {selectedVariant.availability === "in_stock" &&
+              selectedVariant.stock > 0
+                ? `In Stock (${selectedVariant.stock} available)`
+                : "Out of Stock"}
+            </span>
+          </div>
+        )}
+
+        {/* Quantity Counter & Add to Cart */}
+        <div className="flex items-center gap-4 pt-2">
+          <div className="flex items-center rounded-full border border-border bg-background">
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              className="flex size-12 items-center justify-center text-foreground hover:bg-muted rounded-l-full transition-colors"
+            >
+              <HugeiconsIcon icon={MinusSignIcon} size={16} />
+            </button>
+            <span className="w-10 text-center text-base font-semibold text-foreground tabular-nums">
+              {String(quantity).padStart(2, "0")}
+            </span>
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => q + 1)}
+              className="flex size-12 items-center justify-center text-foreground hover:bg-muted rounded-r-full transition-colors"
+            >
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+            </button>
+          </div>
+
           <button
             type="button"
-            onClick={() => setQuantity((q) => q + 1)}
-            className="flex size-10 items-center justify-center text-foreground hover:bg-muted rounded-r-lg transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 rounded-full bg-slate-950 py-4 text-center text-sm font-bold tracking-widest text-white uppercase transition-colors hover:bg-gold hover:text-slate-950"
           >
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
+            Add to Cart
+            <HugeiconsIcon icon={PlusSignIcon} size={18} />
           </button>
         </div>
 
+        {/* Save to wishlist */}
         <button
           type="button"
-          className="flex-1 rounded-lg bg-slate-950 py-3.5 text-center text-sm font-bold tracking-widest text-white uppercase transition-colors hover:bg-gold hover:text-slate-950"
+          className="flex items-center justify-center gap-2 w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          ADD TO CART
-        </button>
-
-        <button
-          type="button"
-          aria-label="Add to wishlist"
-          className="flex size-12 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground hover:text-rose-500 hover:border-rose-300 transition-colors"
-        >
-          <HugeiconsIcon icon={FavouriteIcon} size={20} />
+          <HugeiconsIcon icon={FavouriteIcon} size={18} />
+          Save to wishlist
         </button>
       </div>
 
       {/* Value Badges */}
-      <div className="space-y-2.5 rounded-xl border border-border/60 bg-muted/20 p-4 text-xs text-muted-foreground">
+      <div className="my-12 space-y-3 text-sm text-muted-foreground">
         <div className="flex items-center gap-2.5">
           <HugeiconsIcon
             icon={DeliveryTruck01Icon}
@@ -188,19 +335,21 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
         </div>
       </div>
 
-      {/* Accordions matching Images 3 & 5 */}
+      {/* Accordions */}
       <div className="border-t border-border/60 pt-4 space-y-3">
         {/* Materials & Care */}
         <div className="border-b border-border/60 pb-3">
           <button
             type="button"
             onClick={() => toggleAccordion("materialsAndCare")}
-            className="flex w-full items-center justify-between py-2 text-left font-serif text-lg font-medium text-foreground"
+            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
           >
             <span>Materials &amp; Care</span>
-            <span className="text-muted-foreground text-sm">
-              {openAccordions.materialsAndCare ? "−" : "+"}
-            </span>
+            <HugeiconsIcon
+              icon={ChevronDownIcon}
+              size={20}
+              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.materialsAndCare ? "rotate-180" : ""}`}
+            />
           </button>
           {openAccordions.materialsAndCare && (
             <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
@@ -214,12 +363,14 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
           <button
             type="button"
             onClick={() => toggleAccordion("shippingAndReturns")}
-            className="flex w-full items-center justify-between py-2 text-left font-serif text-lg font-medium text-foreground"
+            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
           >
             <span>Shipping &amp; Returns</span>
-            <span className="text-muted-foreground text-sm">
-              {openAccordions.shippingAndReturns ? "−" : "+"}
-            </span>
+            <HugeiconsIcon
+              icon={ChevronDownIcon}
+              size={20}
+              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.shippingAndReturns ? "rotate-180" : ""}`}
+            />
           </button>
           {openAccordions.shippingAndReturns && (
             <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
@@ -233,12 +384,14 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
           <button
             type="button"
             onClick={() => toggleAccordion("payment")}
-            className="flex w-full items-center justify-between py-2 text-left font-serif text-lg font-medium text-foreground"
+            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
           >
             <span>Payment</span>
-            <span className="text-muted-foreground text-sm">
-              {openAccordions.payment ? "−" : "+"}
-            </span>
+            <HugeiconsIcon
+              icon={ChevronDownIcon}
+              size={20}
+              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.payment ? "rotate-180" : ""}`}
+            />
           </button>
           {openAccordions.payment && (
             <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
@@ -252,12 +405,14 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
           <button
             type="button"
             onClick={() => toggleAccordion("installationAndBulbs")}
-            className="flex w-full items-center justify-between py-2 text-left font-serif text-lg font-medium text-foreground"
+            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
           >
             <span>Installation &amp; Bulbs</span>
-            <span className="text-muted-foreground text-sm">
-              {openAccordions.installationAndBulbs ? "−" : "+"}
-            </span>
+            <HugeiconsIcon
+              icon={ChevronDownIcon}
+              size={20}
+              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.installationAndBulbs ? "rotate-180" : ""}`}
+            />
           </button>
           {openAccordions.installationAndBulbs && (
             <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">

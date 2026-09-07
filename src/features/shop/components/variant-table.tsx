@@ -459,7 +459,7 @@ function VariantRow({
               className={`h-8 min-w-24 w-full font-mono text-xs ${skuError ? "border-destructive focus-visible:ring-destructive" : ""}`}
             />
             {skuError && (
-              <p className="text-[11px] text-destructive leading-tight">
+              <p className="text-xs text-destructive leading-tight">
                 {skuError}
               </p>
             )}

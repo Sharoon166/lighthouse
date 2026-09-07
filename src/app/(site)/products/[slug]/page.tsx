@@ -51,8 +51,9 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <main className="min-h-screen bg-background">
+    <div className="container">
       {/* Breadcrumbs Section */}
-      <section className="pt-8 pb-4 px-4 sm:px-6 lg:px-8 border-b border-border/40">
+      <section className="pt-8 pb-4 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             items={[
@@ -73,78 +74,81 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           {/* Right: Purchase & Info Panel */}
           <ProductPurchasePanel product={product} />
         </div>
-      </section>
+        </section>
+    </div>
 
       {/* Detail Tabs Section */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-muted">
+        <div className="container">
           <ProductDetailTabs product={product} />
         </div>
       </section>
 
-      {/* "You Might Also Like" Recommendation Section matching Image 5 */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border/40">
-        <div className="mx-auto max-w-7xl space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-serif text-2xl sm:text-3xl font-normal text-foreground">
-              You Might Also Like
-            </h2>
-            <Link
-              href="/products"
-              className="text-xs font-semibold uppercase tracking-wider text-gold hover:underline"
-            >
-              View all &rarr;
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((relProduct) => (
-              <div
-                key={relProduct.id}
-                className="group flex flex-col justify-between rounded-xl border border-border/80 bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+      <div className="container">
+        {/* "You Might Also Like" Recommendation Section matching Image 5 */}
+        <section className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border/40">
+          <div className="mx-auto max-w-7xl space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="font-serif text-2xl sm:text-3xl font-normal text-foreground">
+                You Might Also Like
+              </h2>
+              <Link
+                href="/products"
+                className="text-xs font-semibold uppercase tracking-wider text-gold hover:underline"
               >
-                <Link
-                  href={`/products/${relProduct.slug}`}
-                  className="block relative aspect-square bg-muted/30 overflow-hidden"
-                >
-                  <Image
-                    src={relProduct.images[0] || "/products/1.png"}
-                    alt={relProduct.name}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 25vw"
-                    className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-                  />
-                </Link>
+                View all &rarr;
+              </Link>
+            </div>
 
-                <div className="p-4 space-y-2 bg-card border-t border-border/40">
-                  <Link href={`/products/${relProduct.slug}`}>
-                    <h4 className="font-heading font-medium text-sm text-foreground group-hover:text-gold transition-colors line-clamp-1">
-                      {relProduct.name}
-                    </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((relProduct) => (
+                <div
+                  key={relProduct.id}
+                  className="group flex flex-col justify-between rounded-xl border border-border/80 bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <Link
+                    href={`/products/${relProduct.slug}`}
+                    className="block relative aspect-square bg-muted/30 overflow-hidden"
+                  >
+                    <Image
+                      src={relProduct.images[0] || "/products/1.png"}
+                      alt={relProduct.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                      className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+                    />
                   </Link>
 
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-xs text-foreground">
-                      {formatCurrency(relProduct.price)}
-                    </span>
-                    <button
-                      type="button"
-                      aria-label={`Add ${relProduct.name} to cart`}
-                      className="flex size-7 items-center justify-center rounded-full bg-slate-900 text-white transition-colors hover:bg-gold hover:text-slate-950"
-                    >
-                      <HugeiconsIcon icon={PlusSignIcon} size={14} />
-                    </button>
+                  <div className="p-4 space-y-2 bg-card border-t border-border/40">
+                    <Link href={`/products/${relProduct.slug}`}>
+                      <h4 className="font-heading font-medium text-sm text-foreground group-hover:text-gold transition-colors line-clamp-1">
+                        {relProduct.name}
+                      </h4>
+                    </Link>
+
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-xs text-foreground">
+                        {formatCurrency(relProduct.price)}
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`Add ${relProduct.name} to cart`}
+                        className="flex size-7 items-center justify-center rounded-full bg-slate-900 text-white transition-colors hover:bg-gold hover:text-slate-950"
+                      >
+                        <HugeiconsIcon icon={PlusSignIcon} size={14} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Banner */}
-      <div className="mt-8">
-        <CTA />
+        {/* CTA Banner */}
+        <div className="mt-8">
+          <CTA />
+        </div>
       </div>
     </main>
   );

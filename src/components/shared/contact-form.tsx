@@ -147,7 +147,7 @@ export function ContactForm() {
             />
           </div>
 
-          <Button type="submit" size="lg">
+          <Button type="submit" variant="secondary" size="lg">
             Send a Message
           </Button>
         </form>

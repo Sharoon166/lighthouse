@@ -13,18 +13,18 @@ interface ProductDetailTabsProps {
 export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<
     "description" | "specifications" | "reviews"
-  >("reviews");
+  >("description");
 
   const totalReviewsCount = product.ratings.count || 24;
 
   return (
-    <div className="space-y-8 border-t border-border/60 pt-12">
+    <div className="space-y-8 bg-muted">
       {/* Tabs Bar */}
-      <div className="flex items-center gap-8 border-b border-border/60 pb-3">
+      <div className="flex items-center gap-8 border-b border-border/60">
         <button
           type="button"
           onClick={() => setActiveTab("description")}
-          className={`relative text-sm font-medium transition-colors pb-3 ${
+          className={`relative font-medium transition-colors pb-3 ${
             activeTab === "description"
               ? "text-foreground font-semibold border-b-2 border-gold"
               : "text-muted-foreground hover:text-foreground"
@@ -36,7 +36,7 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
         <button
           type="button"
           onClick={() => setActiveTab("specifications")}
-          className={`relative text-sm font-medium transition-colors pb-3 ${
+          className={`relative font-medium transition-colors pb-3 ${
             activeTab === "specifications"
               ? "text-foreground font-semibold border-b-2 border-gold"
               : "text-muted-foreground hover:text-foreground"
@@ -48,7 +48,7 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
         <button
           type="button"
           onClick={() => setActiveTab("reviews")}
-          className={`relative text-sm font-medium transition-colors pb-3 ${
+          className={`hidden relative font-medium transition-colors pb-3 ${
             activeTab === "reviews"
               ? "text-foreground font-semibold border-b-2 border-gold"
               : "text-muted-foreground hover:text-foreground"
@@ -60,24 +60,24 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
       {/* Tab 1: Description Content */}
       {activeTab === "description" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-muted/20 p-8 rounded-2xl border border-border/40">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div className="lg:col-span-7 space-y-4">
             <span className="text-xs font-semibold uppercase tracking-widest text-gold">
               DESIGN &amp; CRAFTSMANSHIP
             </span>
-            <h3 className="font-serif text-3xl font-normal text-foreground">
+            <h3 className="font-serif leading-[1] font-normal text-foreground">
               Crafted for the spaces that matter most
             </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               {product.description}
             </p>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed">
               Each piece is meticulously inspected for quality, ensuring smooth
               movement across all joints and flawless luster across the
               lacquered metal surfaces.
             </p>
           </div>
-          <div className="lg:col-span-5 relative aspect-square rounded-xl overflow-hidden bg-muted">
+          <div className="lg:col-span-5 relative aspect-square">
             <Image
               src={product.images[1] || product.images[0] || "/products/2.png"}
               alt={`${product.name} detail`}
@@ -90,24 +90,42 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
       {/* Tab 2: Specifications Content */}
       {activeTab === "specifications" && (
-        <div className="rounded-2xl border border-border/60 overflow-hidden bg-background">
-          <table className="w-full text-left text-sm">
-            <tbody className="divide-y divide-border/60">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-7 space-y-6">
+            <span className="text-xs font-semibold uppercase tracking-widest text-gold">
+              TECHNICAL SPECIFICATIONS
+            </span>
+            <h3 className="font-serif leading-none font-normal text-foreground">
+              Built to last. Specified to perform.
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              Every dimension and material choice in the {product.name} is
+              deliberate. Solid brass construction, linen diffusion, and a
+              weighted marble base are the result of a two-year development
+              process focused entirely on longevity and light quality.
+            </p>
+
+            <div className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
               {product.specifications.map((spec) => (
-                <tr
-                  key={spec.key}
-                  className="hover:bg-muted/30 transition-colors"
-                >
-                  <td className="w-1/3 py-3.5 px-6 font-semibold text-foreground bg-muted/20">
+                <div key={spec.key} className="space-y-1">
+                  <dt className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                     {spec.key}
-                  </td>
-                  <td className="py-3.5 px-6 text-muted-foreground">
+                  </dt>
+                  <dd className="text-xl font-medium text-black font-heading">
                     {spec.value}
-                  </td>
-                </tr>
+                  </dd>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+          <div className="lg:col-span-5 relative aspect-square">
+            <Image
+              src={product.images[2] || product.images[1] || product.images[0] || "/products/1.png"}
+              alt={`${product.name} specifications`}
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
       )}
 

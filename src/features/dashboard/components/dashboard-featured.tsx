@@ -13,7 +13,7 @@ export function DashboardFeatured({
   return (
     <div>
       <div className="mb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
           Featured
         </p>
       </div>
@@ -21,7 +21,7 @@ export function DashboardFeatured({
         {featured.blog && (
           <Link
             href={`/admin/blog/edit/${featured.blog.slug}`}
-            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all hover:border-ring hover:shadow-sm"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-2 transition-all hover:border-ring hover:shadow-sm"
           >
             <div className="absolute -bottom-8 -right-8 size-24 rounded-full bg-chart-4/4 blur-xl" />
             <div className="relative flex items-start gap-4">
@@ -50,7 +50,7 @@ export function DashboardFeatured({
           <Link
             key={project.slug}
             href={`/admin/projects/edit/${project.slug}`}
-            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-all hover:border-ring hover:shadow-sm"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-card p-2 transition-all hover:border-ring hover:shadow-sm"
           >
             <div className="absolute -bottom-8 -right-8 size-24 rounded-full bg-chart-3/4 blur-xl" />
             <div className="relative flex items-start gap-4">

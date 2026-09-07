@@ -84,8 +84,8 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           className={cn(
             "hidden items-center gap-1 rounded-full px-2 py-1 md:flex",
             isHero
-              ? "border border-border/40 bg-muted/10"
-              : "border border-border bg-muted/40",
+              ? "bg-muted/10"
+              : "border bg-muted/40",
           )}
         >
           {NAV_LINKS.map(({ href, label }) => (
@@ -111,7 +111,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           className={cn(
             "hidden items-center gap-1 rounded-full md:flex",
             isHero
-              ? "border border-border/40 bg-muted/10"
+              ? "bg-muted/10"
               : "border border-border bg-muted/40",
           )}
         >

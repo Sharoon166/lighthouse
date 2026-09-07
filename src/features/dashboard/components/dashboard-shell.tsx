@@ -1,25 +1,22 @@
 "use client";
 
 import { type ReactNode, useState } from "react";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { cn } from "@/lib/utils";
 import { DashboardHeader } from "./dashboard-header";
 import { SidebarNav } from "./sidebar-nav";
 
 export function DashboardShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [collapsed] = useLocalStorage("lighthouse:sidebar-collapsed", true);
 
   return (
     <div className="min-h-dvh bg-background text-foreground">
       <div className="mx-auto flex w-full max-w-[1600px] gap-6 p-4 md:gap-10 md:p-8 lg:p-10">
         <aside
           className={cn(
-            "sticky top-8 hidden h-[calc(100dvh-4rem)] shrink-0 self-start rounded-2xl border border-border bg-card transition-[width] duration-300 ease-in-out lg:block",
-            collapsed ? "w-16" : "w-60",
+            "sticky top-8 hidden h-[calc(100dvh-4rem)] shrink-0 self-start rounded-2xl border border-border bg-card lg:block",
           )}
         >
-          <SidebarNav />
+          <SidebarNav isMobile={false} />
         </aside>
 
         <div className="min-w-0 flex-1">
@@ -37,7 +34,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             onClick={() => setMobileOpen(false)}
           />
           <div className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card shadow-xl">
-            <SidebarNav navigate={() => setMobileOpen(false)} />
+            <SidebarNav navigate={() => setMobileOpen(false)} isMobile={true} />
           </div>
         </div>
       )}

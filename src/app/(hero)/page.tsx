@@ -5,15 +5,15 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
-import HeroImage from "@/assets/hero-img.png";
+import HeroImage from "@/assets/hero-img.webp";
+import { HeroLinks } from "@/components/hero/hero-links";
 import { CTA } from "@/components/hero/cta";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
 import { BlogCard } from "@/components/shared/blog-card";
 import { Clients } from "@/components/shared/clients";
 import { Marquee } from "@/components/shared/marquee";
-import { Partners } from "@/components/shared/partners";
 import { SectionHeader } from "@/components/shared/section-header";
-import { ProductCard } from "@/components/shop/product-card";
+import { Partners } from "@/components/shared/partners";
 import { Button } from "@/components/ui/button";
 import {
   dummyCategories,
@@ -56,10 +56,15 @@ export default function Home() {
             />
           </Button>
         </div>
+        <HeroLinks />
       </section>
+
       <Marquee duration="10s" className="bg-gray-900 text-gold py-4">
         {marqueeText.map((text) => (
-          <span key={text}>{text}✦</span>
+          <div key={text} className="contents">
+          <span>{text}</span>
+          <span>✦</span>
+          </div>
         ))}
       </Marquee>
 
@@ -115,16 +120,25 @@ export default function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {dummyProducts.map((product, index) => (
-              <ProductCard
-                key={product.id}
-                product={{
-                  id: product.id,
-                  name: product.title,
-                  slug: product.id,
-                  price: product.price,
-                  image: `/products/${index + 1}.png`,
-                }}
-              />
+              <div key={product.id} className="group border">
+                <div className="relative aspect-square overflow-hidden bg-muted">
+                  <Image
+                    src={`/products/${index + 1}.png`}
+                    alt={product.title}
+                    width={1024}
+                    height={1024}
+                    className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-xl font-sans hover:text-gold transition-colors">
+                    {product.title}
+                  </h3>
+                  <p className="text-muted-foreground font-semibold uppercase font-heading">
+                    {product.price}
+                  </p>
+                </div>
+              </div>
             ))}
           </div>
         </section>
@@ -149,7 +163,7 @@ export default function Home() {
         </div>
 
         <Image
-          src="/about-image.png"
+          src="/about-image.webp"
           width={1024}
           height={1024}
           priority

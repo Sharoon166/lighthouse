@@ -1,7 +1,8 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 interface CategoryOption {
   name: string;
@@ -42,51 +43,53 @@ export function ProductFiltersSidebar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const activeCategory = searchParams.get("category") || "all";
-  const activeDesign = searchParams.getAll("design");
-  const activePrice = searchParams.getAll("price");
-  const activeMaterial = searchParams.getAll("material");
+  const initialCategory = searchParams.get("category") || "all";
+  const initialDesign = useMemo(() => new Set(searchParams.getAll("design")), [searchParams]);
+  const initialPrice = useMemo(() => new Set(searchParams.getAll("price")), [searchParams]);
+  const initialMaterial = useMemo(() => new Set(searchParams.getAll("material")), [searchParams]);
 
-  const createQueryString = useCallback(
-    (name: string, value: string, isArray = false) => {
-      const params = new URLSearchParams(searchParams.toString());
+  const [category, setCategory] = useState(initialCategory);
+  const [design, setDesign] = useState<Set<string>>(initialDesign);
+  const [price, setPrice] = useState<Set<string>>(initialPrice);
+  const [material, setMaterial] = useState<Set<string>>(initialMaterial);
 
-      if (!isArray) {
-        if (value && value !== "all") {
-          params.set(name, value);
-        } else {
-          params.delete(name);
-        }
-      } else {
-        const currentVals = params.getAll(name);
-        if (currentVals.includes(value)) {
-          const updated = currentVals.filter((v) => v !== value);
-          params.delete(name);
-          updated.forEach((v) => params.append(name, v));
-        } else {
-          params.append(name, value);
-        }
-      }
-
-      params.set("page", "1");
-      return params.toString();
-    },
-    [searchParams],
-  );
-
-  const handleCategorySelect = (slug: string) => {
-    const query = createQueryString("category", slug);
-    router.push(`${pathname}?${query}`);
+  const toggleSet = (setter: React.Dispatch<React.SetStateAction<Set<string>>>, value: string) => {
+    setter((prev) => {
+      const next = new Set(prev);
+      if (next.has(value)) next.delete(value);
+      else next.add(value);
+      return next;
+    });
   };
 
-  const handleCheckboxToggle = (paramKey: string, val: string) => {
-    const query = createQueryString(paramKey, val, true);
-    router.push(`${pathname}?${query}`);
+  const applyFilters = () => {
+    const params = new URLSearchParams();
+
+    if (category && category !== "all") params.set("category", category);
+    design.forEach((v) => params.append("design", v));
+    price.forEach((v) => params.append("price", v));
+    material.forEach((v) => params.append("material", v));
+    params.set("page", "1");
+
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const handleClearAll = () => {
+    setCategory("all");
+    setDesign(new Set());
+    setPrice(new Set());
+    setMaterial(new Set());
     router.push(pathname);
   };
+
+  const hasChanges =
+    category !== initialCategory ||
+    design.size !== initialDesign.size ||
+    price.size !== initialPrice.size ||
+    material.size !== initialMaterial.size ||
+    [...design].some((v) => !initialDesign.has(v)) ||
+    [...price].some((v) => !initialPrice.has(v)) ||
+    [...material].some((v) => !initialMaterial.has(v));
 
   return (
     <aside className="w-full lg:w-64 space-y-8 shrink-0 border-r border-border/40 pr-0 lg:pr-6">
@@ -97,12 +100,12 @@ export function ProductFiltersSidebar() {
         </h3>
         <div className="space-y-1.5 text-sm">
           {CATEGORY_OPTIONS.map((cat) => {
-            const isSelected = activeCategory === cat.slug;
+            const isSelected = category === cat.slug;
             return (
               <button
                 key={cat.slug}
                 type="button"
-                onClick={() => handleCategorySelect(cat.slug)}
+                onClick={() => setCategory(cat.slug)}
                 className={`flex w-full items-center justify-between py-1 text-left transition-colors ${
                   isSelected
                     ? "font-semibold text-gold"
@@ -124,20 +127,20 @@ export function ProductFiltersSidebar() {
           DESIGN
         </h3>
         <div className="space-y-2">
-          {DESIGN_OPTIONS.map((design) => {
-            const checked = activeDesign.includes(design);
+          {DESIGN_OPTIONS.map((d) => {
+            const checked = design.has(d);
             return (
               <label
-                key={design}
+                key={d}
                 className="flex items-center gap-2.5 text-sm text-foreground/80 cursor-pointer hover:text-foreground"
               >
                 <input
                   type="checkbox"
                   checked={checked}
-                  onChange={() => handleCheckboxToggle("design", design)}
+                  onChange={() => toggleSet(setDesign, d)}
                   className="size-4 rounded border-border text-gold focus:ring-gold"
                 />
-                <span>{design}</span>
+                <span>{d}</span>
               </label>
             );
           })}
@@ -149,20 +152,20 @@ export function ProductFiltersSidebar() {
           PRICE RANGE
         </h3>
         <div className="space-y-2">
-          {PRICE_OPTIONS.map((price) => {
-            const checked = activePrice.includes(price.value);
+          {PRICE_OPTIONS.map((p) => {
+            const checked = price.has(p.value);
             return (
               <label
-                key={price.value}
+                key={p.value}
                 className="flex items-center gap-2.5 text-sm text-foreground/80 cursor-pointer hover:text-foreground"
               >
                 <input
                   type="checkbox"
                   checked={checked}
-                  onChange={() => handleCheckboxToggle("price", price.value)}
+                  onChange={() => toggleSet(setPrice, p.value)}
                   className="size-4 rounded border-border text-gold focus:ring-gold"
                 />
-                <span>{price.label}</span>
+                <span>{p.label}</span>
               </label>
             );
           })}
@@ -174,27 +177,35 @@ export function ProductFiltersSidebar() {
           MATERIAL
         </h3>
         <div className="space-y-2">
-          {MATERIAL_OPTIONS.map((mat) => {
-            const checked = activeMaterial.includes(mat);
+          {MATERIAL_OPTIONS.map((m) => {
+            const checked = material.has(m);
             return (
               <label
-                key={mat}
+                key={m}
                 className="flex items-center gap-2.5 text-sm text-foreground/80 cursor-pointer hover:text-foreground"
               >
                 <input
                   type="checkbox"
                   checked={checked}
-                  onChange={() => handleCheckboxToggle("material", mat)}
+                  onChange={() => toggleSet(setMaterial, m)}
                   className="size-4 rounded border-border text-gold focus:ring-gold"
                 />
-                <span>{mat}</span>
+                <span>{m}</span>
               </label>
             );
           })}
         </div>
       </div>
 
-      <div className="border-t border-border/60 pt-6">
+      <div className="border-t border-border/60 pt-6 space-y-3">
+        <Button
+          type="button"
+          onClick={applyFilters}
+          disabled={!hasChanges}
+          className="w-full bg-gold text-white hover:bg-gold/90"
+        >
+          Apply Filters
+        </Button>
         <button
           type="button"
           onClick={handleClearAll}

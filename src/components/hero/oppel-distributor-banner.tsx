@@ -6,7 +6,9 @@ import { Button } from "../ui/button";
 
 export function OppelDistributorBanner() {
   return (
-    <section className="bg-noise">
+    <section style={{
+      backgroundImage: "url('/brands/opple-distribution-banner.png')"
+    }} className="bg-cover bg-center h-155">
       <div className="container flex max-lg:flex-col items-center gap-y-10 justify-between py-10">
         <header className="flex flex-col gap-6">
           {/* Logo section */}
@@ -49,23 +51,6 @@ export function OppelDistributorBanner() {
             </Button>
           </div>
         </header>
-
-        <figure className="grow relative">
-          <Image
-            src="/exciting-news-badge.png"
-            alt="Exciting news badge"
-            height={60}
-            width={220}
-            className="absolute left-2/12 -rotate-6"
-          />
-          <Image
-            src="/brands/opple-product-showcase.png"
-            alt="OPPLE product showcase featuring lighting fixtures and panels"
-            height={452}
-            width={660}
-          />
-          <figcaption className="sr-only">OPPLE lighting products</figcaption>
-        </figure>
       </div>
     </section>
   );

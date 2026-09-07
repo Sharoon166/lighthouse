@@ -111,7 +111,7 @@ export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
   return (
     <>
       {/* Search + Category Filters */}
-      <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-10 flex flex-col-reverse gap-6 lg:flex-row lg:items-center lg:justify-between">
         <nav
           aria-label="Blog categories"
           className="flex flex-wrap items-center gap-2"
@@ -167,7 +167,7 @@ export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
         </div>
       ) : (
         <>
-          <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 *:border">
             {gridPosts.map((post) => (
               <li key={post.id}>
                 <BlogCard post={post} />

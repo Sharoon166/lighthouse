@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const WHATSAPP_PHONE = "923001234567";
 const WHATSAPP_MESSAGE =
@@ -24,12 +25,18 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 export function WhatsAppButton() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
+  const isAdmin = pathname.startsWith("/admin");
+
   useEffect(() => {
+    if (isAdmin) return;
     const timer = setTimeout(() => setVisible(true), 600);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isAdmin]);
+
+  if (isAdmin) return null;
 
   return (
     <a

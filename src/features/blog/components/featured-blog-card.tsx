@@ -28,28 +28,28 @@ export function FeaturedBlogCard({ post }: { post: BlogPostListItem }) {
           />
         </div>
       ) : (
-        <div className="flex aspect-[16/10] items-center justify-center bg-muted md:aspect-auto">
+        <div className="flex aspect-16/10 items-center justify-center bg-muted md:aspect-auto">
           <span className="text-6xl">📰</span>
         </div>
       )}
 
       {/* Content */}
       <div className="flex flex-col justify-center bg-noise p-8 md:p-10">
-        <Badge className="mb-4 w-fit bg-gold text-primary text-xs uppercase tracking-wider">
+        <Badge className="mb-4 w-fit bg-gold text-primary text-xs uppercase tracking-widest">
           Featured
         </Badge>
 
-        <h2 className="mb-4 text-secondary-foreground font-heading text-2xl font-bold leading-tight text-foreground md:text-3xl">
+        <h2 className="mb-4 text-secondary-foreground font-heading text-2xl leading-tight md:text-3xl">
           {post.title}
         </h2>
 
         {post.summary && (
-          <p className="mb-6 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+          <p className="mb-6 line-clamp-3 text-sm leading-relaxed text-foreground">
             {post.summary}
           </p>
         )}
 
-        <div className="mb-6 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+        <div className="mb-6 flex flex-wrap items-center gap-3 text-sm text-foreground">
           {post.authorName && <span>{post.authorName}</span>}
           {post.authorName && post.publishedAt && <span>•</span>}
           {post.publishedAt && (

@@ -11,6 +11,19 @@ export interface ShopCategoryItem {
   designsCount: number;
 }
 
+export interface ShopProductVariant {
+  id: string;
+  sku: string;
+  title: string;
+  attributes: Record<string, string>;
+  price: number;
+  salePrice?: number;
+  images: string[];
+  stock: number;
+  availability: "in_stock" | "out_of_stock" | "preorder" | "backorder";
+  isDefault: boolean;
+}
+
 export interface ShopProductItem {
   id: string;
   name: string;
@@ -25,6 +38,8 @@ export interface ShopProductItem {
   description: string;
   images: string[];
   finishes: { name: string; hex: string }[];
+  variantAttributes: string[];
+  variants: ShopProductVariant[];
   ratings: {
     average: number;
     count: number;
@@ -191,6 +206,45 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       { name: "Black", hex: "#1A1A1A" },
       { name: "Silver", hex: "#C0C0C0" },
     ],
+    variantAttributes: ["finish"],
+    variants: [
+      {
+        id: "v1",
+        sku: "ABL-BRASS",
+        title: "Brass",
+        attributes: { finish: "Brass" },
+        price: 21000,
+        salePrice: 18900,
+        images: [],
+        stock: 15,
+        availability: "in_stock",
+        isDefault: true,
+      },
+      {
+        id: "v2",
+        sku: "ABL-BLACK",
+        title: "Black",
+        attributes: { finish: "Black" },
+        price: 21000,
+        salePrice: 18900,
+        images: [],
+        stock: 8,
+        availability: "in_stock",
+        isDefault: false,
+      },
+      {
+        id: "v3",
+        sku: "ABL-SILVER",
+        title: "Silver",
+        attributes: { finish: "Silver" },
+        price: 21000,
+        salePrice: 18900,
+        images: [],
+        stock: 5,
+        availability: "in_stock",
+        isDefault: false,
+      },
+    ],
     ratings: {
       average: 4.8,
       count: 24,
@@ -268,6 +322,31 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       { name: "White Marble", hex: "#F5F5F0" },
       { name: "Black Marble", hex: "#222222" },
     ],
+    variantAttributes: ["finish"],
+    variants: [
+      {
+        id: "v4",
+        sku: "MAT-WM",
+        title: "White Marble",
+        attributes: { finish: "White Marble" },
+        price: 16900,
+        images: [],
+        stock: 10,
+        availability: "in_stock",
+        isDefault: true,
+      },
+      {
+        id: "v5",
+        sku: "MAT-BM",
+        title: "Black Marble",
+        attributes: { finish: "Black Marble" },
+        price: 16900,
+        images: [],
+        stock: 7,
+        availability: "in_stock",
+        isDefault: false,
+      },
+    ],
     ratings: {
       average: 4.9,
       count: 18,
@@ -313,6 +392,31 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       { name: "Brass", hex: "#D4AF37" },
       { name: "Matte Black", hex: "#1A1A1A" },
     ],
+    variantAttributes: ["finish"],
+    variants: [
+      {
+        id: "v6",
+        sku: "LAF-BRASS",
+        title: "Brass",
+        attributes: { finish: "Brass" },
+        price: 28900,
+        images: [],
+        stock: 6,
+        availability: "in_stock",
+        isDefault: true,
+      },
+      {
+        id: "v7",
+        sku: "LAF-BLACK",
+        title: "Matte Black",
+        attributes: { finish: "Matte Black" },
+        price: 28900,
+        images: [],
+        stock: 4,
+        availability: "in_stock",
+        isDefault: false,
+      },
+    ],
     ratings: {
       average: 4.7,
       count: 14,
@@ -351,6 +455,20 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       "Elysian Feather Floor Lamp combines organic glamour with gentle ambient illumination.",
     images: ["/products/4.png", "/products/1.png", "/products/2.png"],
     finishes: [{ name: "Gold", hex: "#D4AF37" }],
+    variantAttributes: ["finish"],
+    variants: [
+      {
+        id: "v8",
+        sku: "EFF-GOLD",
+        title: "Gold",
+        attributes: { finish: "Gold" },
+        price: 34900,
+        images: [],
+        stock: 3,
+        availability: "in_stock",
+        isDefault: true,
+      },
+    ],
     ratings: {
       average: 5.0,
       count: 9,
@@ -386,6 +504,20 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       "Casts delicate prismatic refractions across your space when illuminated.",
     images: ["/products/5.png", "/products/2.png", "/products/3.png"],
     finishes: [{ name: "Gold & Crystal", hex: "#E5C158" }],
+    variantAttributes: ["finish"],
+    variants: [
+      {
+        id: "v9",
+        sku: "CBT-GOLD",
+        title: "Gold & Crystal",
+        attributes: { finish: "Gold & Crystal" },
+        price: 22900,
+        images: [],
+        stock: 8,
+        availability: "in_stock",
+        isDefault: true,
+      },
+    ],
     ratings: {
       average: 4.8,
       count: 12,
@@ -423,6 +555,20 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       "Clean geometric symmetry providing versatile reading and mood lighting.",
     images: ["/products/6.png", "/products/1.png", "/products/4.png"],
     finishes: [{ name: "Brass & Black Marble", hex: "#1F1F1F" }],
+    variantAttributes: ["finish"],
+    variants: [
+      {
+        id: "v10",
+        sku: "GMF-BM",
+        title: "Brass & Black Marble",
+        attributes: { finish: "Brass & Black Marble" },
+        price: 31900,
+        images: [],
+        stock: 5,
+        availability: "in_stock",
+        isDefault: true,
+      },
+    ],
     ratings: {
       average: 4.6,
       count: 8,
@@ -475,6 +621,7 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
 
 export interface FetchProductsOptions {
   categorySlug?: string;
+  brandSlug?: string;
   search?: string;
   designStyle?: string[];
   material?: string[];
@@ -493,6 +640,9 @@ export async function fetchStoreProducts(
     if (options.categorySlug && options.categorySlug !== "all") {
       query["category.slug"] = options.categorySlug;
     }
+    if (options.brandSlug && options.brandSlug !== "all") {
+      query["brand.slug"] = options.brandSlug;
+    }
     if (options.search) {
       query.name = { $regex: options.search, $options: "i" };
     }
@@ -506,6 +656,54 @@ export async function fetchStoreProducts(
           defaultVar?.price && defaultVar?.salePrice
             ? defaultVar.price
             : undefined;
+
+        // Map real variants from MongoDB
+        const variants: ShopProductVariant[] = (p.variants || [])
+          .filter((v) => v.isActive)
+          .map((v) => ({
+            id: String(v._id),
+            sku: v.sku,
+            title: v.title,
+            attributes: v.attributes instanceof Map
+              ? Object.fromEntries(v.attributes)
+              : (v.attributes as Record<string, string> || {}),
+            price: v.salePrice || v.price,
+            salePrice: v.salePrice && v.salePrice < v.price ? v.salePrice : undefined,
+            images: v.images?.length ? v.images : [],
+            stock: v.stock,
+            availability: v.availability,
+            isDefault: v.isDefault,
+          }));
+
+        // Extract finish options from variant attributes
+        const variantAttributes = p.variantAttributes || [];
+        const finishAttrKey = variantAttributes.find((key) =>
+          ["finish", "color", "colour"].includes(key.toLowerCase()),
+        );
+        const finishes: { name: string; hex: string }[] = [];
+        if (finishAttrKey && variants.length > 0) {
+          const seen = new Set<string>();
+          for (const v of variants) {
+            const val = v.attributes[finishAttrKey];
+            if (val && !seen.has(val)) {
+              seen.add(val);
+              // Try to extract hex from value if it contains color info
+              const hexMatch = val.match(/#[0-9a-fA-F]{6}/);
+              finishes.push({
+                name: val.replace(/#[0-9a-fA-F]{6}/, "").trim() || val,
+                hex: hexMatch?.[0] || "#D4AF37",
+              });
+            }
+          }
+        }
+        // Fallback finishes if none extracted
+        if (finishes.length === 0) {
+          finishes.push(
+            { name: "Brass", hex: "#D4AF37" },
+            { name: "Black", hex: "#1A1A1A" },
+          );
+        }
+
         return {
           id: String(p._id),
           name: p.name,
@@ -522,10 +720,9 @@ export async function fetchStoreProducts(
             p.shortDescription || p.description?.slice(0, 120) || "",
           description: p.description || "",
           images: p.images?.length ? p.images : ["/products/1.png"],
-          finishes: [
-            { name: "Brass", hex: "#D4AF37" },
-            { name: "Black", hex: "#1A1A1A" },
-          ],
+          finishes,
+          variantAttributes,
+          variants,
           ratings: p.ratings?.count
             ? {
                 average: p.ratings.average || 4.8,

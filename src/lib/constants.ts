@@ -1,3 +1,13 @@
+import { Facebook02Icon, Linkedin, Location, NewTwitterIcon, VimeoIcon } from "@hugeicons/core-free-icons";
+
+export const heroLinks = [
+  { label: "Facebook", href: "https://facebook.com", icon: Facebook02Icon },
+  { label: "Twitter", href: "https://x.com", icon: NewTwitterIcon },
+  { label: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
+  { label: "Vimeo", href: "https://vimeo.com", icon: VimeoIcon },
+  { label: "Location", href: "https://google.maps.com", icon: Location },
+];
+
 export const marqueeText = [
   "Pendant Lights",
   "Chandeliers",
@@ -243,6 +253,14 @@ export const howWeWork = [
       "From brief through installation and aftercare — one team, one point of contact, no handoffs that lose detail.",
   },
 ];
+
+export const ceoMessage = {
+  name: "Tariq Mahmood",
+  role: "Founder & CEO",
+  image: "/ceo.webp",
+  message:
+    "When we started Light House, the idea was simple, to bring premium lighting to Pakistan that actually serves the space, not just the catalogue. Twelve years later, that idea hasn't changed. Every fixture we source, every project we take on, is guided by one question: does this make the room better? If the answer is yes, we're on the right track.",
+};
 
 export const teamMembers = [
   {

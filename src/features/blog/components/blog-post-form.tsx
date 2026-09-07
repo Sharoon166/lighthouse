@@ -1512,7 +1512,7 @@ export function BlogPostForm({
                 />
               </div>
 
-              <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border bg-muted/40 px-4 py-2 text-[11px] text-muted-foreground">
+              <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border bg-muted/40 px-4 py-2 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <kbd className="rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[10px] text-foreground">
                     Esc

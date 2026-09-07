@@ -7,7 +7,7 @@ import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Clients } from "@/components/shared/clients";
 import { Partners } from "@/components/shared/partners";
 import { Button } from "@/components/ui/button";
-import { aboutStats, howWeWork, teamMembers } from "@/lib/constants";
+import { aboutStats, ceoMessage, howWeWork } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "About | Lighthouse",
@@ -19,41 +19,39 @@ export default function AboutPage() {
   return (
     <main>
       {/* Hero Section */}
-      <section className="bg-noise overflow-hidden pb-0">
-        <Breadcrumb
-          items={[{ label: "Home", href: "/" }, { label: "About" }]}
-          className="container"
-        />
-        <div className="flex max-lg:flex-col items-center justify-between overflow-x-hidden">
-          <div className="container lg:ml-28">
-            <div className="max-w-2xl space-y-4 pt-10">
-              <h1>About Lighthouse</h1>
-              <p>
-                For years, Light House has helped homeowners, architects, and
-                businesses create warm, inviting spaces. We carefully source
-                premium lighting that blends quality, performance, and timeless
-                design. Our goal is simple — to provide fixtures that enhance
-                the look and feel of every room.
-              </p>
-              <Button size="lg" className="mt-2">
-                Learn More <HugeiconsIcon icon={ArrowRight02Icon} />
-              </Button>
-            </div>
-          </div>
-
-          <Image
-            src="/about-image.png"
-            width={1024}
-            height={1024}
-            priority
-            alt="Premium lighting fixture"
-            className="hover:brightness-125 transition-all"
+      <section className="bg-noise pb-0 lg:pt-0 grid lg:grid-cols-5 place-items-center overflow-hidden">
+        <div className="container max-lg:pt-10 lg:ml-28 space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10">
+          <Breadcrumb
+            items={[{ label: "Home", href: "/" }, { label: "About" }]}
           />
+          <h1 className="lg:text-5xl">About Lighthouse</h1>
+          <p className="max-w-2xl">
+            Premium lighting, carefully chosen for quality, style, and performance. Beautiful fixtures that make every space feel warm and inviting.
+          </p>
+          <Button size="lg" className="mt-2">
+            Learn More <HugeiconsIcon icon={ArrowRight02Icon} />
+          </Button>
         </div>
+
+        <Image
+          src="/about-image.webp"
+          width={1024}
+          height={1024}
+          priority
+          alt="Premium lighting fixture"
+          className="
+            w-full
+            lg:col-start-3
+            lg:col-span-5
+            lg:row-start-1
+            hover:brightness-125
+            transition-all
+          "
+        />
       </section>
 
       {/* Stats Section */}
-      <section>
+      <section className="py-8">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-border border">
             {aboutStats.map((stat) => (
@@ -103,42 +101,48 @@ export default function AboutPage() {
       </section>
 
       {/* Our Clients */}
-      <section className="container">
+      <div className="container">
         <Clients />
-      </section>
+      </div>
 
-      {/* Our Team */}
+      {/* CEO Message */}
       <section className="bg-muted">
         <div className="container">
-          <div className="max-w-3xl space-y-3 mb-12">
-            <h2>Our Team</h2>
-            <p>
-              A team of lighting enthusiasts, designers, and experts dedicated
-              to helping you create spaces that shine.
-            </p>
-          </div>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Quote side */}
+            <div className="space-y-8">
+              <svg
+                viewBox="0 0 80 60"
+                className="w-16 h-16 text-secondary fill-current"
+                aria-hidden="true"
+              >
+                <path d="M26.3 23.1C21.8 23.1 18.1 24.9 15.4 28.5C12.7 32.1 11.3 36.8 11.3 42.6C11.3 48.1 12.7 52.6 15.4 56.2C18.1 59.8 21.8 61.6 26.3 61.6C30.1 61.6 33.3 60.1 35.8 57.1C38.4 54.1 39.7 50.1 39.7 45.1C39.7 40.6 38.5 36.8 36.1 33.8C33.7 30.7 30.3 29.1 26.3 29.1V23.1ZM61.3 23.1C56.8 23.1 53.1 24.9 50.4 28.5C47.7 32.1 46.3 36.8 46.3 42.6C46.3 48.1 47.7 52.6 50.4 56.2C53.1 59.8 56.8 61.6 61.3 61.6C65.1 61.6 68.3 60.1 70.8 57.1C73.4 54.1 74.7 50.1 74.7 45.1C74.7 40.6 73.5 36.8 71.1 33.8C68.7 30.7 65.3 29.1 61.3 29.1V23.1Z" />
+              </svg>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {teamMembers.map((member) => (
-              <div key={member.name} className="space-y-3">
-                <div className="relative aspect-3/4 overflow-hidden bg-muted">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <p className="font-heading font-semibold text-primary-foreground">
-                    {member.name}
-                  </p>
-                  <p className="text-xs tracking-widest text-gold uppercase">
-                    {member.role}
-                  </p>
-                </div>
+              <blockquote className="text-lg leading-relaxed text-foreground">
+                {ceoMessage.message}
+              </blockquote>
+
+              <div className="space-y-1">
+                <p className="font-heading text-xl font-semibold text-gold">
+                  {ceoMessage.name}
+                </p>
+                <p className="text-sm tracking-widest text-muted-foreground uppercase">
+                  {ceoMessage.role}
+                </p>
               </div>
-            ))}
+            </div>
+
+            {/* Image side */}
+            <div className="relative aspect-4/5 overflow-hidden">
+              <Image
+                src={ceoMessage.image}
+                alt={ceoMessage.name}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>

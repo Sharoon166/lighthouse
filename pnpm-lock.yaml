@@ -17,6 +17,9 @@ importers:
       '@hugeicons/react':
         specifier: ^1.1.9
         version: 1.1.9(react@19.2.8)
+      '@kitlangton/rolling-number':
+        specifier: ^0.4.1
+        version: 0.4.1(react@19.2.8)
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -672,6 +675,17 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@kitlangton/rolling-number@0.4.1':
+    resolution: {integrity: sha512-wvtmA/iz2rZ8QKrHt32dsxWFq4AJk0RfeXUsk/eXHvto7m3bRQxJ5Nv3KzWZmE7FNB1Ysz567Oj/hILlvpCqLQ==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      solid-js: ^1.9.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      solid-js:
+        optional: true
 
   '@modelcontextprotocol/sdk@1.30.0':
     resolution: {integrity: sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==}
@@ -3564,6 +3578,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@kitlangton/rolling-number@0.4.1(react@19.2.8)':
+    optionalDependencies:
+      react: 19.2.8
 
   '@modelcontextprotocol/sdk@1.30.0(zod@3.25.76)':
     dependencies:

@@ -484,7 +484,7 @@ export function DashboardCharts({ stats }: { stats: DashboardStats }) {
   return (
     <div>
       <div className="mb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
           Analytics
         </p>
       </div>

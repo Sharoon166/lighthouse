@@ -4,7 +4,7 @@ import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { formatCurrency } from "@/lib/format";
+import { Pagination } from "@/components/shared/pagination";
 import type { ShopProductItem } from "@/lib/shop-data";
 import { ProductCard } from "./product-card";
 
@@ -13,6 +13,8 @@ interface ProductGridToolbarProps {
   total: number;
 }
 
+const PAGE_SIZE = 12;
+
 export function ProductGridToolbar({
   products,
   total,
@@ -20,6 +22,9 @@ export function ProductGridToolbar({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const currentPage = Number(searchParams.get("page") || "1");
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const [searchVal, setSearchVal] = useState(searchParams.get("search") || "");
 
@@ -38,6 +43,12 @@ export function ProductGridToolbar({
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("sort", e.target.value);
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
     router.push(`${pathname}?${params.toString()}`);
   };
 
@@ -67,7 +78,7 @@ export function ProductGridToolbar({
         {/* Counter and Sort */}
         <div className="flex items-center justify-between md:justify-end gap-4 text-xs text-muted-foreground">
           <span>
-            {total} products | Page 1 of {Math.max(1, Math.ceil(total / 12))}
+            {total} products | Page {currentPage} of {totalPages}
           </span>
           <select
             onChange={handleSortChange}
@@ -82,20 +93,11 @@ export function ProductGridToolbar({
         </div>
       </div>
 
-      {/* 3-Column Product Grid matching Image 1 */}
+      {/* Product Grid */}
       {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={{
-                id: product.id,
-                name: product.name,
-                slug: product.slug,
-                price: formatCurrency(product.price),
-                image: product.images[0] || "/products/1.png",
-              }}
-            />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (
@@ -104,51 +106,12 @@ export function ProductGridToolbar({
         </div>
       )}
 
-      {/* Pagination controls matching Image 1 */}
-      <div className="flex items-center justify-center gap-2 border-t border-border/60 pt-8">
-        <button
-          type="button"
-          className="px-3 py-1.5 text-xs font-semibold rounded border border-border bg-background text-muted-foreground hover:bg-muted"
-        >
-          &lt;
-        </button>
-        <button
-          type="button"
-          className="px-3.5 py-1.5 text-xs font-semibold rounded bg-slate-900 text-white"
-        >
-          1
-        </button>
-        <button
-          type="button"
-          className="px-3.5 py-1.5 text-xs font-semibold rounded border border-border bg-background text-foreground hover:bg-muted"
-        >
-          2
-        </button>
-        <button
-          type="button"
-          className="px-3.5 py-1.5 text-xs font-semibold rounded border border-border bg-background text-foreground hover:bg-muted"
-        >
-          3
-        </button>
-        <button
-          type="button"
-          className="px-3.5 py-1.5 text-xs font-semibold rounded border border-border bg-background text-foreground hover:bg-muted"
-        >
-          4
-        </button>
-        <button
-          type="button"
-          className="px-3.5 py-1.5 text-xs font-semibold rounded border border-border bg-background text-foreground hover:bg-muted"
-        >
-          5
-        </button>
-        <button
-          type="button"
-          className="px-3 py-1.5 text-xs font-semibold rounded border border-border bg-background text-muted-foreground hover:bg-muted"
-        >
-          &gt;
-        </button>
-      </div>
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 }

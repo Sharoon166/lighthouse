@@ -76,7 +76,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
         <div className="absolute -bottom-16 -right-16 size-48 rounded-full bg-chart-2/4 blur-2xl transition-transform duration-500 group-hover:scale-150" />
 
         <div className="relative">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
             Products
           </p>
 
@@ -120,7 +120,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
             <div className="absolute -bottom-10 -right-10 size-32 rounded-full bg-chart-3/4 blur-2xl transition-transform duration-500 group-hover:scale-150" />
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                   Projects
                 </p>
                 <p className="mt-2 font-heading text-3xl font-bold tracking-tight text-foreground">
@@ -147,7 +147,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
             <div className="absolute -bottom-10 -right-10 size-32 rounded-full bg-chart-4/4 blur-2xl transition-transform duration-500 group-hover:scale-150" />
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                   Blog
                 </p>
                 <p className="mt-2 font-heading text-3xl font-bold tracking-tight text-foreground">
@@ -178,7 +178,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
               <span className="size-2 rounded-full bg-destructive" />
             </span>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                 Out of stock
               </p>
               <p className="text-xl font-bold tabular-nums text-destructive">
@@ -196,7 +196,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
               color="var(--chart-1)"
             />
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                 Published
               </p>
               <p className="text-xl font-bold tabular-nums text-foreground">
@@ -210,7 +210,7 @@ export function DashboardStatCards({ stats }: { stats: DashboardStats }) {
             className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card px-4 py-3.5 transition-all hover:border-ring"
           >
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">
                 Catalog
               </p>
               <p className="text-xl font-bold tabular-nums text-foreground">

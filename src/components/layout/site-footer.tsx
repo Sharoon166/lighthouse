@@ -4,7 +4,7 @@ import { footerNav } from "@/lib/constants";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-10 px-6 pt-16 pb-8 bg-noise">
+    <footer className="mt-10 px-6 pt-16 bg-noise">
       <div className="container">
         <div className="max-w-md space-y-4">
           <LogoImage />
@@ -48,7 +48,7 @@ export function SiteFooter() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-2 border-t border-muted pt-6 text-sm sm:flex-row">
+        <div className="mt-14 flex flex-col items-center justify-between gap-2 border-t border-muted py-4 text-sm sm:flex-row">
           <span>
             &copy; Copyright {new Date().getFullYear()} Light House. All rights
             reserved

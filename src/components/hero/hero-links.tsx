@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { heroLinks } from "@/lib/constants";
-import { HugeiconsIcon } from "@hugeicons/react";
 
 export function HeroLinks() {
   return (
@@ -9,9 +8,9 @@ export function HeroLinks() {
         <Link
           key={link.href}
           href={link.href}
-          className="text-sm text-white/70 transition-colors hover:text-gold border border-secondary not-last:border-b-0 p-4 group"
+          className="w-full grid place-content-center text-sm text-white/70 transition-colors border border-secondary/50 not-last:border-b-0 p-4 group"
         >
-          <HugeiconsIcon icon={link.icon} />
+          <link.icon />
           <span className="sr-only">{link.label}</span>
         </Link>
       ))}

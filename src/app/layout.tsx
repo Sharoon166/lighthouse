@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Fraunces, Karla } from "next/font/google";
+import { Playfair_Display, Karla } from "next/font/google";
 import { WhatsAppButton } from "@/components/shared/whatsapp-button";
 import "./globals.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
   subsets: ["latin"],
 });
 
@@ -22,7 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${karla.variable} h-full antialiased`}
+      className={`${playfairDisplay.variable} ${karla.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

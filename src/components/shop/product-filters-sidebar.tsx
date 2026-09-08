@@ -221,7 +221,7 @@ export function ProductFiltersSidebar({
           type="button"
           variant="outline"
           onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 rounded-full"
         >
           <HugeiconsIcon icon={FilterHorizontalIcon} size={16} />
           Filters

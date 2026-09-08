@@ -1,11 +1,17 @@
-import { Facebook02Icon, Linkedin, Location, NewTwitterIcon, VimeoIcon } from "@hugeicons/core-free-icons";
+import {
+  FacebookIcon,
+  TwitterIcon,
+  LinkedinIcon,
+  VimeoIcon,
+  LocationIcon,
+} from "@/components/hero/social-icons";
 
 export const heroLinks = [
-  { label: "Facebook", href: "https://facebook.com", icon: Facebook02Icon },
-  { label: "Twitter", href: "https://x.com", icon: NewTwitterIcon },
-  { label: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
+  { label: "Facebook", href: "https://facebook.com", icon: FacebookIcon },
+  { label: "Twitter", href: "https://x.com", icon: TwitterIcon },
+  { label: "LinkedIn", href: "https://linkedin.com", icon: LinkedinIcon },
   { label: "Vimeo", href: "https://vimeo.com", icon: VimeoIcon },
-  { label: "Location", href: "https://google.maps.com", icon: Location },
+  { label: "Location", href: "https://google.maps.com", icon: LocationIcon },
 ];
 
 export const marqueeText = [
@@ -255,11 +261,14 @@ export const howWeWork = [
 ];
 
 export const ceoMessage = {
-  name: "Tariq Mahmood",
-  role: "Founder & CEO",
+  name: "Raja Abdul Ghaffar",
+  role: "CEO @ lighthouse",
   image: "/ceo.webp",
-  message:
-    "When we started Light House, the idea was simple, to bring premium lighting to Pakistan that actually serves the space, not just the catalogue. Twelve years later, that idea hasn't changed. Every fixture we source, every project we take on, is guided by one question: does this make the room better? If the answer is yes, we're on the right track.",
+  message:[
+    "Raja Abdul Ghaffar is the CEO and founder of the newly emerging Lighthouse that was established in 2018. Mr Ghaffar is a highly qualified and learned person with 26 years of experience in the lighting business. As the leader of Lighthouse, he leads all the design, engineering, and manufacturing of the lighting products. Since the inception of Lighthouse after 26 years of his untiring service in the lighting sector, he has finally pooled in all his previous knowledge and experience to bring a new wave of innovative high-potential products.",
+    "Mr Ghaffar is a visionary and a person with highly noticeable 26 years of experience in this industry offering excellent services.Now he has embarked on this mission to offer cost- effective, international- standard and efficient lighting products.Lighthouse has the privilege to produce world - class lighting products while following all international standards.",
+    "Mr Ghaffar has proved his worth in all his previous 26 years of experience and now as the CEO of Lighthouse that he and his company has all the potential to bring much-needed change and lighting products to the market. Mr Ghaffar has personally focused his energies on establishing a state-of-the-art company while offering a chance to the consumer to experience the real future of lighting products.",
+  ],
 };
 
 export const teamMembers = [

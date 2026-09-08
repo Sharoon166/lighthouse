@@ -25,7 +25,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   return (
     <header
       className={cn(
-        "flex flex-col md:flex-row md:items-end md:justify-between gap-6 w-full py-8",
+        "flex flex-col md:flex-row md:items-end md:justify-between gap-6 w-full pb-8",
         className,
       )}
     >

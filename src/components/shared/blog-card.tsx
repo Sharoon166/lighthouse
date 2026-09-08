@@ -24,7 +24,7 @@ export function BlogCard({
           alt={title}
           width={600}
           height={400}
-          className="aspect-3/2 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+          className="aspect-2/1 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
       </div>
       <div className="pt-5 pb-2 border p-4">
@@ -32,7 +32,7 @@ export function BlogCard({
           {category}
         </span>
         <h3
-          className="mt-3 font-heading text-lg leading-snug line-clamp-2"
+          className="mt-3 font-heading font-semibold text-lg leading-snug line-clamp-2"
           title={title}
         >
           {title}

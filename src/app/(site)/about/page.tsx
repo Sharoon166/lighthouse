@@ -53,16 +53,16 @@ export default function AboutPage() {
       {/* Stats Section */}
       <section className="py-8">
         <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x max-md:divide-y divide-border border">
+          <div className="w-full grid grid-cols-2 md:grid-cols-4 divide-x max-md:divide-y divide-border border">
             {aboutStats.map((stat) => (
               <div
                 key={stat.label}
-                className="py-10 px-6 text-center space-y-2"
+                className="py-10 px-6 space-y-2"
               >
                 <p className="text-4xl font-heading font-semibold text-primary-foreground">
                   {stat.value}
                 </p>
-                <p className="text-xs tracking-widest text-muted-foreground uppercase">
+                <p className="text-sm font-medium tracking-widest text-muted-foreground uppercase">
                   {stat.label}
                 </p>
               </div>
@@ -119,8 +119,10 @@ export default function AboutPage() {
                 <path d="M26.3 23.1C21.8 23.1 18.1 24.9 15.4 28.5C12.7 32.1 11.3 36.8 11.3 42.6C11.3 48.1 12.7 52.6 15.4 56.2C18.1 59.8 21.8 61.6 26.3 61.6C30.1 61.6 33.3 60.1 35.8 57.1C38.4 54.1 39.7 50.1 39.7 45.1C39.7 40.6 38.5 36.8 36.1 33.8C33.7 30.7 30.3 29.1 26.3 29.1V23.1ZM61.3 23.1C56.8 23.1 53.1 24.9 50.4 28.5C47.7 32.1 46.3 36.8 46.3 42.6C46.3 48.1 47.7 52.6 50.4 56.2C53.1 59.8 56.8 61.6 61.3 61.6C65.1 61.6 68.3 60.1 70.8 57.1C73.4 54.1 74.7 50.1 74.7 45.1C74.7 40.6 73.5 36.8 71.1 33.8C68.7 30.7 65.3 29.1 61.3 29.1V23.1Z" />
               </svg>
 
-              <blockquote className="text-lg leading-relaxed text-foreground">
-                {ceoMessage.message}
+              <blockquote className="text-lg leading-relaxed text-foreground space-y-4">
+                {ceoMessage.message.map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
               </blockquote>
 
               <div className="space-y-1">

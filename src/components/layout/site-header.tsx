@@ -74,7 +74,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         {/* Logo */}
         <Link
           href="/"
-          className="relative z-50 flex items-center gap-2 shrink-0"
+          className="relative z-50"
         >
           <LogoImage dark={variant == "page" || mobileOpen} />
         </Link>
@@ -82,7 +82,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         {/* Desktop nav — centered pill */}
         <nav
           className={cn(
-            "hidden items-center gap-1 rounded-full px-2 py-1 md:flex",
+            "hidden items-center gap-1 rounded-full px-2 py-2 md:flex",
             isHero
               ? "bg-muted/10"
               : "border bg-muted/40",
@@ -93,11 +93,11 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               key={href}
               href={href}
               className={cn(
-                "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+                "rounded-full px-4 py-1.5 font-medium transition-colors",
                 isActive(href)
-                  ? "bg-primary text-primary-foreground"
+                  ? "text-gold"
                   : isHero
-                    ? "text-background hover:bg-muted hover:text-foreground"
+                    ? "text-background hover:text-gold"
                     : "text-foreground hover:bg-muted",
               )}
             >
@@ -120,7 +120,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
             <form
               action={`/products${typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('search') ? `?search=${encodeURIComponent(new URLSearchParams(window.location.search).get('search') || '')}` : ''}`}
               className={cn(
-                "flex items-center rounded-full px-2",
+                "flex items-center rounded-full px-7",
                 isHero
                   ? "bg-background/10 text-background"
                   : "bg-muted text-foreground",
@@ -132,7 +132,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 name="search"
                 placeholder="Search...."
                 className={cn(
-                  "w-40 bg-transparent text-sm outline-none placeholder:text-current/50 px-4 pl-2 py-2",
+                  "w-40 bg-transparent text-sm outline-none placeholder:text-current/50 px-4 pl-2 py-4",
                   isHero
                     ? "text-background placeholder:text-background/50"
                     : "text-foreground placeholder:text-foreground/50",

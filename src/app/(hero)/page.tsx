@@ -39,11 +39,11 @@ export default function Home() {
           src={MobileHeroImage}
           alt="hero image"
           priority
-          className="absolute inset-0 -z-10 block w-full object-cover object-top sm:hidden"
+          className="absolute inset-0 -z-10 block w-full h-full object-cover object-top sm:hidden"
         />
-        <div className="space-y-6 sm:space-y-8 container max-sm:mt-auto max-sm:mb-[24%]">
+        <div className="space-y-6 sm:space-y-8 container max-sm:mt-auto">
           <div className="lg:w-[65%] space-y-4">
-            <h1 className="text-pretty max-sm:text-5xl">
+            <h1 className="text-pretty max-sm:text-4xl">
               A house is only as warm as its{" "}
               <span className="text-gold">light</span>
             </h1>
@@ -55,7 +55,7 @@ export default function Home() {
             </p>
           </div>
 
-          <Button size="lg" className="group sm:py-8 gap-4 font-bold">
+          <Button size="lg" className="group gap-4 font-bold">
             Shop Collection
             <HugeiconsIcon
               icon={ArrowUpRight01FreeIcons}
@@ -66,11 +66,11 @@ export default function Home() {
         <HeroLinks />
       </section>
 
-      <Marquee duration="10s" className="bg-gray-900 text-gold py-4">
+      <Marquee duration="10s" className="bg-gray-900 text-gold py-2">
         {marqueeText.map((text) => (
           <div key={text} className="contents">
           <span>{text}</span>
-          <span>✦</span>
+          <span>•</span>
           </div>
         ))}
       </Marquee>
@@ -88,15 +88,15 @@ export default function Home() {
                 key={category.id}
                 href="#"
                 className={cn(
-                  "p-6 min-h-80 bg-contain relative overflow-hidden",
+                  "p-6 min-h-66 bg-contain relative overflow-hidden",
                   {
                     "row-span-1 col-span-12 md:col-span-6 lg:col-span-8":
                       index === 0,
                     "lg:row-span-2 col-span-6 md:col-span-6 lg:col-span-4":
                       index === 1,
-                    "row-span-1 col-span-6 md:col-span-6 lg:col-span-4":
+                    "row-span-1 col-span-6 md:col-span-6 lg:col-span-4 min-h-62":
                       index === 2,
-                     "row-span-1 col-span-12 md:col-span-6 lg:col-span-4": index === 3,
+                     "row-span-1 col-span-12 md:col-span-6 lg:col-span-4 min-h-62": index === 3,
                   },
                 )}
               >
@@ -112,7 +112,7 @@ export default function Home() {
                   width={1024}
                   height={1024}
                   alt={category.id}
-                  className="absolute top-0 right-0 w-full h-full -z-10 object-cover brightness-170"
+                  className="absolute top-0 right-0 w-full h-full -z-10 object-cover brightness-180"
                 />
               </Link>
             ))}
@@ -153,7 +153,7 @@ export default function Home() {
       </div>
 
       <section className="bg-noise pb-0 lg:pt-0 grid lg:grid-cols-5 place-items-center overflow-hidden">
-        <div className="container max-lg:pt-10 lg:ml-28 space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10">
+        <div className="container max-lg:pt-10 lg:ml-15 space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10">
           <h2 className="text-primary">About Lighthouse</h2>
 
           <p className="max-w-2xl">
@@ -194,20 +194,20 @@ export default function Home() {
             description="Explore a selection of residential and commercial projects featuring our premium lighting solutions, designed to enhance ambience, functionality and style."
             ctaText="View all Projects"
           />
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-5 gap-4 h-136">
             {dummyProjects.map((project, index) => (
               <Link
                 key={project.id}
                 href={project.link}
                 style={{ backgroundImage: `url(${project.image})` }}
                 className={cn(
-                  `border min-h-72 p-4 bg-cover max-md:col-span-3 place-content-end`,
+                  `border p-4 bg-cover max-md:col-span-5 place-content-end col-span-2`,
                   {
-                    "md:col-span-2 md:row-span-2": index === 0,
+                    "md:col-span-3 md:row-span-2": index === 0,
                   },
                 )}
               >
-                <h3 className="text-xl text-primary">{project.title}</h3>
+                <h3 className="text-2xl font-bold text-primary">{project.title}</h3>
                 <div className="flex items-center gap-4 text-gold">
                   <p>{project.subtitle}</p>
                   <HugeiconsIcon icon={ArrowRight02Icon} />

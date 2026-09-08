@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Pagination } from "@/components/shared/pagination";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import type { ShopProductItem } from "@/lib/shop-data";
 import { ProductCard } from "./product-card";
 import { ProductListItem } from "./product-list-item";
@@ -33,6 +34,8 @@ export function ProductGridToolbar({
 
   const [searchVal, setSearchVal] = useState(searchParams.get("search") || "");
   const [view, setView] = useLocalStorage<ViewMode>("lighthouse:products-view", "grid");
+  const isSmallScreen = !useMediaQuery("(min-width: 640px)");
+  const effectiveView = isSmallScreen ? "grid" : view;
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +101,7 @@ export function ProductGridToolbar({
             <option value="newest">Newest Arrivals</option>
           </select>
           {/* View Toggle */}
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-1">
+          <div className={cn("flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-1", isSmallScreen && "hidden")}>
             <button
               type="button"
               onClick={() => setView("grid")}
@@ -131,7 +134,7 @@ export function ProductGridToolbar({
 
       {/* Product Grid or List */}
       {products.length > 0 ? (
-        view === "grid" ? (
+        effectiveView === "grid" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />

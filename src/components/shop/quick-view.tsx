@@ -120,7 +120,7 @@ function QuickViewPanel({
         {/* Top section: Image gallery + Product info (matches detail page layout) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
           {/* Left: Image gallery — mirrors ProductImageGallery */}
-          <div className="flex flex-col-reverse gap-3 p-4 md:p-6 border-b md:border-b-0 md:border-r border-border">
+          <div className="flex flex-col-reverse gap-3 p-4 md:p-6 ">
             {/* Thumbnail strip — vertical on desktop, horizontal on mobile */}
             {product.images.length > 1 && (
               <div className="flex md:flex-col gap-2 shrink-0 overflow-x-auto md:overflow-y-auto md:max-h-[500px]">
@@ -174,7 +174,7 @@ function QuickViewPanel({
             </h2>
 
             {/* Rating */}
-            <div className="flex items-center gap-2 text-sm">
+            {/*<div className="flex items-center gap-2 text-sm">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
                   <HugeiconsIcon
@@ -196,7 +196,7 @@ function QuickViewPanel({
               <span className="text-muted-foreground">
                 ({product.ratings.count} reviews)
               </span>
-            </div>
+            </div>*/}
 
             {/* Price */}
             <div className="flex items-center gap-3">
@@ -215,9 +215,6 @@ function QuickViewPanel({
               )}
             </div>
 
-            {/* Divider */}
-            <div className="h-px bg-border" />
-
             {/* Description */}
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
               {product.shortDescription}
@@ -227,7 +224,7 @@ function QuickViewPanel({
             {product.finishes.length > 0 && (
               <div className="space-y-3">
                 <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Finish: <span className="text-foreground">{selectedFinish}</span>
+                  Finish
                 </label>
                 <div className="flex flex-wrap items-center gap-2">
                   {product.finishes.map((finish) => (
@@ -236,14 +233,14 @@ function QuickViewPanel({
                       type="button"
                       onClick={() => setSelectedFinish(finish.name)}
                       className={cn(
-                        "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
+                        "flex flex-col items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
                         selectedFinish === finish.name
-                          ? "border-gold bg-gold/10 text-foreground ring-1 ring-gold"
-                          : "border-border bg-background text-muted-foreground hover:border-foreground",
+                          ? " text-gold"
+                          : "text-muted-foreground hover:border-foreground",
                       )}
                     >
                       <span
-                        className="size-3 rounded-full border border-black/20"
+                        className="size-8 rounded-full border border-black/20"
                         style={{ backgroundColor: finish.hex }}
                       />
                       {finish.name}

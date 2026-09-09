@@ -4,6 +4,7 @@ import {
   Delete02Icon,
   Edit02Icon,
   InformationCircleIcon,
+  PackageOpenIcon,
   PlusSignIcon,
   Search01Icon,
   Tick02Icon,
@@ -32,6 +33,14 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Pagination } from "@/components/ui/pagination";
 import { formatDate } from "@/lib/date-utils";
 import { formatCurrency, formatPriceRange } from "@/lib/format";
@@ -464,19 +473,23 @@ export function ProductsManager({
       {isLoading && !data ? (
         <SkeletonTable />
       ) : data && data.products.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            No products found. Try a different search, or add your first
-            product.
-          </p>
-          <Link
-            href="/admin/products/new"
-            className={cn(buttonVariants(), "mt-4")}
-          >
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            New product
-          </Link>
-        </div>
+        <Empty className="rounded-2xl border border-border bg-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={PackageOpenIcon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No products found</EmptyTitle>
+            <EmptyDescription>
+              Try a different search, or add your first product.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link href="/admin/products/new" className={buttonVariants()}>
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              New product
+            </Link>
+          </EmptyContent>
+        </Empty>
       ) : (
         data && (
           <>

@@ -18,6 +18,14 @@ import { useEffect, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -325,22 +333,29 @@ export function CategoriesManager({
           ))}
         </div>
       ) : filteredTree.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            {search
-              ? "No categories match your search."
-              : "No categories yet. Create your first category to organize products."}
-          </p>
+        <Empty className="rounded-2xl border border-border bg-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={TagsIcon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>
+              {search ? "No categories match" : "No categories yet"}
+            </EmptyTitle>
+            <EmptyDescription>
+              {search
+                ? "Try a different search."
+                : "Create your first category to organize products."}
+            </EmptyDescription>
+          </EmptyHeader>
           {!search && (
-            <Link
-              href="/admin/categories/new"
-              className={cn(buttonVariants(), "mt-4")}
-            >
-              <HugeiconsIcon icon={PlusSignIcon} size={16} />
-              New category
-            </Link>
+            <EmptyContent>
+              <Link href="/admin/categories/new" className={buttonVariants()}>
+                <HugeiconsIcon icon={PlusSignIcon} size={16} />
+                New category
+              </Link>
+            </EmptyContent>
           )}
-        </div>
+        </Empty>
       ) : (
         <div className="rounded-2xl border border-border bg-card">
           <div className="p-2">

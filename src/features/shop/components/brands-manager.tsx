@@ -5,6 +5,7 @@ import {
   Edit02Icon,
   PlusSignIcon,
   Search01Icon,
+  Store01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -17,6 +18,14 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   InputGroup,
   InputGroupAddon,
@@ -336,18 +345,23 @@ export function BrandsManager({
       {isLoading && !data ? (
         <SkeletonTable />
       ) : data && data.brands.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            No brands found. Try a different search, or add your first brand.
-          </p>
-          <Link
-            href="/admin/brands/new"
-            className={cn(buttonVariants(), "mt-4")}
-          >
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            New brand
-          </Link>
-        </div>
+        <Empty className="rounded-2xl border border-border bg-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={Store01Icon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No brands found</EmptyTitle>
+            <EmptyDescription>
+              Try a different search, or add your first brand.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link href="/admin/brands/new" className={buttonVariants()}>
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              New brand
+            </Link>
+          </EmptyContent>
+        </Empty>
       ) : (
         data && (
           <>

@@ -4,6 +4,7 @@ import {
   ArrowLeft02Icon,
   CheckIcon,
   Delete02Icon,
+  ListSettingIcon,
   Loading02Icon,
   PlusSignIcon,
   Refresh01Icon,
@@ -36,6 +37,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Dialog } from "@/components/ui/dialog";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
@@ -1300,14 +1308,19 @@ export function ProductForm({
               )}
 
               {options.length === 0 && suggestedVariantAttrs.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-border p-8 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    No options yet.{" "}
-                    {category
-                      ? "Add options to define product variants."
-                      : "Select a category first, or add options manually."}
-                  </p>
-                </div>
+                <Empty className="rounded-lg border border-border p-8">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <HugeiconsIcon icon={ListSettingIcon} size={24} />
+                    </EmptyMedia>
+                    <EmptyTitle>No options yet</EmptyTitle>
+                    <EmptyDescription>
+                      {category
+                        ? "Add options to define product variants."
+                        : "Select a category first, or add options manually."}
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
               ) : options.length === 0 ? null : (
                 options.map((option, index) => (
                   <div

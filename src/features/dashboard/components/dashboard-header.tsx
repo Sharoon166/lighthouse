@@ -43,7 +43,7 @@ export function DashboardHeader({ menuClick }: { menuClick: () => void }) {
       <div className="flex items-center gap-3">
         <Button
           variant="ghost"
-          className="lg:hidden border-4 border-red-500 p-0"
+          className="lg:hidden"
           onClick={menuClick}
           aria-label="Open navigation"
         >

@@ -4,11 +4,19 @@ import {
   Loading02Icon,
   PlusSignIcon,
   Search01Icon,
+  VariableIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getAllActiveAttributeDefinitions } from "../actions/attribute-definition-actions";
@@ -119,9 +127,17 @@ export function AddAttributeDialog({
             })}
           </div>
         ) : (
-          <p className="py-4 text-center text-sm text-muted-foreground">
-            No attributes found.
-          </p>
+          <Empty className="p-4">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={VariableIcon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No attributes found</EmptyTitle>
+            <EmptyDescription>
+              Create a new attribute below or search with a different term.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
         )}
 
         <div className="border-t border-border pt-3">

@@ -2,6 +2,7 @@
 
 import {
   Delete02Icon,
+  FilePenIcon,
   PlusSignIcon,
   Search01Icon,
   StarIcon,
@@ -14,6 +15,14 @@ import { SegmentedControl } from "@/components/shared/segmented-control";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   InputGroup,
   InputGroupAddon,
@@ -303,15 +312,23 @@ export function BlogPostsManager({
       {isLoading && !data ? (
         <SkeletonGrid />
       ) : data && data.posts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            No posts found. Try a different search, or write your first post.
-          </p>
-          <Link href="/admin/blog/new" className={cn(buttonVariants(), "mt-4")}>
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            New post
-          </Link>
-        </div>
+        <Empty className="rounded-2xl border border-border bg-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={FilePenIcon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No posts found</EmptyTitle>
+            <EmptyDescription>
+              Try a different search, or write your first post.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link href="/admin/blog/new" className={buttonVariants()}>
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              New post
+            </Link>
+          </EmptyContent>
+        </Empty>
       ) : (
         data && (
           <>

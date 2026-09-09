@@ -6,6 +6,7 @@ import {
   Delete02Icon,
   PlusSignIcon,
   SaveIcon,
+  VariableIcon,
   Warning,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -22,6 +23,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import {
   InputGroup,
@@ -642,10 +650,18 @@ export function CategoryForm({
               </CardHeader>
               <CardContent>
                 {categoryAttributes.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No attributes assigned. Click &ldquo;Add&rdquo; to assign
-                    product attributes to this category.
-                  </p>
+                  <Empty className="border border-border">
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <HugeiconsIcon icon={VariableIcon} size={24} />
+                    </EmptyMedia>
+                    <EmptyTitle>No attributes assigned</EmptyTitle>
+                    <EmptyDescription>
+                      Click &ldquo;Add&rdquo; to assign product attributes to
+                      this category.
+                    </EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
                 ) : (
                   <div className="space-y-3">
                     {categoryAttributes.map((catAttr, index) => {

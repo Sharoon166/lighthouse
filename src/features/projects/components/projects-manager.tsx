@@ -2,6 +2,7 @@
 
 import {
   Delete02Icon,
+  FolderOpenIcon,
   PlusSignIcon,
   Search01Icon,
   StarIcon,
@@ -13,6 +14,14 @@ import { useConfirm } from "@/components/shared/confirm-provider";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   InputGroup,
   InputGroupAddon,
@@ -308,19 +317,23 @@ export function ProjectsManager({
       {isLoading && !data ? (
         <SkeletonGrid />
       ) : data && data.projects.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            No projects found. Try a different search, or create your first
-            project.
-          </p>
-          <Link
-            href="/admin/projects/new"
-            className={cn(buttonVariants(), "mt-4")}
-          >
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            New project
-          </Link>
-        </div>
+        <Empty className="rounded-2xl border border-border bg-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={FolderOpenIcon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No projects found</EmptyTitle>
+            <EmptyDescription>
+              Try a different search, or create your first project.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Link href="/admin/projects/new" className={buttonVariants()}>
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              New project
+            </Link>
+          </EmptyContent>
+        </Empty>
       ) : (
         data && (
           <>

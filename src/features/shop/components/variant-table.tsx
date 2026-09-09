@@ -3,6 +3,7 @@
 import {
   Delete02Icon,
   ExpandIcon,
+  Layers01Icon,
   PlusSignIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -15,6 +16,14 @@ import {
 } from "@/components/shared/image-dropzone";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -173,22 +182,30 @@ export function VariantTable({
   if (variants.length === 0) {
     return (
       <div className="space-y-4">
-        <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          {optionKeys.length > 0
-            ? "No variants yet. Add variants manually or generate them from options above."
-            : "No variants yet. Add a base variant for this product."}
-        </div>
-        <div className="flex justify-center">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={addVariant}
-          >
-            <HugeiconsIcon icon={PlusSignIcon} size={14} />
-            {optionKeys.length > 0 ? "Add variant" : "Add base variant"}
-          </Button>
-        </div>
+        <Empty className="rounded-lg border border-border p-8">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={Layers01Icon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No variants yet</EmptyTitle>
+            <EmptyDescription>
+              {optionKeys.length > 0
+                ? "Add variants manually or generate them from options above."
+                : "Add a base variant for this product."}
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addVariant}
+            >
+              <HugeiconsIcon icon={PlusSignIcon} size={14} />
+              {optionKeys.length > 0 ? "Add variant" : "Add base variant"}
+            </Button>
+          </EmptyContent>
+        </Empty>
       </div>
     );
   }

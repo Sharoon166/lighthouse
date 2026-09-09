@@ -2,6 +2,13 @@
 
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -77,9 +84,17 @@ export function CategorySearchFilter({
       </div>
 
       {filtered.length === 0 && (
-        <div className="rounded-xl border border-dashed border-border p-12 text-center text-muted-foreground">
-          No categories found matching &quot;{query}&quot;.
-        </div>
+        <Empty className="rounded-xl border border-border">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={Search01Icon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No categories found</EmptyTitle>
+            <EmptyDescription>
+              No categories found matching &quot;{query}&quot;.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       )}
     </div>
   );

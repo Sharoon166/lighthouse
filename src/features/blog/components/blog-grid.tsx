@@ -1,9 +1,16 @@
 "use client";
 
-import { Search01Icon } from "@hugeicons/core-free-icons";
+import { NewsIcon, Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   InputGroup,
   InputGroupAddon,
@@ -162,13 +169,23 @@ export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
       {isLoading ? (
         <SkeletonGrid />
       ) : gridPosts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
-          <p className="text-muted-foreground">
-            {debouncedSearch || activeCategory !== "all"
-              ? "No articles found. Try a different search or filter."
-              : "No articles published yet. Check back soon!"}
-          </p>
-        </div>
+        <Empty className="rounded-2xl border border-border bg-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={NewsIcon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>
+              {debouncedSearch || activeCategory !== "all"
+                ? "No articles found"
+                : "No articles yet"}
+            </EmptyTitle>
+            <EmptyDescription>
+              {debouncedSearch || activeCategory !== "all"
+                ? "Try a different search or filter."
+                : "No articles published yet. Check back soon!"}
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : (
         <>
           <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 *:border">

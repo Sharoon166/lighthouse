@@ -5,6 +5,7 @@ import {
   Edit02Icon,
   PlusSignIcon,
   Search01Icon,
+  VariableIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -17,6 +18,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   InputGroup,
   InputGroupAddon,
@@ -444,16 +453,23 @@ export function AttributesManager({
       {isLoading && !data ? (
         <SkeletonTable />
       ) : data && data.attributes.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
-          <p className="text-sm text-muted-foreground">
-            No attributes found. Try a different search, or add your first
-            attribute.
-          </p>
-          <Button onClick={openCreateDialog} className="mt-4">
-            <HugeiconsIcon icon={PlusSignIcon} size={16} />
-            New attribute
-          </Button>
-        </div>
+        <Empty className="rounded-2xl border border-border bg-card">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <HugeiconsIcon icon={VariableIcon} size={24} />
+            </EmptyMedia>
+            <EmptyTitle>No attributes found</EmptyTitle>
+            <EmptyDescription>
+              Try a different search, or add your first attribute.
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button onClick={openCreateDialog}>
+              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              New attribute
+            </Button>
+          </EmptyContent>
+        </Empty>
       ) : (
         data && (
           <>

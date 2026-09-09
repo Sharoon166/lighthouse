@@ -224,7 +224,7 @@ export function CategoriesMegaMenu({
         >
           <span>Categories</span>
           <HugeiconsIcon
-            icon={ArrowDown02Icon}
+            icon={ArrowDownIcon}
             size={20}
             className={cn(
               "transition-transform duration-200",
@@ -236,7 +236,7 @@ export function CategoriesMegaMenu({
         <div
           className={cn(
             "overflow-hidden transition-all duration-300",
-            mobileExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0",
+            mobileExpanded ? "max-h-125 opacity-100" : "max-h-0 opacity-0",
           )}
         >
           <div className="pl-5 pb-2 pt-1 space-y-1">

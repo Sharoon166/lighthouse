@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu01Icon } from "@hugeicons/core-free-icons";
+import { Menu01Icon, Menu02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -42,13 +42,12 @@ export function DashboardHeader({ menuClick }: { menuClick: () => void }) {
     <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
       <div className="flex items-center gap-3">
         <Button
-          variant="outline"
-          size="icon"
-          className="lg:hidden"
+          variant="ghost"
+          className="lg:hidden border-4 border-red-500 p-0"
           onClick={menuClick}
           aria-label="Open navigation"
         >
-          <HugeiconsIcon icon={Menu01Icon} size={18} />
+          <HugeiconsIcon icon={Menu02Icon} size={18} />
         </Button>
         <div>
           {isHome ? (
@@ -62,12 +61,12 @@ export function DashboardHeader({ menuClick }: { menuClick: () => void }) {
             </>
           ) : (
             <>
-              <h1 className="font-heading text-3xl tracking-tight text-foreground">
+              {/*<h1 className="font-heading text-3xl tracking-tight text-foreground">
                 {title}
               </h1>
               <p className="mt-1 text-sm text-muted-foreground md:text-base">
                 Manage your products, projects and stories from one place.
-              </p>
+              </p>*/}
             </>
           )}
         </div>

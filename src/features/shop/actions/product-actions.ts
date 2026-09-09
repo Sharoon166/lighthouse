@@ -3,6 +3,7 @@
 import type { QueryFilter } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { deleteImage, extractPublicId } from "@/lib/cloudinary";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { BrandModel } from "@/models/brand";
@@ -250,6 +251,25 @@ export async function updateProduct(
   }
 }
 
+export async function updateProductStatus(
+  id: string,
+  status: "draft" | "active" | "archived",
+): Promise<{ ok: boolean; message?: string }> {
+  await connectToDatabase();
+
+  const product = await ProductModel.findById(id);
+  if (!product) {
+    return { ok: false, message: "Product not found." };
+  }
+
+  product.status = status;
+  await product.save();
+
+  revalidatePath("/admin/products");
+
+  return { ok: true, message: "Status updated." };
+}
+
 export async function deleteProduct(
   id: string,
 ): Promise<{ ok: boolean; message?: string }> {
@@ -260,11 +280,73 @@ export async function deleteProduct(
     return { ok: false, message: "This product no longer exists." };
   }
 
-  await existing.deleteOne();
+  if (existing.deletedAt) {
+    return { ok: false, message: "This product is already in trash." };
+  }
+
+  existing.deletedAt = new Date();
+  await existing.save();
 
   revalidatePath("/admin/products");
 
-  return { ok: true, message: "Product deleted." };
+  return { ok: true, message: "Product moved to trash." };
+}
+
+export async function restoreProduct(
+  id: string,
+): Promise<{ ok: boolean; message?: string }> {
+  await connectToDatabase();
+
+  const existing = await ProductModel.findById(id);
+  if (!existing) {
+    return { ok: false, message: "Product not found." };
+  }
+
+  existing.deletedAt = null;
+  await existing.save();
+
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/products/trash");
+
+  return { ok: true, message: "Product restored." };
+}
+
+export async function permanentlyDeleteProduct(
+  id: string,
+): Promise<{ ok: boolean; message?: string }> {
+  await connectToDatabase();
+
+  const existing = await ProductModel.findById(id);
+  if (!existing) {
+    return { ok: false, message: "Product not found." };
+  }
+
+  for (const imageUrl of existing.images) {
+    const publicId = extractPublicId(imageUrl);
+    if (publicId) {
+      await deleteImage(publicId).catch((error) => {
+        console.error("Failed to delete product image from Cloudinary:", error);
+      });
+    }
+  }
+
+  for (const variant of existing.variants) {
+    for (const imageUrl of variant.images) {
+      const publicId = extractPublicId(imageUrl);
+      if (publicId) {
+        await deleteImage(publicId).catch((error) => {
+          console.error("Failed to delete variant image from Cloudinary:", error);
+        });
+      }
+    }
+  }
+
+  await existing.deleteOne();
+
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/products/trash");
+
+  return { ok: true, message: "Product permanently deleted." };
 }
 
 export async function updateVariantStock(
@@ -357,6 +439,7 @@ export async function listProducts(input: unknown): Promise<ProductListResult> {
       };
 
   const filter: QueryFilter<Product> = {};
+  filter.deletedAt = { $eq: null };
   if (status !== "all") {
     filter.status = status;
   }
@@ -370,7 +453,7 @@ export async function listProducts(input: unknown): Promise<ProductListResult> {
     filter.inStock = inStock;
   }
   if (search) {
-    filter.$text = { $search: search };
+    filter.name = { $regex: escapeRegExp(search), $options: "i" };
   }
 
   const sortMap: Record<string, Record<string, 1 | -1>> = {
@@ -424,10 +507,86 @@ export async function getProduct(id: string): Promise<Product | null> {
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   await connectToDatabase();
-  return ProductModel.findOne({ slug, status: { $ne: "archived" } }).lean();
+  return ProductModel.findOne({
+    slug,
+    deletedAt: { $eq: null },
+    status: { $ne: "archived" },
+  }).lean();
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
   await connectToDatabase();
-  return ProductModel.findById(id).lean();
+  return ProductModel.findOne({ _id: id, deletedAt: null }).lean();
+}
+
+const listTrashedProductsSchema = z.object({
+  page: z.number().int().min(1).default(1),
+  pageSize: z.number().int().min(1).max(100).default(20),
+  search: z.string().trim().max(200).default(""),
+});
+
+export type TrashedProductListItem = {
+  id: string;
+  name: string;
+  slug: string;
+  categoryName: string;
+  brandName: string;
+  status: "draft" | "active" | "archived";
+  images: string[];
+  deletedAt: string | null;
+};
+
+export type TrashedProductListResult = {
+  products: TrashedProductListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+};
+
+export async function listTrashedProducts(
+  input: unknown,
+): Promise<TrashedProductListResult> {
+  const parsed = listTrashedProductsSchema.safeParse(input);
+  const { page, pageSize, search } = parsed.success
+    ? parsed.data
+    : { page: 1, pageSize: 20, search: "" };
+
+  const filter: Record<string, unknown> = { deletedAt: { $ne: null } };
+  if (search) {
+    filter.name = { $regex: escapeRegExp(search), $options: "i" };
+  }
+
+  await connectToDatabase();
+
+  const [total, documents] = await Promise.all([
+    ProductModel.collection.countDocuments(filter),
+    ProductModel.collection
+      .aggregate([
+        { $match: filter },
+        { $sort: { deletedAt: -1 } },
+        { $skip: (page - 1) * pageSize },
+        { $limit: pageSize },
+      ])
+      .toArray(),
+  ]);
+
+  const products: TrashedProductListItem[] = documents.map((doc) => ({
+    id: String(doc._id),
+    name: doc.name,
+    slug: doc.slug,
+    categoryName: doc.category?.name ?? "",
+    brandName: doc.brand?.name ?? "",
+    status: doc.status,
+    images: doc.images ?? [],
+    deletedAt: doc.deletedAt instanceof Date ? doc.deletedAt.toISOString() : doc.deletedAt ?? null,
+  }));
+
+  return {
+    products,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  };
 }

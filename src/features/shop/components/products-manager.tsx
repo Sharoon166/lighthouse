@@ -3,8 +3,10 @@
 import {
   Delete02Icon,
   Edit02Icon,
+  InformationCircleIcon,
   PlusSignIcon,
   Search01Icon,
+  Tick02Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -20,6 +22,12 @@ import { SegmentedControl } from "@/components/shared/segmented-control";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { buttonVariants } from "@/components/ui/button";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -31,18 +39,23 @@ import { cn } from "@/lib/utils";
 import {
   deleteProduct,
   listProducts,
+  updateProductStatus,
   type ProductListItem,
   type ProductListResult,
 } from "../actions/product-actions";
 
 const columnHelper = createColumnHelper<ProductListItem>();
 
+const PRODUCT_STATUSES = ["active", "draft", "archived"] as const;
+
 function ProductTable({
   products,
   onDelete,
+  onStatusChange,
 }: {
   products: ProductListItem[];
   onDelete?: (product: ProductListItem) => void;
+  onStatusChange?: (product: ProductListItem, status: "draft" | "active" | "archived") => void;
 }) {
   const columns = useMemo(
     () => [
@@ -118,7 +131,31 @@ function ProductTable({
       }),
       columnHelper.accessor("status", {
         header: "Status",
-        cell: (info) => <StatusBadge status={info.getValue()} />,
+        cell: (info) => {
+          const currentStatus = info.getValue();
+          const product = info.row.original;
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="cursor-pointer outline-none">
+                <StatusBadge status={currentStatus} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center">
+                {PRODUCT_STATUSES.map((s) => (
+                  <DropdownMenuItem
+                    key={s}
+                    onClick={() => onStatusChange?.(product, s)}
+                    className="gap-2 p-1"
+                  >
+                    <StatusBadge status={s} />
+                    {s === currentStatus && (
+                      <HugeiconsIcon icon={Tick02Icon} size={14} className="ml-auto text-foreground" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
       }),
       columnHelper.accessor("updatedAt", {
         header: "Updated",
@@ -154,7 +191,7 @@ function ProductTable({
         ),
       }),
     ],
-    [onDelete],
+    [onDelete, onStatusChange],
   );
 
   const table = useReactTable({
@@ -285,14 +322,29 @@ export function ProductsManager({
     setActionError(null);
 
     const confirmed = await confirm({
-      title: "Delete this product?",
+      title: "Move this product to trash?",
       description: (
-        <>
-          "{product.name}" will be permanently deleted. This action cannot be
-          undone.
-        </>
+        <div className="space-y-2">
+          <p>
+            &ldquo;{product.name}&rdquo; will be moved to trash. You can restore
+            it anytime or delete it forever from the trash.
+          </p>
+          {product.inStock && (
+            <div className="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
+              <HugeiconsIcon
+                icon={InformationCircleIcon}
+                size={14}
+                className="mt-0.5 shrink-0"
+              />
+              <p>
+                This product is in stock ({product.totalStock} units). It will
+                no longer be visible to customers.
+              </p>
+            </div>
+          )}
+        </div>
       ),
-      confirmLabel: "Delete",
+      confirmLabel: "Move to trash",
       cancelLabel: "Keep product",
       danger: true,
     });
@@ -304,7 +356,7 @@ export function ProductsManager({
     setIsDeleting(false);
 
     if (!result.ok) {
-      setActionError(result.message ?? "Could not delete this product.");
+      setActionError(result.message ?? "Could not move product to trash.");
       return;
     }
 
@@ -315,6 +367,30 @@ export function ProductsManager({
       status,
     });
     setData(refreshed);
+  };
+
+  const handleStatusChange = async (
+    product: ProductListItem,
+    newStatus: "draft" | "active" | "archived",
+  ) => {
+    setActionError(null);
+
+    const result = await updateProductStatus(product.id, newStatus);
+    if (!result.ok) {
+      setActionError(result.message ?? "Could not update status.");
+      return;
+    }
+
+    setData((prev) =>
+      prev
+        ? {
+            ...prev,
+            products: prev.products.map((p) =>
+              p.id === product.id ? { ...p, status: newStatus } : p,
+            ),
+          }
+        : prev,
+    );
   };
 
   return (
@@ -328,10 +404,19 @@ export function ProductsManager({
             Manage your product catalog and inventory.
           </p>
         </div>
-        <Link href="/admin/products/new" className={buttonVariants()}>
-          <HugeiconsIcon icon={PlusSignIcon} size={16} />
-          New product
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/admin/products/trash"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            <HugeiconsIcon icon={Delete02Icon} size={16} />
+            Trash
+          </Link>
+          <Link href="/admin/products/new" className={buttonVariants()}>
+            <HugeiconsIcon icon={PlusSignIcon} size={16} />
+            New product
+          </Link>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -399,6 +484,7 @@ export function ProductsManager({
               <ProductTable
                 products={data.products}
                 onDelete={isDeleting ? undefined : handleDelete}
+                onStatusChange={handleStatusChange}
               />
             </div>
             <Pagination

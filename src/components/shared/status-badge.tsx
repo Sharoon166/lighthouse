@@ -2,9 +2,10 @@ import { Badge } from "@/components/ui/badge";
 
 const STATUS_VARIANTS = {
   published: "success" as const,
+  active: "success" as const,
   draft: "muted" as const,
   scheduled: "accent" as const,
-  archived: "outline" as const,
+  archived: "muted" as const,
   ongoing: "default" as const,
   completed: "success" as const,
 };

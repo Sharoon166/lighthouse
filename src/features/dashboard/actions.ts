@@ -65,11 +65,11 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     ProductModel.aggregate([
       {
         $facet: {
-          total: [{ $count: "count" }],
-          drafts: [{ $match: { status: "draft" } }, { $count: "count" }],
-          active: [{ $match: { status: "active" } }, { $count: "count" }],
+          total: [{ $match: { deletedAt: { $eq: null } } }, { $count: "count" }],
+          drafts: [{ $match: { status: "draft", deletedAt: { $eq: null } } }, { $count: "count" }],
+          active: [{ $match: { status: "active", deletedAt: { $eq: null } } }, { $count: "count" }],
           outOfStock: [
-            { $match: { inStock: false, status: { $ne: "archived" } } },
+            { $match: { inStock: false, status: { $ne: "archived" }, deletedAt: { $eq: null } } },
             { $count: "count" },
           ],
         },
@@ -118,19 +118,19 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       },
     ]),
     ProductModel.aggregate([
-      { $match: { status: { $ne: "archived" } } },
+      { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
       { $group: { _id: "$category.name", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 8 },
     ]),
     ProductModel.aggregate([
-      { $match: { status: { $ne: "archived" } } },
+      { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
       { $group: { _id: "$brand.name", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 8 },
     ]),
     ProductModel.aggregate([
-      { $match: { status: { $ne: "archived" } } },
+      { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
       {
         $group: {
           _id: "$category.name",

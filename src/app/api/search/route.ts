@@ -23,11 +23,11 @@ export async function GET(request: NextRequest) {
   const safe = escapeRegExp(q);
 
   const [textProducts, regexProducts, projects, posts] = await Promise.all([
-    ProductModel.find({ $text: { $search: q } })
+    ProductModel.find({ $text: { $search: q }, deletedAt: { $eq: null } })
       .select("name slug status")
       .limit(5)
       .lean(),
-    ProductModel.find({ name: { $regex: safe, $options: "i" } })
+    ProductModel.find({ name: { $regex: safe, $options: "i" }, deletedAt: { $eq: null } })
       .select("name slug status")
       .limit(5)
       .lean(),

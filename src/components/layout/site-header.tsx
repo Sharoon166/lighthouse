@@ -249,7 +249,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           </form>
 
           {/* Navigation Links */}
-          <nav className="flex flex-col gap-1.5">
+          <nav className="flex flex-col gap-1.5 overflow-auto">
             <CategoriesMegaMenu
               isHero={isHero}
               isActive={isActive}

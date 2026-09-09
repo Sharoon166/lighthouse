@@ -7,12 +7,16 @@ import {
   Search01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
-import { StatusBadge } from "@/components/shared/status-badge";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   InputGroup,
   InputGroupAddon,
@@ -22,26 +26,26 @@ import { Pagination } from "@/components/ui/pagination";
 import { formatDate } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import {
-  type BlogPostListItem,
-  type BlogPostListResult,
-  listTrashedBlogPosts,
-  permanentlyDeleteBlogPost,
-  restoreBlogPost,
-} from "../actions";
+  listTrashedProducts,
+  permanentlyDeleteProduct,
+  restoreProduct,
+  type TrashedProductListItem,
+  type TrashedProductListResult,
+} from "../actions/product-actions";
 
 const SKELETON_KEYS = ["one", "two", "three", "four", "five"];
 
-export function BlogTrashManager({
+export function ProductTrashManager({
   initialData,
 }: {
-  initialData?: BlogPostListResult;
+  initialData?: TrashedProductListResult;
 }) {
   const { confirm } = useConfirm();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
-  const [data, setData] = useState<BlogPostListResult | null>(
+  const [pageSize, setPageSize] = useState(20);
+  const [data, setData] = useState<TrashedProductListResult | null>(
     initialData ?? null,
   );
   const [isLoading, setIsLoading] = useState(!initialData);
@@ -69,7 +73,7 @@ export function BlogTrashManager({
     setIsLoading(true);
     setError(null);
 
-    listTrashedBlogPosts({ page, pageSize, search: debouncedSearch })
+    listTrashedProducts({ page, pageSize, search: debouncedSearch })
       .then((result) => {
         if (!cancelled) setData(result);
       })
@@ -86,7 +90,7 @@ export function BlogTrashManager({
   }, [page, pageSize, debouncedSearch]);
 
   const refresh = async () => {
-    const result = await listTrashedBlogPosts({
+    const result = await listTrashedProducts({
       page,
       pageSize,
       search: debouncedSearch,
@@ -94,45 +98,43 @@ export function BlogTrashManager({
     setData(result);
   };
 
-  const handleRestore = async (post: BlogPostListItem) => {
+  const handleRestore = async (product: TrashedProductListItem) => {
     setActionError(null);
     setIsBusy(true);
-    const result = await restoreBlogPost(post.slug);
+    const result = await restoreProduct(product.id);
     setIsBusy(false);
 
     if (!result.ok) {
-      setActionError(result.message ?? "Could not restore this post.");
+      setActionError(result.message ?? "Could not restore this product.");
       return;
     }
     await refresh();
   };
 
-  const handleDeleteForever = async (post: BlogPostListItem) => {
+  const handleDeleteForever = async (product: TrashedProductListItem) => {
     setActionError(null);
 
     const confirmed = await confirm({
-      title: "Delete this post forever?",
+      title: "Delete this product forever?",
       description: (
         <>
-          “{post.title}” and its cover image will be permanently removed. This
-          cannot be undone. Type the post title to confirm.
+          &ldquo;{product.name}&rdquo; will be permanently removed. This cannot
+          be undone.
         </>
       ),
       confirmLabel: "Delete forever",
       cancelLabel: "Cancel",
       danger: true,
-      matchText: post.title,
-      matchLabel: "Type the post title to confirm",
     });
 
     if (!confirmed) return;
 
     setIsBusy(true);
-    const result = await permanentlyDeleteBlogPost(post.slug);
+    const result = await permanentlyDeleteProduct(product.id);
     setIsBusy(false);
 
     if (!result.ok) {
-      setActionError(result.message ?? "Could not delete this post.");
+      setActionError(result.message ?? "Could not delete this product.");
       return;
     }
     await refresh();
@@ -144,27 +146,27 @@ export function BlogTrashManager({
         <div>
           <div className="flex items-center gap-4">
             <Link
-              href="/admin/blog"
-              aria-label="Back to blog posts"
+              href="/admin/products"
+              aria-label="Back to products"
               className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
               <HugeiconsIcon icon={ArrowLeft02Icon} size={18} />
             </Link>
             <div>
               <h1 className="font-heading text-2xl tracking-tight text-foreground md:text-3xl">
-                Blogs Trash
+                Product Trash
               </h1>
               <p className="mt-1 text-sm text-muted-foreground">
-                Restore a post or delete it forever.
+                Restore a product or delete it forever.
               </p>
             </div>
           </div>
         </div>
         <Link
-          href="/admin/blog"
+          href="/admin/products"
           className={cn(buttonVariants({ variant: "outline" }))}
         >
-          All posts
+          All products
         </Link>
       </div>
 
@@ -208,12 +210,12 @@ export function BlogTrashManager({
             />
           ))}
         </div>
-      ) : data && data.posts.length === 0 ? (
+      ) : data && data.products.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-border bg-card p-16 text-center">
           <p className="text-sm text-muted-foreground">
             {debouncedSearch
-              ? "No trashed posts match your search."
-              : "The trash is empty. Deleted posts end up here."}
+              ? "No trashed products match your search."
+              : "The trash is empty. Deleted products end up here."}
           </p>
         </div>
       ) : (
@@ -226,62 +228,55 @@ export function BlogTrashManager({
               )}
             >
               <ul className="divide-y divide-border">
-                {data.posts.map((post) => (
+                {data.products.map((product) => (
                   <li
-                    key={post.id}
+                    key={product.id}
                     className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center"
                   >
                     <div className="flex min-w-0 flex-1 items-center gap-4">
-                      {post.heroImage ? (
-                        <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-border">
-                          <Image
-                            src={post.heroImage.url}
-                            alt=""
-                            fill
-                            sizes="96px"
-                            className="object-cover"
-                          />
-                        </div>
+                      {product.images?.[0] ? (
+                        <img
+                          src={product.images[0]}
+                          alt=""
+                          className="size-12 shrink-0 rounded-lg border border-border object-cover"
+                        />
                       ) : (
-                        <div className="flex aspect-[16/9] w-24 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/40 text-muted-foreground">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/40 text-muted-foreground">
                           <HugeiconsIcon icon={RestoreBinIcon} size={18} />
                         </div>
                       )}
                       <div className="min-w-0">
                         <p className="truncate font-medium text-foreground">
-                          {post.title}
+                          {product.name}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
-                          /{post.slug}
+                          {product.categoryName} &middot; {product.brandName}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex shrink-0 items-center justify-between gap-4 sm:justify-end">
-                      <div className="flex items-center gap-3">
-                        <StatusBadge status={post.status} />
-                        <span className="text-xs text-muted-foreground">
-                          Trashed{" "}
-                          {post.deletedAt ? formatDate(post.deletedAt) : ""}
-                        </span>
-                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        Trashed{" "}
+                        {product.deletedAt ? formatDate(product.deletedAt) : ""}
+                      </span>
                       <div className="flex items-center gap-1">
                         <button
                           type="button"
-                          aria-label={`Restore ${post.title}`}
+                          aria-label={`Restore ${product.name}`}
                           title="Restore"
                           disabled={isBusy}
-                          onClick={() => void handleRestore(post)}
+                          onClick={() => void handleRestore(product)}
                           className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
                         >
                           <HugeiconsIcon icon={RestoreBinIcon} size={16} />
                         </button>
                         <button
                           type="button"
-                          aria-label={`Delete ${post.title} forever`}
+                          aria-label={`Delete ${product.name} forever`}
                           title="Delete forever"
                           disabled={isBusy}
-                          onClick={() => void handleDeleteForever(post)}
+                          onClick={() => void handleDeleteForever(product)}
                           className="flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:pointer-events-none disabled:opacity-50"
                         >
                           <HugeiconsIcon icon={Delete02Icon} size={16} />
@@ -297,7 +292,7 @@ export function BlogTrashManager({
               totalPages={data.totalPages}
               totalItems={data.total}
               pageSize={data.pageSize}
-              pageSizeOptions={[8, 16, 32]}
+              pageSizeOptions={[10, 20, 50]}
               onPageSizeChange={(value) => {
                 setPageSize(value);
                 setPage(1);

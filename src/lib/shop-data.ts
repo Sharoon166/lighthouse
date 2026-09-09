@@ -666,7 +666,7 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
         .select({ name: 1, slug: 1, productCount: 1 })
         .lean(),
       (ProductModel as any).aggregate([
-        { $match: { status: { $ne: "archived" } } },
+        { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
         {
           $group: {
             _id: { name: "$brand.name", slug: "$brand.slug", logo: "$brand.logo" },
@@ -676,7 +676,7 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
         { $sort: { count: -1 } },
       ]),
       ProductModel.aggregate([
-        { $match: { status: { $ne: "archived" } } },
+        { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
         {
           $group: {
             _id: null,
@@ -732,7 +732,10 @@ export async function fetchStoreProducts(
 
   try {
     await connectToDatabase();
-    const query: Record<string, unknown> = { status: { $ne: "archived" } };
+    const query: Record<string, unknown> = {
+      status: { $ne: "archived" },
+      deletedAt: { $eq: null },
+    };
     if (options.categorySlug && options.categorySlug !== "all") {
       query["category.slug"] = options.categorySlug;
     }

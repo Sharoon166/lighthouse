@@ -70,6 +70,7 @@ export interface Product {
   };
   tags: string[];
   status: "draft" | "active" | "archived";
+  deletedAt: Date | null;
   seo: {
     metaTitle: string;
     metaDescription: string;
@@ -210,6 +211,7 @@ const productSchema = new Schema<Product>(
       default: "draft",
     },
     seo: { type: seoSchema, default: () => ({}) },
+    deletedAt: { type: Date, default: null },
   },
   {
     timestamps: true,
@@ -224,6 +226,7 @@ productSchema.index({ "variants.sku": 1 }, { unique: true });
 // Uniqueness within a product is enforced by the application logic
 productSchema.index({ name: "text", description: "text", tags: "text" });
 productSchema.index({ "category._id": 1, inStock: 1, status: 1 });
+productSchema.index({ deletedAt: 1 });
 
 productSchema.pre("save", function () {
   if (this.isModified("name") && !this.slug) {

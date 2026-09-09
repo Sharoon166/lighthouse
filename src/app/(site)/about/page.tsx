@@ -44,8 +44,10 @@ export default function AboutPage() {
             lg:col-start-3
             lg:col-span-5
             lg:row-start-1
-            hover:brightness-125
+            brightness-75
+            hover:brightness-150
             transition-all
+            duration-500
           "
         />
       </section>

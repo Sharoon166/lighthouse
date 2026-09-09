@@ -75,6 +75,7 @@ interface CategoryFormProps {
     slug: string;
     level: number;
     parent: string | null;
+    ancestors: string[];
   }>;
   allAttributes?: Array<{
     id: string;
@@ -188,12 +189,22 @@ export function CategoryForm({
 
   const excludedIds =
     isEdit && initialData
-      ? [editId, ...(initialData.ancestors?.map(String) ?? [])]
+      ? [
+          editId,
+          ...allCategories
+            .filter((c) => c.ancestors?.includes(editId))
+            .map((c) => c.id),
+        ]
       : [];
 
   const parentOptions = allCategories.filter(
     (c) => !excludedIds.includes(c.id),
   );
+
+  const selectedParentName =
+    parent === null
+      ? ""
+      : parentOptions.find((c) => c.id === parent)?.name ?? "";
 
   const [addAttrDialogOpen, setAddAttrDialogOpen] = useState(false);
 
@@ -529,7 +540,9 @@ export function CategoryForm({
                     ]}
                   >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="None (top-level)" />
+                      <SelectValue placeholder="None (top-level)">
+                        {selectedParentName || "None (top-level)"}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">None (top-level)</SelectItem>

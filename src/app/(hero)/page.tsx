@@ -69,8 +69,8 @@ export default function Home() {
       <Marquee duration="10s" className="bg-gray-900 text-gold py-2">
         {marqueeText.map((text) => (
           <div key={text} className="contents">
-          <span>{text}</span>
-          <span>•</span>
+            <span>{text}</span>
+            <span>•</span>
           </div>
         ))}
       </Marquee>
@@ -96,7 +96,8 @@ export default function Home() {
                       index === 1,
                     "row-span-1 col-span-6 md:col-span-6 lg:col-span-4 min-h-62":
                       index === 2,
-                     "row-span-1 col-span-12 md:col-span-6 lg:col-span-4 min-h-62": index === 3,
+                    "row-span-1 col-span-12 md:col-span-6 lg:col-span-4 min-h-62":
+                      index === 3,
                   },
                 )}
               >
@@ -153,7 +154,7 @@ export default function Home() {
       </div>
 
       <section className="bg-noise pb-0 lg:pt-0 grid lg:grid-cols-5 place-items-center overflow-hidden">
-        <div className="container max-lg:pt-10 lg:ml-15 space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10">
+        <div className="container lg:ml-28 space-y-6 lg:col-start-1 lg:col-span-3 lg:row-start-1 z-10">
           <h2 className="text-primary">About Lighthouse</h2>
 
           <p className="max-w-2xl">
@@ -181,8 +182,10 @@ export default function Home() {
             lg:col-start-3
             lg:col-span-5
             lg:row-start-1
-            hover:brightness-125
+            brightness-75
+            hover:brightness-150
             transition-all
+            duration-500
           "
         />
       </section>
@@ -207,7 +210,9 @@ export default function Home() {
                   },
                 )}
               >
-                <h3 className="text-2xl font-bold text-primary">{project.title}</h3>
+                <h3 className="text-2xl font-bold text-primary">
+                  {project.title}
+                </h3>
                 <div className="flex items-center gap-4 text-gold">
                   <p>{project.subtitle}</p>
                   <HugeiconsIcon icon={ArrowRight02Icon} />

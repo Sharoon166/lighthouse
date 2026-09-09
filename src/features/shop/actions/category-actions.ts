@@ -536,6 +536,36 @@ export async function getCategoryById(id: string): Promise<Category | null> {
   return CategoryModel.findById(id).lean();
 }
 
+export async function getCategoryBySlug(
+  slug: string,
+): Promise<Category | null> {
+  await connectToDatabase();
+  return CategoryModel.findOne({ slug, isActive: true }).lean();
+}
+
+export async function getSubcategories(
+  parentId: string,
+): Promise<
+  { id: string; name: string; slug: string; description: string; image: string; productCount: number }[]
+> {
+  await connectToDatabase();
+  const children = await CategoryModel.find({
+    parent: parentId,
+    isActive: true,
+  })
+    .sort({ sortOrder: 1, name: 1 })
+    .lean();
+
+  return children.map((c) => ({
+    id: String(c._id),
+    name: c.name,
+    slug: c.slug,
+    description: c.description || "",
+    image: c.image || "/1.png",
+    productCount: c.productCount || 0,
+  }));
+}
+
 export async function getAllCategoriesAdmin(): Promise<
   {
     id: string;

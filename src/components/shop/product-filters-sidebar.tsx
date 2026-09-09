@@ -90,48 +90,50 @@ export function ProductFiltersSidebar({
 
   const filterContent = (
     <div className="space-y-8">
-      {/* Category */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-          CATEGORY
-        </h3>
-        <div className="space-y-1.5 text-sm">
-          <button
-            type="button"
-            onClick={() => setCategory("all")}
-            className={`flex w-full items-center justify-between py-1 text-left transition-colors ${
-              category === "all"
-                ? "font-semibold text-gold"
-                : "text-foreground/80 hover:text-foreground"
-            }`}
-          >
-            <span>All Products</span>
-            <span className="text-xs text-muted-foreground">
-              ({products.length})
-            </span>
-          </button>
-          {categories.map((cat) => {
-            const isSelected = category === cat.slug;
-            return (
-              <button
-                key={cat.slug}
-                type="button"
-                onClick={() => setCategory(cat.slug)}
-                className={`flex w-full items-center justify-between py-1 text-left transition-colors ${
-                  isSelected
-                    ? "font-semibold text-gold"
-                    : "text-foreground/80 hover:text-foreground"
-                }`}
-              >
-                <span>{cat.name}</span>
-                <span className="text-xs text-muted-foreground">
-                  ({cat.count})
-                </span>
-              </button>
-            );
-          })}
+      {/* Category — only show if categories are provided */}
+      {categories.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            CATEGORY
+          </h3>
+          <div className="space-y-1.5 text-sm">
+            <button
+              type="button"
+              onClick={() => setCategory("all")}
+              className={`flex w-full items-center justify-between py-1 text-left transition-colors ${
+                category === "all"
+                  ? "font-semibold text-gold"
+                  : "text-foreground/80 hover:text-foreground"
+              }`}
+            >
+              <span>All Products</span>
+              <span className="text-xs text-muted-foreground">
+                ({products.length})
+              </span>
+            </button>
+            {categories.map((cat) => {
+              const isSelected = category === cat.slug;
+              return (
+                <button
+                  key={cat.slug}
+                  type="button"
+                  onClick={() => setCategory(cat.slug)}
+                  className={`flex w-full items-center justify-between py-1 text-left transition-colors ${
+                    isSelected
+                      ? "font-semibold text-gold"
+                      : "text-foreground/80 hover:text-foreground"
+                  }`}
+                >
+                  <span>{cat.name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    ({cat.count})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Brand */}
       {brands.length > 0 && (

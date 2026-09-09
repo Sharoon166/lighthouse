@@ -14,6 +14,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import LogoImage from "@/components/shared/logo-img";
 import { cn } from "@/lib/utils";
+import { CategoriesMegaMenu } from "./categories-mega-menu";
 
 const IS_PHASE_2 = false;
 
@@ -88,6 +89,10 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               : "border bg-muted/40",
           )}
         >
+          <CategoriesMegaMenu
+            isHero={isHero}
+            isActive={isActive}
+          />
           {NAV_LINKS.map(({ href, label }) => (
             <Link
               key={href}
@@ -123,7 +128,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 "flex items-center rounded-full px-7",
                 isHero
                   ? "bg-background/10 text-background"
-                  : "bg-muted text-foreground",
+                  : "text-foreground bg-background",
               )}
             >
               <HugeiconsIcon icon={Search01Icon} size={18} />
@@ -219,7 +224,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
       >
         <div className="flex flex-col h-full max-w-md mx-auto w-full">
           {/* Integrated Search */}
-          <form 
+          <form
             action={(formData) => {
               const search = formData.get('search');
               if (search && String(search).trim().length >= 2) {
@@ -245,6 +250,12 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
 
           {/* Navigation Links */}
           <nav className="flex flex-col gap-1.5">
+            <CategoriesMegaMenu
+              isHero={isHero}
+              isActive={isActive}
+              onMobileLinkClick={() => setMobileOpen(false)}
+              mobileOpen={mobileOpen}
+            />
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}

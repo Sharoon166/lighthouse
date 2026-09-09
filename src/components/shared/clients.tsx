@@ -15,7 +15,7 @@ export function Clients() {
             key={client.id}
             src={client.imageURL}
             alt={client.name}
-            className="size-32"
+            className="size-32 object-contain"
             title={client.name}
             suppressHydrationWarning
           />

@@ -107,54 +107,54 @@ export const dummyProjects = [
 export const clients = [
   {
     id: "client-001",
-    name: "IKEA",
-    imageURL: "https://cdn.simpleicons.org/ikea",
+    name: "Behbud Hospital",
+    imageURL: "/clients/behbud-hospital.png",
   },
   {
     id: "client-002",
-    name: "Samsung",
-    imageURL: "https://cdn.simpleicons.org/samsung",
+    name: "Eighteen Society",
+    imageURL: "/clients/eighteen-society.png",
   },
   {
     id: "client-003",
-    name: "LG",
-    imageURL: "https://cdn.simpleicons.org/lg",
+    name: "Islamabad Club",
+    imageURL: "/clients/islamabad-club.png",
   },
   {
     id: "client-004",
-    name: "Panasonic",
-    imageURL: "https://cdn.simpleicons.org/panasonic",
+    name: "Marriot Hotel",
+    imageURL: "/clients/marriot.png",
   },
   {
     id: "client-005",
-    name: "Starbucks",
-    imageURL: "https://cdn.simpleicons.org/starbucks",
+    name: "Taj Residencia",
+    imageURL: "/clients/taj-residencia.png",
   },
   {
     id: "client-006",
-    name: "Emirates",
-    imageURL: "https://cdn.simpleicons.org/emirates",
+    name: "Zeeta Mall",
+    imageURL: "/clients/zeeta-mall.png",
   },
   {
     id: "client-007",
-    name: "Coca-Cola",
-    imageURL: "https://cdn.simpleicons.org/cocacola",
+    name: "Faisal Hills",
+    imageURL: "/clients/faisal-hills.png",
   },
-  {
-    id: "client-008",
-    name: "Unilever",
-    imageURL: "https://cdn.simpleicons.org/unilever",
-  },
-  {
-    id: "client-009",
-    name: "McDonald's",
-    imageURL: "https://cdn.simpleicons.org/mcdonalds",
-  },
-  {
-    id: "client-010",
-    name: "Marriott",
-    imageURL: "https://cdn.simpleicons.org/marriott",
-  },
+  // {
+  //   id: "client-008",
+  //   name: "Unilever",
+  //   imageURL: "https://cdn.simpleicons.org/unilever",
+  // },
+  // {
+  //   id: "client-009",
+  //   name: "McDonald's",
+  //   imageURL: "https://cdn.simpleicons.org/mcdonalds",
+  // },
+  // {
+  //   id: "client-010",
+  //   name: "Marriott",
+  //   imageURL: "https://cdn.simpleicons.org/marriott",
+  // },
 ];
 
 export const featuredBlogs = [

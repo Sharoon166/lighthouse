@@ -3,6 +3,8 @@
 import {
   ChevronDownIcon,
   ChevronRightIcon,
+  ChevronsDownIcon,
+  ChevronsUpIcon,
   Delete02Icon,
   Edit02Icon,
   ImageIcon,
@@ -14,7 +16,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
@@ -31,12 +33,16 @@ function TreeNode({
   node,
   depth,
   onDelete,
+  defaultExpanded,
 }: {
   node: CategoryTreeNode;
   depth: number;
   onDelete?: (node: CategoryTreeNode) => void;
+  defaultExpanded?: boolean;
 }) {
-  const [expanded, setExpanded] = useState(depth < 1);
+  const [expanded, setExpanded] = useState(
+    defaultExpanded !== undefined ? defaultExpanded : depth < 1,
+  );
   const hasChildren = node.children.length > 0;
 
   return (
@@ -123,6 +129,7 @@ function TreeNode({
             node={child}
             depth={depth + 1}
             onDelete={onDelete}
+            defaultExpanded={defaultExpanded}
           />
         ))}
     </div>
@@ -140,6 +147,8 @@ export function CategoriesManager({
   const [isLoading, setIsLoading] = useState(!initialTree);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [treeVersion, setTreeVersion] = useState(0);
+  const [forceExpand, setForceExpand] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (initialTree) return;
@@ -195,6 +204,16 @@ export function CategoriesManager({
     setTree(refreshed);
   };
 
+  const handleExpandAll = () => {
+    setForceExpand(true);
+    setTreeVersion((v) => v + 1);
+  };
+
+  const handleCollapseAll = () => {
+    setForceExpand(false);
+    setTreeVersion((v) => v + 1);
+  };
+
   const filterTree = (
     nodes: CategoryTreeNode[],
     query: string,
@@ -248,6 +267,28 @@ export function CategoriesManager({
             className="h-10"
           />
         </InputGroup>
+        {!isLoading && tree.length > 0 && (
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              onClick={handleExpandAll}
+              aria-label="Expand all categories"
+            >
+              <HugeiconsIcon icon={ChevronsDownIcon} size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              onClick={handleCollapseAll}
+              aria-label="Collapse all categories"
+            >
+              <HugeiconsIcon icon={ChevronsUpIcon} size={16} />
+            </Button>
+          </div>
+        )}
         {!isLoading && (
           <span className="text-sm text-muted-foreground">
             {countAll(tree)} total categories
@@ -305,10 +346,13 @@ export function CategoriesManager({
           <div className="p-2">
             {filteredTree.map((node) => (
               <TreeNode
-                key={node.id}
+                key={`${node.id}-${treeVersion}`}
                 node={node}
                 depth={0}
                 onDelete={handleDelete}
+                defaultExpanded={
+                  forceExpand !== null ? forceExpand : undefined
+                }
               />
             ))}
           </div>

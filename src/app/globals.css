@@ -146,7 +146,7 @@
   --sidebar-border: oklch(0.9 0 0);
   --sidebar-ring: oklch(0.55 0.22 264);
 
-  --font-playfair-display: var(--font-poiret-one);
+  --font-playfair-display: var(--font-tenor-sans);
 
 }
 
@@ -430,6 +430,15 @@
   /* Pause animation on hover */
   .hover\:pause-animation:hover {
     animation-play-state: paused;
+  }
+
+  /* Hide scrollbar */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   /* Respect user's motion preferences */

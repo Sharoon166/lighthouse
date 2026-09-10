@@ -13,6 +13,7 @@ import {
   Store01Icon,
   TagsIcon,
   UserCircleIcon,
+  UserShield01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
@@ -166,6 +167,18 @@ export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMo
           <span className={cn(collapsed && "hidden")}>Settings</span>
           {collapsed && <Tooltip label="Settings" />}
         </Link>
+        {user?.role === "admin" && (
+          <Link
+            href="/admin/settings/staff"
+            onClick={navigate}
+            aria-label={collapsed ? "Staff" : undefined}
+            className={itemClasses(collapsed, pathname === "/admin/settings/staff")}
+          >
+            <HugeiconsIcon icon={UserShield01Icon} size={18} className="shrink-0" />
+            <span className={cn(collapsed && "hidden")}>Staff</span>
+            {collapsed && <Tooltip label="Staff" />}
+          </Link>
+        )}
       </nav>
 
       {/* Avatar dropdown */}

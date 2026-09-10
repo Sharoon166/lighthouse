@@ -3,6 +3,7 @@
 import type { QueryFilter } from "mongoose";
 import { revalidatePath, unstable_cache, updateTag } from "next/cache";
 import { z } from "zod";
+import { requireAdminForAction } from "@/lib/admin-guard";
 import {
   CLOUDINARY_DEFAULT_FOLDER,
   deleteImage,
@@ -292,6 +293,9 @@ export async function getBlogPost(
 export async function deleteBlogPost(
   slug: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await BlogPostModel.findOne({ slug, deletedAt: null });
@@ -312,6 +316,9 @@ export async function deleteBlogPost(
 export async function restoreBlogPost(
   slug: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await BlogPostModel.findOne({
@@ -335,6 +342,9 @@ export async function restoreBlogPost(
 export async function permanentlyDeleteBlogPost(
   slug: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await BlogPostModel.findOne({

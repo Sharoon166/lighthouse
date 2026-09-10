@@ -1,6 +1,9 @@
 "use client";
 
 import { Activity, useState } from "react";
+import Link from "next/link";
+import { UserShield01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { authClient } from "@/lib/auth-client";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button } from "@/components/ui/button";
@@ -274,6 +277,38 @@ export default function AdminSettingsPage() {
                 </div>
               </form>
             </section>
+
+            {/* Team & staff */}
+            {(user as Record<string, unknown>)?.role === "admin" && (
+              <section>
+                <h2 className="text-base font-semibold text-foreground">Team &amp; staff</h2>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Manage staff accounts, passwords, and sessions.
+                </p>
+
+                <div className="my-4 h-px bg-border" />
+
+                <Link
+                  href="/admin/settings/staff"
+                  className="flex items-center gap-3 rounded-xl border border-border bg-background p-4 transition-colors hover:bg-muted"
+                >
+                  <span className="flex size-10 items-center justify-center rounded-lg bg-[#2a1b45]/8 text-[#2a1b45]">
+                    <HugeiconsIcon icon={UserShield01Icon} size={20} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-medium text-foreground">
+                      Staff management
+                    </span>
+                    <span className="block text-xs text-muted-foreground">
+                      Create, update, and log out staff members
+                    </span>
+                  </span>
+                  <span className="ml-auto text-xs font-medium text-muted-foreground">
+                    Open →
+                  </span>
+                </Link>
+              </section>
+            )}
 
             {/* Sign out */}
             <section>

@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
+import { authClient } from "@/lib/auth-client";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Empty,
@@ -210,6 +211,8 @@ export function BrandsManager({
   initialData?: BrandListResult;
 }) {
   const { confirm } = useConfirm();
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -368,7 +371,7 @@ export function BrandsManager({
             <div className={cn(isLoading && "pointer-events-none opacity-60")}>
               <BrandTable
                 brands={data.brands}
-                onDelete={isDeleting ? undefined : handleDelete}
+                onDelete={isDeleting || !isAdmin ? undefined : handleDelete}
               />
             </div>
             <Pagination

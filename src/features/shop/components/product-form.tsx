@@ -989,7 +989,7 @@ export function ProductForm({
       )}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="min-w-0 space-y-6 *:border-none *:p-0">
+        <div className="min-w-0 space-y-6 *:border-0 *:ring-0 *:p-0 divide-y-2">
           {/* ── 1. Product Information ── */}
           <Card>
             <CardHeader>
@@ -1065,123 +1065,126 @@ export function ProductForm({
                 </div>
               </div>
 
-              <div className="space-y-2" data-field="name">
-                <Label htmlFor="name">Name</Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="name"
-                    value={name}
-                    onChange={(event) => {
-                      setName(event.target.value);
-                      clearFieldError("name");
-                    }}
-                    placeholder="e.g. LED Downlight 10W"
-                    aria-invalid={Boolean(fieldError("name"))}
-                    maxLength={FIELD_LIMITS.name.medium}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>
-                      {name.length}/{FIELD_LIMITS.name.medium}
-                    </InputGroupText>
-                  </InputGroupAddon>
-                </InputGroup>
-                {fieldError("name") && (
-                  <p className="text-xs text-destructive">
-                    {fieldError("name")}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2" data-field="slug">
-                <Label htmlFor="slug">Slug</Label>
-                <div className="flex gap-2">
-                  <InputGroup className="flex-1">
-                    <InputGroupAddon align="inline-start">
-                      <InputGroupText>/products/</InputGroupText>
-                    </InputGroupAddon>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2" data-field="name">
+                  <Label htmlFor="name">Name</Label>
+                  <InputGroup>
                     <InputGroupInput
-                      id="slug"
-                      value={slug}
+                      id="name"
+                      value={name}
                       onChange={(event) => {
-                        setIsSlugEdited(true);
-                        setSlug(slugify(event.target.value));
+                        setName(event.target.value);
+                        clearFieldError("name");
                       }}
-                      placeholder="auto-generated-from-name"
-                      aria-invalid={Boolean(fieldError("slug"))}
-                      className="font-mono text-sm"
+                      placeholder="e.g. LED Downlight 10W"
+                      aria-invalid={Boolean(fieldError("name"))}
+                      maxLength={FIELD_LIMITS.name.medium}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>
+                        {name.length}/{FIELD_LIMITS.name.medium}
+                      </InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {fieldError("name") && (
+                    <p className="text-xs text-destructive">
+                      {fieldError("name")}
+                    </p>
+                  )}
+                </div>
+  
+                <div className="space-y-2" data-field="slug">
+                  <Label htmlFor="slug">Slug</Label>
+                  <div className="flex gap-2">
+                    <InputGroup className="flex-1">
+                      <InputGroupAddon align="inline-start">
+                        <InputGroupText>/products/</InputGroupText>
+                      </InputGroupAddon>
+                      <InputGroupInput
+                        id="slug"
+                        value={slug}
+                        onChange={(event) => {
+                          setIsSlugEdited(true);
+                          setSlug(slugify(event.target.value));
+                        }}
+                        placeholder="auto-generated-from-name"
+                        aria-invalid={Boolean(fieldError("slug"))}
+                        className="font-mono text-sm"
+                      />
+                    </InputGroup>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="shrink-0"
+                      onClick={() => {
+                        setSlug(slugify(name));
+                        setIsSlugEdited(false);
+                      }}
+                      title="Regenerate slug from name"
+                    >
+                      <HugeiconsIcon icon={Refresh01Icon} size={16} />
+                    </Button>
+                  </div>
+                  {fieldError("slug") ? (
+                    <p className="text-xs text-destructive">
+                      {fieldError("slug")}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      URL-friendly identifier. Auto-generated from name.
+                    </p>
+                  )}
+                  </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2" data-field="description">
+                  <Label htmlFor="description">Description</Label>
+                  <InputGroup>
+                    <InputGroupTextarea
+                      id="description"
+                      value={description}
+                      onChange={(event) => {
+                        setDescription(event.target.value);
+                        clearFieldError("description");
+                      }}
+                      placeholder="Detailed product description..."
+                      aria-invalid={Boolean(fieldError("description"))}
                     />
                   </InputGroup>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="shrink-0"
-                    onClick={() => {
-                      setSlug(slugify(name));
-                      setIsSlugEdited(false);
-                    }}
-                    title="Regenerate slug from name"
-                  >
-                    <HugeiconsIcon icon={Refresh01Icon} size={16} />
-                  </Button>
+                  {fieldError("description") && (
+                    <p className="text-xs text-destructive">
+                      {fieldError("description")}
+                    </p>
+                  )}
                 </div>
-                {fieldError("slug") ? (
-                  <p className="text-xs text-destructive">
-                    {fieldError("slug")}
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground">
-                    URL-friendly identifier. Auto-generated from name.
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2" data-field="description">
-                <Label htmlFor="description">Description</Label>
-                <InputGroup className="min-h-32">
-                  <InputGroupTextarea
-                    id="description"
-                    value={description}
-                    onChange={(event) => {
-                      setDescription(event.target.value);
-                      clearFieldError("description");
-                    }}
-                    placeholder="Detailed product description..."
-                    aria-invalid={Boolean(fieldError("description"))}
-                  />
-                </InputGroup>
-                {fieldError("description") && (
-                  <p className="text-xs text-destructive">
-                    {fieldError("description")}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2" data-field="shortDescription">
-                <Label htmlFor="short-description">Short description</Label>
-                <InputGroup>
-                  <InputGroupInput
-                    id="short-description"
-                    value={shortDescription}
-                    onChange={(event) => {
-                      setShortDescription(event.target.value);
-                      clearFieldError("shortDescription");
-                    }}
-                    placeholder="Brief summary for listings..."
-                    aria-invalid={Boolean(fieldError("shortDescription"))}
-                    maxLength={FIELD_LIMITS.description.short}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>
-                      {shortDescription.length}/{FIELD_LIMITS.description.short}
-                    </InputGroupText>
-                  </InputGroupAddon>
-                </InputGroup>
-                {fieldError("shortDescription") && (
-                  <p className="text-xs text-destructive">
-                    {fieldError("shortDescription")}
-                  </p>
-                )}
+  
+                <div className="space-y-2" data-field="shortDescription">
+                  <Label htmlFor="short-description">Short description</Label>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="short-description"
+                      value={shortDescription}
+                      onChange={(event) => {
+                        setShortDescription(event.target.value);
+                        clearFieldError("shortDescription");
+                      }}
+                      placeholder="Brief summary for listings..."
+                      aria-invalid={Boolean(fieldError("shortDescription"))}
+                      maxLength={FIELD_LIMITS.description.short}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>
+                        {shortDescription.length}/{FIELD_LIMITS.description.short}
+                      </InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+                  {fieldError("shortDescription") && (
+                    <p className="text-xs text-destructive">
+                      {fieldError("shortDescription")}
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2" data-field="images">

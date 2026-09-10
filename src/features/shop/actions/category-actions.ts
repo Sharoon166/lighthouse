@@ -4,6 +4,7 @@ import type { QueryFilter } from "mongoose";
 import { Types } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireAdminForAction } from "@/lib/admin-guard";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { AttributeDefinitionModel } from "@/models/attribute-definition";
@@ -334,6 +335,9 @@ export async function updateCategory(
 export async function deleteCategory(
   id: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await CategoryModel.findById(id);

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { buttonVariants } from "@/components/ui/button";
 import { listTrashedBlogPosts } from "@/features/blog/actions";
 import { BlogTrashManager } from "@/features/blog/components/blog-trash-manager";
+import { requireRole } from "@/lib/require-role";
 
 export const metadata: Metadata = {
   title: "Trash · Lighthouse",
@@ -15,6 +17,8 @@ export default async function BlogTrashPage({
 }: {
   searchParams: { page?: string; search?: string };
 }) {
+  const session = await requireRole(["admin"]);
+  if (!session) redirect("/admin/blog");
   const page = Number(searchParams.page) || 1;
   const search = searchParams.search || "";
   const data = await listTrashedBlogPosts({ page, pageSize: 8, search });

@@ -2,8 +2,7 @@
 
 import {
   Cancel01Icon,
-  Idea01Icon,
-  Menu01Icon,
+  Menu11Icon,
   Search01Icon,
   ShoppingBag02Icon,
   UserIcon,
@@ -207,7 +206,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           )}
         >
           <HugeiconsIcon
-            icon={mobileOpen ? Cancel01Icon : Menu01Icon}
+            icon={mobileOpen ? Cancel01Icon : Menu11Icon}
             size={20}
           />
         </button>
@@ -269,13 +268,6 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 )}
               >
                 <span>{label}</span>
-                {isActive(href) && (
-                  <HugeiconsIcon
-                    icon={Idea01Icon}
-                    size={30}
-                    className="text-gold"
-                  />
-                )}
               </Link>
             ))}
           </nav>

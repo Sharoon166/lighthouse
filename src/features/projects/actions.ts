@@ -3,6 +3,7 @@
 import type { QueryFilter } from "mongoose";
 import { revalidatePath, unstable_cache, updateTag } from "next/cache";
 import { z } from "zod";
+import { requireAdminForAction } from "@/lib/admin-guard";
 import {
   CLOUDINARY_DEFAULT_FOLDER,
   deleteImage,
@@ -288,6 +289,9 @@ export async function getProject(
 export async function deleteProject(
   slug: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await ProjectModel.findOne({ slug, deletedAt: null });
@@ -308,6 +312,9 @@ export async function deleteProject(
 export async function restoreProject(
   slug: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await ProjectModel.findOne({
@@ -331,6 +338,9 @@ export async function restoreProject(
 export async function permanentlyDeleteProject(
   slug: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await ProjectModel.findOne({

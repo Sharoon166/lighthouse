@@ -3,6 +3,7 @@
 import type { QueryFilter } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireAdminForAction } from "@/lib/admin-guard";
 import { deleteImage, extractPublicId } from "@/lib/cloudinary";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
@@ -273,6 +274,9 @@ export async function updateProductStatus(
 export async function deleteProduct(
   id: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await ProductModel.findById(id);
@@ -295,6 +299,9 @@ export async function deleteProduct(
 export async function restoreProduct(
   id: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await ProductModel.findById(id);
@@ -314,6 +321,9 @@ export async function restoreProduct(
 export async function permanentlyDeleteProduct(
   id: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await ProductModel.findById(id);

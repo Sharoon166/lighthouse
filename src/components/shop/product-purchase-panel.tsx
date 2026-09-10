@@ -2,6 +2,7 @@
 
 import {
   ArrowReloadVerticalIcon,
+  ArrowRight,
   CheckmarkBadge01Icon,
   ChevronDownIcon,
   DeliveryTruck01Icon,
@@ -17,6 +18,9 @@ import "@kitlangton/rolling-number/styles.css";
 import { formatCurrency } from "@/lib/format";
 import { PRESET_COLORS } from "@/components/shared/color-picker";
 import type { ShopProductItem, ShopProductVariant } from "@/lib/shop-data";
+import { IS_PHASE_2 } from "@/lib/constants";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface ProductPurchasePanelProps {
   product: ShopProductItem;
@@ -92,7 +96,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
   };
 
   const isColorAttribute = (key: string) =>
-    ["color", "colour", "finish"].includes(key.toLowerCase());
+    ["color", "colour"].includes(key.toLowerCase());
 
   return (
     <div>
@@ -181,14 +185,16 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
                     const isSelected = currentValue === value;
                     const isAvailable = product.variants.some((v) =>
                       product.variantAttributes.every((k) => {
-                        const val = k === attrKey ? value : selectedAttributes[k];
+                        const val =
+                          k === attrKey ? value : selectedAttributes[k];
                         return v.attributes[k] === val;
                       }),
                     );
                     // Find the matching variant to get its colorHex
                     const matchingVariant = product.variants.find((v) =>
                       product.variantAttributes.every((k) => {
-                        const val = k === attrKey ? value : selectedAttributes[k];
+                        const val =
+                          k === attrKey ? value : selectedAttributes[k];
                         return v.attributes[k] === val;
                       }),
                     );
@@ -196,8 +202,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
                       matchingVariant?.colorHex ||
                       product.finishes.find((f) => f.name === value)?.hex ||
                       PRESET_COLORS.find(
-                        (c) =>
-                          c.name.toLowerCase() === value.toLowerCase(),
+                        (c) => c.name.toLowerCase() === value.toLowerCase(),
                       )?.hex ||
                       "#888888";
 
@@ -239,7 +244,8 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
                     const isSelected = currentValue === value;
                     const isAvailable = product.variants.some((v) =>
                       product.variantAttributes.every((k) => {
-                        const val = k === attrKey ? value : selectedAttributes[k];
+                        const val =
+                          k === attrKey ? value : selectedAttributes[k];
                         return v.attributes[k] === val;
                       }),
                     );
@@ -287,8 +293,8 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
                   value={selectedVariant.stock}
                   duration={500}
                   className="inline-block font-semibold text-foreground tabular-nums"
-                />
-                {" "}available)
+                />{" "}
+                available)
               </span>
             ) : (
               <span className="text-muted-foreground">Out of Stock</span>
@@ -297,50 +303,70 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
         )}
 
         {/* Quantity Counter & Add to Cart */}
-        <div className="flex items-center gap-4 pt-2">
-          <div className="flex items-center rounded-full border border-border bg-background">
+        {IS_PHASE_2 ? (
+          <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center rounded-full border border-border bg-background">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="flex size-12 items-center justify-center text-foreground hover:bg-muted rounded-l-full transition-colors"
+              >
+                <HugeiconsIcon icon={MinusSignIcon} size={16} />
+              </button>
+              <RollingNumber
+                value={quantity}
+                duration={300}
+                className="w-10 text-center text-base font-semibold text-foreground tabular-nums"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setQuantity((q) =>
+                    Math.min(
+                      q + 1,
+                      Math.max(1, selectedVariant?.stock ?? Infinity),
+                    ),
+                  )
+                }
+                className="flex size-12 items-center justify-center text-foreground hover:bg-muted rounded-r-full transition-colors"
+              >
+                <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              </button>
+            </div>
+
             <button
               type="button"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="flex size-12 items-center justify-center text-foreground hover:bg-muted rounded-l-full transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 rounded-full bg-slate-950 py-4 text-center text-sm font-bold tracking-widest text-white uppercase transition-colors hover:bg-gold hover:text-slate-950"
             >
-              <HugeiconsIcon icon={MinusSignIcon} size={16} />
-            </button>
-            <RollingNumber
-              value={quantity}
-              duration={300}
-              className="w-10 text-center text-base font-semibold text-foreground tabular-nums"
-            />
-            <button
-              type="button"
-              onClick={() =>
-                setQuantity((q) =>
-                  Math.min(q + 1, Math.max(1, selectedVariant?.stock ?? Infinity)),
-                )
-              }
-              className="flex size-12 items-center justify-center text-foreground hover:bg-muted rounded-r-full transition-colors"
-            >
-              <HugeiconsIcon icon={PlusSignIcon} size={16} />
+              Add to Cart
+              <HugeiconsIcon icon={PlusSignIcon} size={18} />
             </button>
           </div>
-
-          <button
+        ) : (
+          <Button
             type="button"
-            className="flex-1 flex items-center justify-center gap-2 rounded-full bg-slate-950 py-4 text-center text-sm font-bold tracking-widest text-white uppercase transition-colors hover:bg-gold hover:text-slate-950"
-          >
-            Add to Cart
-            <HugeiconsIcon icon={PlusSignIcon} size={18} />
-          </button>
-        </div>
+            variant="secondary"
+            size="lg"
+            className="w-full tracking-widest uppercase transition-colors hover:bg-gold hover:text-slate-950"
+            render={
+              <Link href="/contact">
+                Contact Us
+                <HugeiconsIcon icon={ArrowRight} size={18} />
+              </Link>
+            }
+          />
+        )}
 
         {/* Save to wishlist */}
-        <button
-          type="button"
-          className="flex items-center justify-center gap-2 w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <HugeiconsIcon icon={FavouriteIcon} size={18} />
-          Save to wishlist
-        </button>
+        {IS_PHASE_2 && (
+          <button
+            type="button"
+            className="flex items-center justify-center gap-2 w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <HugeiconsIcon icon={FavouriteIcon} size={18} />
+            Save to wishlist
+          </button>
+        )}
       </div>
 
       {/* Value Badges */}
@@ -388,7 +414,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             />
           </button>
           {openAccordions.materialsAndCare && (
-            <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.content.materialsAndCare}
             </div>
           )}
@@ -409,7 +435,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             />
           </button>
           {openAccordions.shippingAndReturns && (
-            <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.content.shippingAndReturns}
             </div>
           )}
@@ -430,7 +456,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             />
           </button>
           {openAccordions.payment && (
-            <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.content.payment}
             </div>
           )}
@@ -451,7 +477,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             />
           </button>
           {openAccordions.installationAndBulbs && (
-            <div className="mt-2 text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
               {product.content.installationAndBulbs}
             </div>
           )}

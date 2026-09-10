@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
+import { authClient } from "@/lib/auth-client";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -278,6 +279,8 @@ export function ProductsManager({
   initialData?: ProductListResult;
 }) {
   const { confirm } = useConfirm();
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
   const [status, setStatus] = useState<ProductStatus>("all");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -414,13 +417,15 @@ export function ProductsManager({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href="/admin/products/trash"
-            className={buttonVariants({ variant: "outline" })}
-          >
-            <HugeiconsIcon icon={Delete02Icon} size={16} />
-            Trash
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/admin/products/trash"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <HugeiconsIcon icon={Delete02Icon} size={16} />
+              Trash
+            </Link>
+          )}
           <Link href="/admin/products/new" className={buttonVariants()}>
             <HugeiconsIcon icon={PlusSignIcon} size={16} />
             New product
@@ -496,7 +501,7 @@ export function ProductsManager({
             <div className={cn(isLoading && "pointer-events-none opacity-60")}>
               <ProductTable
                 products={data.products}
-                onDelete={isDeleting ? undefined : handleDelete}
+                onDelete={isDeleting || !isAdmin ? undefined : handleDelete}
                 onStatusChange={handleStatusChange}
               />
             </div>

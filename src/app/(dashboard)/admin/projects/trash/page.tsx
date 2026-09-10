@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { buttonVariants } from "@/components/ui/button";
 import { listTrashedProjects } from "@/features/projects/actions";
 import { ProjectTrashManager } from "@/features/projects/components/project-trash-manager";
+import { requireRole } from "@/lib/require-role";
 
 export const metadata: Metadata = {
   title: "Trash · Lighthouse",
@@ -15,6 +17,8 @@ export default async function ProjectTrashPage({
 }: {
   searchParams: { page?: string; search?: string };
 }) {
+  const session = await requireRole(["admin"]);
+  if (!session) redirect("/admin/projects");
   const page = Number(searchParams.page) || 1;
   const search = searchParams.search || "";
   const data = await listTrashedProjects({ page, pageSize: 12, search });

@@ -11,6 +11,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
+import { authClient } from "@/lib/auth-client";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,8 @@ export function BlogPostsManager({
   initialData?: BlogPostListResult;
 }) {
   const { confirm } = useConfirm();
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
   const [view, setView] = useLocalStorage<View>(
     "lighthouse:blog-view",
     "table",
@@ -206,13 +209,15 @@ export function BlogPostsManager({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href="/admin/blog/trash"
-            className={buttonVariants({ variant: "outline" })}
-          >
-            <HugeiconsIcon icon={Delete02Icon} size={16} />
-            Trash
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/admin/blog/trash"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <HugeiconsIcon icon={Delete02Icon} size={16} />
+              Trash
+            </Link>
+          )}
           <Link href="/admin/blog/new" className={buttonVariants()}>
             <HugeiconsIcon icon={PlusSignIcon} size={16} />
             New post
@@ -336,14 +341,14 @@ export function BlogPostsManager({
               {view === "table" ? (
                 <BlogTable
                   posts={data.posts}
-                  onDelete={isDeleting ? undefined : handleDelete}
+                  onDelete={isDeleting || !isAdmin ? undefined : handleDelete}
                   onToggleFeatured={handleToggleFeatured}
                   canFeatureMore={canFeatureMore}
                 />
               ) : (
                 <BlogPostCards
                   posts={data.posts}
-                  onDelete={isDeleting ? undefined : handleDelete}
+                  onDelete={isDeleting || !isAdmin ? undefined : handleDelete}
                   onToggleFeatured={handleToggleFeatured}
                   canFeatureMore={canFeatureMore}
                 />

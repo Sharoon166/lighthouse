@@ -16,6 +16,7 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import {
@@ -269,6 +270,8 @@ export function AttributesManager({
   initialData?: AttributeDefinitionListResult;
 }) {
   const { confirm } = useConfirm();
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -477,7 +480,7 @@ export function AttributesManager({
               <AttributeTable
                 attributes={data.attributes}
                 onToggleActive={isMutating ? undefined : handleToggleActive}
-                onDelete={isMutating ? undefined : handleDelete}
+                onDelete={isMutating || !isAdmin ? undefined : handleDelete}
                 onEdit={isMutating ? undefined : openEditDialog}
               />
             </div>

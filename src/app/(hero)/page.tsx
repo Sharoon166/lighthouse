@@ -41,17 +41,20 @@ export default function Home() {
           priority
           className="absolute inset-0 -z-10 block w-full h-full object-cover object-top sm:hidden"
         />
-        <div className="space-y-6 sm:space-y-8 container max-sm:mt-auto">
+        <div className="space-y-6 sm:space-y-8 container max-sm:mt-auto max-sm:mb-[20%]">
           <div className="lg:w-[65%] space-y-4">
             <h1 className="text-pretty max-sm:text-4xl">
               A house is only as warm as its{" "}
               <span className="text-gold">light</span>
             </h1>
-            <p className="max-sm:hidden lg:text-lg">
+            <p className=" lg:text-lg">
               Pendants, chandeliers, and architectural fixtures for homes and
-              commercial spaces across Pakistan. Chosen for how a room feels
+              commercial spaces across Pakistan.
+              <span className="max-sm:hidden">  
+              Chosen for how a room feels
               once the switch is on, not just how the fixture looks when
               it&apos;s off.
+              </span>
             </p>
           </div>
 

@@ -6,6 +6,8 @@ import {
   LocationIcon,
 } from "@/components/hero/social-icons";
 
+export const IS_PHASE_2 = false;
+
 export const heroLinks = [
   { label: "Facebook", href: "https://facebook.com", icon: FacebookIcon },
   { label: "Twitter", href: "https://x.com", icon: TwitterIcon },

@@ -11,6 +11,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
+import { authClient } from "@/lib/auth-client";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -80,6 +81,8 @@ export function ProjectsManager({
   initialData?: ProjectListResult;
 }) {
   const { confirm } = useConfirm();
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
   const [view, setView] = useLocalStorage<View>(
     "lighthouse:projects-view",
     "cards",
@@ -211,13 +214,15 @@ export function ProjectsManager({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href="/admin/projects/trash"
-            className={buttonVariants({ variant: "outline" })}
-          >
-            <HugeiconsIcon icon={Delete02Icon} size={16} />
-            Trash
-          </Link>
+          {isAdmin && (
+            <Link
+              href="/admin/projects/trash"
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <HugeiconsIcon icon={Delete02Icon} size={16} />
+              Trash
+            </Link>
+          )}
           <Link href="/admin/projects/new" className={buttonVariants()}>
             <HugeiconsIcon icon={PlusSignIcon} size={16} />
             New project
@@ -341,14 +346,14 @@ export function ProjectsManager({
               {view === "table" ? (
                 <ProjectTable
                   projects={data.projects}
-                  onDelete={isDeleting ? undefined : handleDelete}
+                  onDelete={isDeleting || !isAdmin ? undefined : handleDelete}
                   onToggleFeatured={handleToggleFeatured}
                   canFeatureMore={canFeatureMore}
                 />
               ) : (
                 <ProjectCards
                   projects={data.projects}
-                  onDelete={isDeleting ? undefined : handleDelete}
+                  onDelete={isDeleting || !isAdmin ? undefined : handleDelete}
                   onToggleFeatured={handleToggleFeatured}
                   canFeatureMore={canFeatureMore}
                 />

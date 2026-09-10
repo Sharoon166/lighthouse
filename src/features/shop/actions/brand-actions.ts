@@ -3,6 +3,7 @@
 import type { QueryFilter } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireAdminForAction } from "@/lib/admin-guard";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { type Brand, BrandModel } from "@/models/brand";
@@ -151,6 +152,9 @@ export async function updateBrand(
 export async function deleteBrand(
   id: string,
 ): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
   await connectToDatabase();
 
   const existing = await BrandModel.findById(id);

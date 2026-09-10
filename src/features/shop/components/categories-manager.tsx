@@ -16,6 +16,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
+import { authClient } from "@/lib/auth-client";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Empty,
@@ -150,6 +151,8 @@ export function CategoriesManager({
   initialTree?: CategoryTreeNode[];
 }) {
   const { confirm } = useConfirm();
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
   const [tree, setTree] = useState<CategoryTreeNode[]>(initialTree ?? []);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(!initialTree);
@@ -364,7 +367,7 @@ export function CategoriesManager({
                 key={`${node.id}-${treeVersion}`}
                 node={node}
                 depth={0}
-                onDelete={handleDelete}
+                onDelete={isAdmin ? handleDelete : undefined}
                 defaultExpanded={
                   forceExpand !== null ? forceExpand : undefined
                 }

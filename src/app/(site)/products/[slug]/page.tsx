@@ -1,7 +1,4 @@
-import { PlusSignIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CTA } from "@/components/hero/cta";
@@ -9,7 +6,7 @@ import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductDetailTabs } from "@/components/shop/product-detail-tabs";
 import { ProductImageGallery } from "@/components/shop/product-image-gallery";
 import { ProductPurchasePanel } from "@/components/shop/product-purchase-panel";
-import { formatCurrency } from "@/lib/format";
+import { ProductCard } from "@/components/shop/product-card";
 import { fetchProductBySlug, fetchStoreProducts } from "@/lib/shop-data";
 
 interface ProductPageProps {
@@ -102,44 +99,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedProducts.map((relProduct) => (
-                <div
+                <ProductCard
                   key={relProduct.id}
-                  className="group flex flex-col justify-between rounded-xl border border-border/80 bg-card overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <Link
-                    href={`/products/${relProduct.slug}`}
-                    className="block relative aspect-square bg-muted/30 overflow-hidden"
-                  >
-                    <Image
-                      src={relProduct.images[0] || "/products/1.png"}
-                      alt={relProduct.name}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 25vw"
-                      className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </Link>
-
-                  <div className="p-4 space-y-2 bg-card border-t border-border/40">
-                    <Link href={`/products/${relProduct.slug}`}>
-                      <h4 className="font-heading font-medium text-sm text-foreground group-hover:text-gold transition-colors line-clamp-1">
-                        {relProduct.name}
-                      </h4>
-                    </Link>
-
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-xs text-foreground">
-                        {formatCurrency(relProduct.price)}
-                      </span>
-                      <button
-                        type="button"
-                        aria-label={`Add ${relProduct.name} to cart`}
-                        className="flex size-7 items-center justify-center rounded-full bg-slate-900 text-white transition-colors hover:bg-gold hover:text-slate-950"
-                      >
-                        <HugeiconsIcon icon={PlusSignIcon} size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                  product={relProduct}
+                  showQuickView
+                />
               ))}
             </div>
           </div>

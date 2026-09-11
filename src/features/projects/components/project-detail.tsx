@@ -10,6 +10,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ProjectDraftData, ProjectListItem } from "../actions";
+import { ProjectVideoPlayer } from "./project-video-player";
 
 interface ProjectDetailProps {
   project: ProjectDraftData;
@@ -267,6 +268,33 @@ export function ProjectDetail({
                     className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Project Videos */}
+      {project.videos && project.videos.length > 0 && (
+        <section className="py-12 md:py-16">
+          <div className="container">
+            <div className="mb-8 flex items-end justify-between">
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Video
+                </h3>
+                <h2 className="mt-3 font-heading text-2xl font-bold">
+                  Project Walkthrough
+                </h2>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                {project.videos.length} video
+                {project.videos.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {project.videos.map((video) => (
+                <ProjectVideoPlayer key={video.publicId} video={video} />
               ))}
             </div>
           </div>

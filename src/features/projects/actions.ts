@@ -7,13 +7,16 @@ import { requireAdminForAction } from "@/lib/admin-guard";
 import {
   CLOUDINARY_DEFAULT_FOLDER,
   deleteImage,
+  deleteVideo,
   uploadImage,
+  uploadVideo,
 } from "@/lib/cloudinary";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import {
   type Project,
   type ProjectImage,
+  type ProjectVideo,
   ProjectModel,
 } from "@/models/project";
 import { projectInputSchema } from "./validation";
@@ -40,6 +43,7 @@ export type ProjectDraftData = {
   features: Array<{ id: string; title: string; description: string }>;
   heroImage: ProjectImage | null;
   gallery: ProjectImage[];
+  videos: ProjectVideo[];
   testimonial: { quote: string; author: string; role: string } | null;
   projectStatus: "ongoing" | "completed";
   seo: {
@@ -62,6 +66,7 @@ function flattenValidation(error: z.ZodError) {
 }
 
 function buildProjectData(data: z.infer<typeof projectInputSchema>) {
+  console.log("[buildProjectData] videos:", JSON.stringify(data.videos));
   return {
     title: data.title,
     subtitle: data.subtitle,
@@ -79,6 +84,7 @@ function buildProjectData(data: z.infer<typeof projectInputSchema>) {
     features: data.features,
     heroImage: data.heroImage ?? null,
     gallery: data.gallery,
+    videos: data.videos,
     testimonial: data.testimonial ?? null,
     projectStatus: data.projectStatus,
     seo: data.seo,
@@ -151,6 +157,8 @@ export async function createProject(
     });
 
     revalidatePath("/admin/projects");
+    revalidatePath(`/admin/projects/edit/${slug}`);
+    revalidatePath(`/projects/${slug}`);
     updateTag("projects");
 
     return { ok: true, slug };
@@ -222,9 +230,20 @@ export async function updateProject(
       publishedAt,
     });
 
+    // Explicitly assign videos — Mongoose .set() with spread can miss arrays on pre-existing docs
+    existing.videos = data.videos as any;
+
     await existing.save();
 
+    // Debug: verify videos were saved
+    const saved = await ProjectModel.findOne({ slug: nextSlug, deletedAt: null })
+      .select("videos")
+      .lean();
+    console.log("[updateProject] saved videos count:", saved?.videos?.length ?? 0);
+
     revalidatePath("/admin/projects");
+    revalidatePath(`/admin/projects/edit/${nextSlug}`);
+    revalidatePath(`/projects/${nextSlug}`);
     updateTag("projects");
 
     return { ok: true, slug: nextSlug };
@@ -248,6 +267,8 @@ const cachedGetProject = unstable_cache(
     }).lean();
     if (!document) return null;
 
+    console.log("[getProject] raw videos from DB:", document.videos?.length ?? 0);
+
     return {
       slug: document.slug,
       title: document.title,
@@ -266,6 +287,7 @@ const cachedGetProject = unstable_cache(
       features: document.features,
       heroImage: document.heroImage,
       gallery: document.gallery,
+      videos: document.videos || [],
       testimonial: document.testimonial,
       projectStatus: document.projectStatus,
       seo: document.seo,
@@ -363,6 +385,15 @@ export async function permanentlyDeleteProject(
     if (image.publicId) {
       await deleteImage(image.publicId).catch((error) => {
         console.error("Failed to delete gallery image from Cloudinary:", error);
+      });
+    }
+  }
+
+  // Delete videos
+  for (const video of existing.videos) {
+    if (video.publicId) {
+      await deleteVideo(video.publicId).catch((error) => {
+        console.error("Failed to delete video from Cloudinary:", error);
       });
     }
   }
@@ -640,6 +671,80 @@ export async function deleteProjectImage(
     return { ok: true };
   } catch (error) {
     console.error("Failed to delete project image:", error);
+    return { ok: false };
+  }
+}
+
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50MB
+
+export type UploadProjectVideoResult =
+  | { ok: true; video: ProjectVideo }
+  | { ok: false; message: string };
+
+export async function uploadProjectVideo(
+  formData: FormData,
+): Promise<UploadProjectVideoResult> {
+  const file = formData.get("file");
+  const title = formData.get("title");
+
+  if (!(file instanceof File)) {
+    return { ok: false, message: "No video was provided." };
+  }
+  if (!file.type.startsWith("video/")) {
+    return { ok: false, message: "Only video files are allowed." };
+  }
+  if (file.size > MAX_VIDEO_BYTES) {
+    return {
+      ok: false,
+      message: "Videos must be 50 MB or smaller. Choose a smaller file.",
+    };
+  }
+
+  const previousPublicId = formData.get("previousPublicId");
+  const previousId =
+    typeof previousPublicId === "string" && previousPublicId.trim()
+      ? previousPublicId.trim()
+      : null;
+
+  try {
+    const uploaded = await uploadVideo(file, {
+      folder: `${CLOUDINARY_DEFAULT_FOLDER}/projects/videos`,
+    });
+
+    if (previousId) {
+      await deleteVideo(previousId).catch((error) => {
+        console.error("Failed to delete previous video:", error);
+      });
+    }
+
+    return {
+      ok: true,
+      video: {
+        url: uploaded.url,
+        publicId: uploaded.publicId,
+        title: typeof title === "string" ? title : "",
+        duration: uploaded.duration,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to upload project video:", error);
+    return {
+      ok: false,
+      message: "Upload failed. Please try again in a moment.",
+    };
+  }
+}
+
+export async function deleteProjectVideo(
+  publicId: string,
+): Promise<{ ok: boolean }> {
+  console.log("[deleteProjectVideo] deleting:", publicId);
+  try {
+    await deleteVideo(publicId);
+    console.log("[deleteProjectVideo] deleted successfully");
+    return { ok: true };
+  } catch (error) {
+    console.error("[deleteProjectVideo] failed:", error);
     return { ok: false };
   }
 }

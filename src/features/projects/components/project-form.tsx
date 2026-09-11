@@ -26,6 +26,7 @@ import { GalleryManager } from "@/components/shared/gallery-manager";
 import { ImageDropzone } from "@/components/shared/image-dropzone";
 import { SeoPreview } from "@/components/shared/seo-preview";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { VideoManager } from "@/components/shared/video-manager";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -49,14 +50,16 @@ import { useSlugValidation } from "@/hooks/use-slug-validation";
 import { PROJECT_CATEGORIES } from "@/lib/constants";
 import { FIELD_LIMITS } from "@/lib/field-limits";
 import { cn, slugify } from "@/lib/utils";
-import type { ProjectImage } from "@/models/project";
+import type { ProjectImage, ProjectVideo } from "@/models/project";
 import {
   createProject,
   deleteProjectImage,
+  deleteProjectVideo,
   type ProjectActionResult,
   type ProjectDraftData,
   updateProject,
   uploadProjectImage,
+  uploadProjectVideo,
 } from "../actions";
 import { type ProjectInput, projectInputSchema } from "../validation";
 
@@ -125,6 +128,9 @@ export function ProjectForm({
   );
   const [gallery, setGallery] = useState<ProjectImage[]>(
     initialData?.gallery ?? [],
+  );
+  const [videos, setVideos] = useState<ProjectVideo[]>(
+    initialData?.videos ?? [],
   );
   const [projectStatus, setProjectStatus] = useState<"ongoing" | "completed">(
     initialData?.projectStatus ?? "ongoing",
@@ -198,6 +204,7 @@ export function ProjectForm({
     setFeatures(initialData.features);
     setHeroImage(initialData.heroImage);
     setGallery(initialData.gallery);
+    setVideos(initialData.videos);
     setProjectStatus(initialData.projectStatus);
     setTestimonial(initialData.testimonial);
     setFeatured(initialData.featured);
@@ -247,6 +254,7 @@ export function ProjectForm({
     features,
     heroImage,
     gallery,
+    videos,
     projectStatus,
     testimonial,
     featured,
@@ -813,12 +821,12 @@ export function ProjectForm({
           {currentStep === "gallery" && (
             <Card>
               <CardHeader>
-                <CardTitle>Gallery</CardTitle>
+                <CardTitle>Gallery & Videos</CardTitle>
                 <CardDescription>
-                  Showcase multiple images from the project.
+                  Showcase multiple images and videos from the project.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-8">
                 <GalleryManager
                   images={gallery}
                   onChange={setGallery}
@@ -830,6 +838,19 @@ export function ProjectForm({
                   maxImages={12}
                   label="Project Gallery"
                 />
+                <div className="border-t border-border pt-6">
+                  <VideoManager
+                    videos={videos}
+                    onChange={setVideos}
+                    upload={uploadProjectVideo}
+                    deleteVideo={async (publicId) => {
+                      await deleteProjectVideo(publicId);
+                      return { ok: true };
+                    }}
+                    maxVideos={5}
+                    label="Project Videos"
+                  />
+                </div>
               </CardContent>
             </Card>
           )}

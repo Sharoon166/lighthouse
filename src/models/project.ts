@@ -6,6 +6,13 @@ export interface ProjectImage {
   caption?: string;
 }
 
+export interface ProjectVideo {
+  url: string;
+  publicId: string;
+  title?: string;
+  duration?: number;
+}
+
 export interface ProjectChallenge {
   id: string;
   challenge: string;
@@ -36,6 +43,7 @@ export interface Project {
   features: ProjectFeature[];
   heroImage: ProjectImage | null;
   gallery: ProjectImage[];
+  videos: ProjectVideo[];
   testimonial: {
     quote: string;
     author: string;
@@ -61,6 +69,16 @@ const projectImageSchema = new Schema<ProjectImage>(
     url: { type: String, required: true },
     publicId: { type: String, required: true },
     caption: { type: String, default: "" },
+  },
+  { _id: false },
+);
+
+const projectVideoSchema = new Schema<ProjectVideo>(
+  {
+    url: { type: String, required: true },
+    publicId: { type: String, required: true },
+    title: { type: String, default: "" },
+    duration: { type: Number, default: 0 },
   },
   { _id: false },
 );
@@ -127,6 +145,7 @@ const projectSchema = new Schema<Project>(
     features: { type: [projectFeatureSchema], default: [] },
     heroImage: { type: projectImageSchema, default: null },
     gallery: { type: [projectImageSchema], default: [] },
+    videos: { type: [projectVideoSchema], default: [] },
     testimonial: { type: testimonialSchema, default: null },
     projectStatus: {
       type: String,

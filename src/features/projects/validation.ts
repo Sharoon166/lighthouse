@@ -87,6 +87,14 @@ export const projectInputSchema = z
         caption: z.string().optional(),
       }),
     ),
+    videos: z.array(
+      z.object({
+        url: z.string().url("Video URL is invalid"),
+        publicId: z.string().min(1, "Video public ID is required"),
+        title: z.string().optional(),
+        duration: z.number().optional(),
+      }),
+    ),
     testimonial: z
       .object({
         quote: z.string().trim().min(1, "Testimonial quote is required"),

@@ -111,6 +111,52 @@ export async function deleteImage(publicId: string): Promise<void> {
   await cloudinary.uploader.destroy(publicId);
 }
 
+export type CloudinaryVideo = {
+  url: string;
+  publicId: string;
+  duration?: number;
+};
+
+export async function uploadVideo(
+  file: File,
+  options: CloudinaryUploadOptions = {},
+): Promise<CloudinaryVideo> {
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: options.folder ?? CLOUDINARY_DEFAULT_FOLDER,
+          resource_type: "video",
+          transformation: undefined,
+          upload_preset: undefined,
+        },
+        (error, callResult) => {
+          if (error) {
+            console.error("Cloudinary video upload error:", error);
+            reject(error);
+          } else if (callResult) {
+            resolve(callResult);
+          } else {
+            reject(new Error("Upload returned no result."));
+          }
+        },
+      )
+      .end(buffer);
+  });
+
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+    duration: result.duration,
+  };
+}
+
+export async function deleteVideo(publicId: string): Promise<void> {
+  await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+}
+
 /**
  * Generate an optimized Cloudinary URL with automatic format and quality.
  *

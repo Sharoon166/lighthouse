@@ -55,7 +55,7 @@ export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
     <div className={`relative w-full ${className}`}>
       {/* Left Progressive Blur Indicator */}
       <div
-        className={`absolute left-0 top-0 bottom-0 z-20 pointer-events-none transition-opacity duration-300 bg-linear-to-r ${backgroundClass} backdrop-blur-[2px] mask-[linear-gradient(to_right,rgba(0,0,0,1),transparent)] ${
+        className={`absolute left-0 top-0 bottom-0 z-20 pointer-events-none transition-opacity duration-300 bg-gradient-to-r ${backgroundClass} backdrop-blur-[2px] [mask-image:linear-gradient(to_right,rgba(0,0,0,1),transparent)] ${
           showLeft ? 'opacity-100' : 'opacity-0'
         }`}
         style={{ width: blurWidth }}
@@ -79,7 +79,7 @@ export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
 
       {/* Right Progressive Blur Indicator */}
       <div
-        className={`absolute right-0 top-0 bottom-0 z-20 pointer-events-none transition-opacity duration-300 bg-linear-to-l ${backgroundClass} backdrop-blur-[2px] [mask-image:linear-gradient(to_left,rgba(0,0,0,1),transparent)] ${
+        className={`absolute right-0 top-0 bottom-0 z-20 pointer-events-none transition-opacity duration-300 bg-gradient-to-l ${backgroundClass} backdrop-blur-[2px] [mask-image:linear-gradient(to_left,rgba(0,0,0,1),transparent)] ${
           showRight ? 'opacity-100' : 'opacity-0'
         }`}
         style={{ width: blurWidth }}

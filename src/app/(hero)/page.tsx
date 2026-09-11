@@ -168,10 +168,12 @@ export default function Home() {
             of every room.
           </p>
 
-          <Button size="lg" className="mt-2">
-            Learn More{" "}
-            <HugeiconsIcon icon={ArrowRight02Icon} className="size-6" />
-          </Button>
+          <Link href="/about">
+            <Button size="lg" className="mt-2">
+              Learn More{" "}
+              <HugeiconsIcon icon={ArrowRight02Icon} className="size-6" />
+            </Button>
+          </Link>
         </div>
 
         <Image

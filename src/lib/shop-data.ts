@@ -52,7 +52,7 @@ export interface ShopProductItem {
   discountPercentage?: number;
   shortDescription: string;
   description: string;
-  images: string[];
+  images: string[]; // Now includes main product + all variant images
   finishes: { name: string; hex: string }[];
   variantAttributes: string[];
   variants: ShopProductVariant[];
@@ -775,6 +775,13 @@ export async function fetchStoreProducts(
             isDefault: v.isDefault,
           }));
 
+        // Combine main product images with all variant images (remove duplicates)
+        const allProductImages = [
+          ...(p.images || []),
+          ...variants.flatMap((v) => v.images || []),
+        ];
+        const uniqueImages = Array.from(new Set(allProductImages));
+
         // Extract finish options from variant attributes
         const variantAttributes = p.variantAttributes || [];
         const finishAttrKey = variantAttributes.find((key) =>
@@ -817,7 +824,7 @@ export async function fetchStoreProducts(
           shortDescription:
             p.shortDescription || p.description?.slice(0, 120) || "",
           description: p.description || "",
-          images: p.images?.length ? p.images : ["/products/1.png"],
+          images: uniqueImages.length ? uniqueImages : ["/products/1.png"],
           finishes,
           variantAttributes,
           variants,
@@ -929,7 +936,5 @@ export async function fetchProductBySlug(
 ): Promise<ShopProductItem | null> {
   const { products } = await fetchStoreProducts();
   const found = products.find((p) => p.slug === slug);
-  if (found) return found;
-  // If slug doesn't match directly, return the primary featured product (Aurora Brass Desk Lamp)
-  return products[0] || null;
+  return found || null;
 }

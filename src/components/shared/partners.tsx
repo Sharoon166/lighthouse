@@ -9,13 +9,13 @@ export function Partners() {
         description="We work directly with globally recognized manufacturers, so every fixture we sell is backed by proven engineering, not just looks."
         noCta
       />
-      <div className="flex items-center max-sm:justify-center flex-wrap gap-6 sm:gap-x-18 sm:gay-y-10">
+      <div className="flex items-center max-sm:justify-center  flex-wrap gap-6 sm:gap-x-18 sm:gay-y-10">
         {partners.map((partner) => (
           <img
             key={partner.id}
             src={partner.imageURL}
             alt={partner.name}
-            className="size-32"
+            className="size-32 object-contain"
             title={partner.name}
             suppressHydrationWarning
           />

@@ -8,6 +8,7 @@ import { ProductImageGallery } from "@/components/shop/product-image-gallery";
 import { ProductPurchasePanel } from "@/components/shop/product-purchase-panel";
 import { ProductCard } from "@/components/shop/product-card";
 import { fetchProductBySlug, fetchStoreProducts } from "@/lib/shop-data";
+import { ProductDetailClient } from "./product-detail-client";
 
 interface ProductPageProps {
   params: Promise<{
@@ -64,12 +65,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
       {/* Main Product Info Section */}
       <section className="py-8 md:py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Left: Image Gallery */}
-          <ProductImageGallery images={product.images} name={product.name} />
-
-          {/* Right: Purchase & Info Panel */}
-          <ProductPurchasePanel product={product} />
+        <div className="mx-auto max-w-7xl">
+          <ProductDetailClient product={product} />
         </div>
         </section>
     </div>

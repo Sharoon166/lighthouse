@@ -4,34 +4,18 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { createPortal } from "react-dom";
 import {
   Cancel01Icon,
-  DeliveryTruck01Icon,
-  CheckmarkBadge01Icon,
-  ArrowReloadVerticalIcon,
-  StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import Image from "next/image";
 import Link from "next/link";
-import { formatCurrency } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { ProductImageGallery } from "./product-image-gallery";
+import { ProductPurchasePanel } from "./product-purchase-panel";
+import type { ShopProductItem } from "@/lib/shop-data";
 
-interface QuickViewProduct {
-  id: string;
-  name: string;
-  slug: string;
-  tag: string;
-  price: number;
-  originalPrice?: number;
-  discountPercentage?: number;
-  shortDescription: string;
-  images: string[];
-  finishes: { name: string; hex: string }[];
-  ratings: { average: number; count: number };
-  inStock: boolean;
-}
+
 
 interface QuickViewContextType {
-  open: (product: QuickViewProduct) => void;
+  open: (product: ShopProductItem) => void;
   close: () => void;
 }
 
@@ -41,9 +25,9 @@ const QuickViewContext = createContext<QuickViewContextType>({
 });
 
 export function QuickViewProvider({ children }: { children: React.ReactNode }) {
-  const [product, setProduct] = useState<QuickViewProduct | null>(null);
+  const [product, setProduct] = useState<ShopProductItem | null>(null);
 
-  const open = useCallback((p: QuickViewProduct) => setProduct(p), []);
+  const open = useCallback((p: ShopProductItem) => setProduct(p), []);
   const close = useCallback(() => setProduct(null), []);
 
   useEffect(() => {
@@ -71,14 +55,9 @@ function QuickViewPanel({
   product,
   onClose,
 }: {
-  product: QuickViewProduct;
+  product: ShopProductItem;
   onClose: () => void;
 }) {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedFinish, setSelectedFinish] = useState(
-    product.finishes[0]?.name || "",
-  );
-
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -119,164 +98,17 @@ function QuickViewPanel({
 
         {/* Top section: Image gallery + Product info (matches detail page layout) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-          {/* Left: Image gallery — mirrors ProductImageGallery */}
-          <div className="flex flex-col-reverse gap-3 p-4 md:p-6 ">
-            {/* Thumbnail strip — vertical on desktop, horizontal on mobile */}
-            {product.images.length > 1 && (
-              <div className="flex md:flex-col gap-2 shrink-0 overflow-x-auto md:overflow-y-auto md:max-h-[500px]">
-                {product.images.map((img, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => setSelectedImage(i)}
-                    className={cn(
-                      "relative size-16 md:size-20 shrink-0 overflow-hidden border-2 bg-muted/20 transition-all",
-                      i === selectedImage
-                        ? "border-gold"
-                        : "border-border/60 hover:border-border",
-                    )}
-                  >
-                    <Image
-                      src={img}
-                      alt={`${product.name} ${i + 1}`}
-                      fill
-                      sizes="80px"
-                      className="object-contain"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Main image */}
-            <div className="relative flex-1 aspect-square overflow-hidden">
-              <Image
-                src={product.images[selectedImage] || product.images[0]}
-                alt={product.name}
-                fill
-                className="object-contain transition-all duration-300"
-                sizes="(max-width: 768px) 100vw, 50vw"
-                priority
-              />
-            </div>
+          {/* Left: Image gallery using ProductImageGallery component */}
+          <div className="p-4 md:p-6 sticky top-0">
+            <ProductImageGallery
+              images={product.images}
+              name={product.name}
+            />
           </div>
 
-          {/* Right: Product info — mirrors ProductPurchasePanel */}
-          <div className="flex flex-col gap-5 p-6 md:p-8">
-            {/* Category tag */}
-            <span className="text-xs font-semibold uppercase tracking-widest text-gold">
-              {product.tag}
-            </span>
-
-            {/* Product name */}
-            <h2 className="font-serif text-2xl md:text-3xl font-normal tracking-tight text-foreground">
-              {product.name}
-            </h2>
-
-            {/* Rating */}
-            {/*<div className="flex items-center gap-2 text-sm">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <HugeiconsIcon
-                    key={i}
-                    icon={StarIcon}
-                    size={14}
-                    className={cn(
-                      "text-amber-400",
-                      i < Math.round(product.ratings.average)
-                        ? "fill-amber-400"
-                        : "fill-muted text-muted",
-                    )}
-                  />
-                ))}
-              </div>
-              <span className="font-semibold text-foreground">
-                {product.ratings.average.toFixed(1)}
-              </span>
-              <span className="text-muted-foreground">
-                ({product.ratings.count} reviews)
-              </span>
-            </div>*/}
-
-            {/* Price */}
-            <div className="flex items-center gap-3">
-              <span className="font-serif text-2xl font-semibold text-foreground">
-                {formatCurrency(product.price)}
-              </span>
-              {product.originalPrice && (
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatCurrency(product.originalPrice)}
-                </span>
-              )}
-              {product.discountPercentage && (
-                <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-600">
-                  -{product.discountPercentage}%
-                </span>
-              )}
-            </div>
-
-            {/* Description */}
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
-              {product.shortDescription}
-            </p>
-
-            {/* Finishes */}
-            {product.finishes.length > 0 && (
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Finish
-                </label>
-                <div className="flex flex-wrap items-center gap-2">
-                  {product.finishes.map((finish) => (
-                    <button
-                      key={finish.name}
-                      type="button"
-                      onClick={() => setSelectedFinish(finish.name)}
-                      className={cn(
-                        "flex flex-col items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
-                        selectedFinish === finish.name
-                          ? " text-gold"
-                          : "text-muted-foreground hover:border-foreground",
-                      )}
-                    >
-                      <span
-                        className="size-8 rounded-full border border-black/20"
-                        style={{ backgroundColor: finish.hex }}
-                      />
-                      {finish.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Divider */}
-            <div className="h-px bg-border" />
-
-            {/* Trust badges */}
-            <div className="grid grid-cols-1 gap-2.5 text-xs text-muted-foreground">
-              <div className="flex items-center gap-2.5">
-                <HugeiconsIcon icon={DeliveryTruck01Icon} size={15} className="text-gold shrink-0" />
-                <span>3–5 business days delivery</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <HugeiconsIcon icon={ArrowReloadVerticalIcon} size={15} className="text-gold shrink-0" />
-                <span>7 days easy return guarantee</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <HugeiconsIcon icon={CheckmarkBadge01Icon} size={15} className="text-gold shrink-0" />
-                <span>2-year warranty on electrics</span>
-              </div>
-            </div>
-
-            {/* View full details link */}
-            <Link
-              href={`/products/${product.slug}`}
-              className="mt-2 flex items-center justify-center gap-2 rounded-lg border border-border py-3 text-xs font-bold uppercase tracking-widest text-foreground transition-colors hover:bg-muted"
-            >
-              View Full Details
-              <span className="text-gold">&rarr;</span>
-            </Link>
+          {/* Right: Collapsed ProductPurchasePanel */}
+          <div className="p-4 md:p-6">
+            <ProductPurchasePanel product={product} compact={true} />
           </div>
         </div>
       </div>

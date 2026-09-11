@@ -727,7 +727,7 @@ export function ProjectForm({
                     />
                   </div>
 
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Label htmlFor="budget-range">Budget Range</Label>
                     <Input
                       id="budget-range"
@@ -735,7 +735,7 @@ export function ProjectForm({
                       onChange={(event) => setBudgetRange(event.target.value)}
                       placeholder="e.g. $50,000 - $100,000"
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="space-y-2">

@@ -190,11 +190,11 @@ export const footerNav = [
   {
     heading: "Products",
     links: [
-      { label: "Pendant Lights", href: "/products?category=pendant-lights" },
-      { label: "Chandeliers", href: "/products?category=chandeliers" },
-      { label: "Wall Lights", href: "/products?category=wall-lights" },
-      { label: "Commercial Lights", href: "/products?category=commercial" },
-      { label: "Gate & Garden Lights", href: "/products?category=outdoor" },
+      { label: "Pendant Lights", href: "/category/pendant-lights" },
+      { label: "Chandeliers", href: "/category/chandeliers" },
+      { label: "Wall Lights", href: "/category/wall-lights" },
+      { label: "Commercial Lights", href: "/category/commercial" },
+      { label: "Gate & Garden Lights", href: "/category/outdoor" },
     ],
   },
   {
@@ -358,27 +358,22 @@ export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number]["value"];
 export const partners = [
   {
     id: "partner-001",
-    name: "Siemens",
-    imageURL: "https://cdn.simpleicons.org/siemens",
+    name: "Opple",
+    imageURL: "/brands/opple-logo.png",
   },
   {
     id: "partner-002",
-    name: "Schneider Electric",
-    imageURL: "https://cdn.simpleicons.org/schneiderelectric",
+    name: "Philips",
+    imageURL: "/partners/philips.png",
   },
   {
     id: "partner-003",
     name: "Panasonic",
-    imageURL: "https://cdn.simpleicons.org/panasonic",
+    imageURL: "/partners/panasonic.png",
   },
   {
     id: "partner-004",
-    name: "Samsung",
-    imageURL: "https://cdn.simpleicons.org/samsung",
-  },
-  {
-    id: "partner-005",
-    name: "IKEA",
-    imageURL: "https://cdn.simpleicons.org/ikea",
+    name: "OSRAM",
+    imageURL: "/partners/osram.png",
   },
 ];

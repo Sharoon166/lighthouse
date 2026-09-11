@@ -8,6 +8,7 @@ import { Clients } from "@/components/shared/clients";
 import { Partners } from "@/components/shared/partners";
 import { Button } from "@/components/ui/button";
 import { aboutStats, ceoMessage, howWeWork } from "@/lib/constants";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About | Lighthouse",
@@ -28,9 +29,11 @@ export default function AboutPage() {
           <p className="max-w-2xl">
             Premium lighting, carefully chosen for quality, style, and performance. Beautiful fixtures that make every space feel warm and inviting.
           </p>
-          <Button size="lg" className="mt-2">
-            Learn More <HugeiconsIcon icon={ArrowRight02Icon} />
-          </Button>
+          <Link href="#ceo-message">
+            <Button size="lg" className="mt-2">
+              Learn More <HugeiconsIcon icon={ArrowRight02Icon} />
+            </Button>
+          </Link>
         </div>
 
         <Image
@@ -108,7 +111,7 @@ export default function AboutPage() {
       </div>
 
       {/* CEO Message */}
-      <section className="bg-muted">
+      <section id="ceo-message" className="bg-muted">
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Quote side */}

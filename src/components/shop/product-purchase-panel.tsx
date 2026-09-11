@@ -12,7 +12,7 @@ import {
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { RollingNumber } from "@kitlangton/rolling-number/react";
 import "@kitlangton/rolling-number/styles.css";
 import { formatCurrency } from "@/lib/format";
@@ -24,9 +24,11 @@ import Link from "next/link";
 
 interface ProductPurchasePanelProps {
   product: ShopProductItem;
+  onVariantChange?: (variant: ShopProductVariant | undefined) => void;
+  compact?: boolean;
 }
 
-export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
+export function ProductPurchasePanel({ product, onVariantChange, compact = false }: ProductPurchasePanelProps) {
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string>
   >(() => {
@@ -52,14 +54,21 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
     if (product.variants.length === 0) return undefined;
     return (
       product.variants.find((v) =>
-        Object.entries(selectedAttributes).every(
-          ([key, val]) => v.attributes[key] === val,
+        product.variantAttributes.every((key) =>
+          selectedAttributes[key] === v.attributes[key],
         ),
       ) ||
       product.variants.find((v) => v.isDefault) ||
       product.variants[0]
     );
-  }, [product.variants, selectedAttributes]);
+  }, [product.variants, selectedAttributes, product.variantAttributes]);
+
+  // Notify parent component when variant changes
+  useEffect(() => {
+    if (selectedVariant && onVariantChange) {
+      onVariantChange(selectedVariant);
+    }
+  }, [selectedVariant, onVariantChange]);
 
   const attributeOptions = useMemo(() => {
     const options: Record<string, string[]> = {};
@@ -85,7 +94,9 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
       const next = { ...prev, [key]: value };
       // Find the variant that matches the new attribute combination
       const nextVariant = product.variants.find((v) =>
-        Object.entries(next).every(([k, val]) => v.attributes[k] === val),
+        product.variantAttributes.every((attrKey) =>
+          next[attrKey] === v.attributes[attrKey],
+        ),
       );
       // Clamp quantity: if new stock is lower, drop down; otherwise keep current
       if (nextVariant) {
@@ -347,6 +358,7 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
             type="button"
             variant="secondary"
             size="lg"
+            nativeButton={false}
             className="w-full tracking-widest uppercase transition-colors hover:bg-gold hover:text-slate-950"
             render={
               <Link href="/contact">
@@ -397,92 +409,107 @@ export function ProductPurchasePanel({ product }: ProductPurchasePanelProps) {
         </div>
       </div>
 
-      {/* Accordions */}
-      <div className="border-t border-border/60 pt-4 space-y-3">
-        {/* Materials & Care */}
-        <div className="border-b border-border/60 pb-3">
-          <button
-            type="button"
-            onClick={() => toggleAccordion("materialsAndCare")}
-            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
-          >
-            <span>Materials &amp; Care</span>
-            <HugeiconsIcon
-              icon={ChevronDownIcon}
-              size={20}
-              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.materialsAndCare ? "rotate-180" : ""}`}
-            />
-          </button>
-          {openAccordions.materialsAndCare && (
-            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-              {product.content.materialsAndCare}
-            </div>
-          )}
-        </div>
+      {/* Accordions - Hidden in compact mode */}
+      {!compact && (
+        <div className="border-t border-border/60 pt-4 space-y-3">
+          {/* Materials & Care */}
+          <div className="border-b border-border/60 pb-3">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("materialsAndCare")}
+              className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
+            >
+              <span>Materials &amp; Care</span>
+              <HugeiconsIcon
+                icon={ChevronDownIcon}
+                size={20}
+                className={`text-muted-foreground transition-transform duration-200 ${openAccordions.materialsAndCare ? "rotate-180" : ""}`}
+              />
+            </button>
+            {openAccordions.materialsAndCare && (
+              <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
+                {product.content.materialsAndCare}
+              </div>
+            )}
+          </div>
 
-        {/* Shipping & Returns */}
-        <div className="border-b border-border/60 pb-3">
-          <button
-            type="button"
-            onClick={() => toggleAccordion("shippingAndReturns")}
-            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
-          >
-            <span>Shipping &amp; Returns</span>
-            <HugeiconsIcon
-              icon={ChevronDownIcon}
-              size={20}
-              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.shippingAndReturns ? "rotate-180" : ""}`}
-            />
-          </button>
-          {openAccordions.shippingAndReturns && (
-            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-              {product.content.shippingAndReturns}
-            </div>
-          )}
-        </div>
+          {/* Shipping & Returns */}
+          <div className="border-b border-border/60 pb-3">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("shippingAndReturns")}
+              className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
+            >
+              <span>Shipping &amp; Returns</span>
+              <HugeiconsIcon
+                icon={ChevronDownIcon}
+                size={20}
+                className={`text-muted-foreground transition-transform duration-200 ${openAccordions.shippingAndReturns ? "rotate-180" : ""}`}
+              />
+            </button>
+            {openAccordions.shippingAndReturns && (
+              <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
+                {product.content.shippingAndReturns}
+              </div>
+            )}
+          </div>
 
-        {/* Payment */}
-        <div className="border-b border-border/60 pb-3">
-          <button
-            type="button"
-            onClick={() => toggleAccordion("payment")}
-            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
-          >
-            <span>Payment</span>
-            <HugeiconsIcon
-              icon={ChevronDownIcon}
-              size={20}
-              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.payment ? "rotate-180" : ""}`}
-            />
-          </button>
-          {openAccordions.payment && (
-            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-              {product.content.payment}
-            </div>
-          )}
-        </div>
+          {/* Payment */}
+          <div className="border-b border-border/60 pb-3">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("payment")}
+              className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
+            >
+              <span>Payment</span>
+              <HugeiconsIcon
+                icon={ChevronDownIcon}
+                size={20}
+                className={`text-muted-foreground transition-transform duration-200 ${openAccordions.payment ? "rotate-180" : ""}`}
+              />
+            </button>
+            {openAccordions.payment && (
+              <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
+                {product.content.payment}
+              </div>
+            )}
+          </div>
 
-        {/* Installation & Bulbs */}
-        <div className="border-b border-border/60 pb-3">
-          <button
-            type="button"
-            onClick={() => toggleAccordion("installationAndBulbs")}
-            className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
-          >
-            <span>Installation &amp; Bulbs</span>
-            <HugeiconsIcon
-              icon={ChevronDownIcon}
-              size={20}
-              className={`text-muted-foreground transition-transform duration-200 ${openAccordions.installationAndBulbs ? "rotate-180" : ""}`}
-            />
-          </button>
-          {openAccordions.installationAndBulbs && (
-            <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-              {product.content.installationAndBulbs}
-            </div>
-          )}
+          {/* Installation & Bulbs */}
+          <div className="border-b border-border/60 pb-3">
+            <button
+              type="button"
+              onClick={() => toggleAccordion("installationAndBulbs")}
+              className="flex w-full items-center justify-between py-2 text-left font-heading text-xl font-semibold text-black"
+            >
+              <span>Installation &amp; Bulbs</span>
+              <HugeiconsIcon
+                icon={ChevronDownIcon}
+                size={20}
+                className={`text-muted-foreground transition-transform duration-200 ${openAccordions.installationAndBulbs ? "rotate-180" : ""}`}
+              />
+            </button>
+            {openAccordions.installationAndBulbs && (
+              <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
+                {product.content.installationAndBulbs}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* View Full Details Link - Only in compact mode */}
+      {compact && (
+        <div className="mt-6 pt-4 border-t border-border/60">
+          <Link
+            href={`/products/${product.slug}`}
+            className="flex items-center justify-center gap-2 rounded-lg border border-border py-3 text-xs font-bold uppercase tracking-widest text-foreground transition-colors hover:bg-muted"
+          >
+            View Full Details
+            <span className="text-gold">&rarr;</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

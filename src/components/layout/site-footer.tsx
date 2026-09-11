@@ -1,8 +1,22 @@
 import Link from "next/link";
 import LogoImage from "@/components/shared/logo-img";
 import { footerNav } from "@/lib/constants";
+import { fetchStoreCategories } from "@/lib/shop-data";
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const categories = await fetchStoreCategories();
+
+  const nav = [
+    {
+      heading: "Products",
+      links: categories.map((c) => ({
+        label: c.name,
+        href: `/categories/${c.slug}`,
+      })),
+    },
+    ...footerNav.filter((g) => g.heading !== "Products"),
+  ];
+
   return (
     <footer className="mt-10 px-6 pt-16 bg-noise">
       <div className="container">
@@ -16,7 +30,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-14 grid grid-cols-2 gap-10 md:grid-cols-4">
-          {footerNav.map((group) => (
+          {nav.map((group) => (
             <div key={group.heading}>
               <h4 className="font-semibold tracking-widest text-gray-200 uppercase">
                 {group.heading}

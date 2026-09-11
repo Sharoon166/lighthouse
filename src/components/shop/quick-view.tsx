@@ -82,7 +82,7 @@ function QuickViewPanel({
         aria-modal="true"
         aria-label={product.name}
         className={cn(
-          "relative z-10 w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-background shadow-2xl",
+          "relative z-10 w-full max-w-5xl max-h-[90vh] rounded-2xl border border-border bg-background shadow-2xl overflow-hidden",
           "animate-in fade-in-0 zoom-in-95 duration-200",
         )}
       >
@@ -97,9 +97,9 @@ function QuickViewPanel({
         </button>
 
         {/* Top section: Image gallery + Product info (matches detail page layout) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-h-[90vh]">
           {/* Left: Image gallery using ProductImageGallery component */}
-          <div className="p-4 md:p-6 sticky top-0">
+          <div className="p-4 md:p-6 md:sticky md:top-0 md:self-start md:max-h-[90vh] md:overflow-y-auto">
             <ProductImageGallery
               images={product.images}
               name={product.name}
@@ -107,7 +107,7 @@ function QuickViewPanel({
           </div>
 
           {/* Right: Collapsed ProductPurchasePanel */}
-          <div className="p-4 md:p-6">
+          <div className="p-4 md:p-6 md:overflow-y-auto md:max-h-[90vh]">
             <ProductPurchasePanel product={product} compact={true} />
           </div>
         </div>

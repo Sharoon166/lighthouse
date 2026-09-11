@@ -9,6 +9,15 @@ export const metadata: Metadata = {
   title: "Projects | Lighthouse",
   description:
     "Explore our lighting projects, where thoughtful design and carefully selected fixtures transform spaces into warm, elegant, and inviting environments.",
+  openGraph: {
+    title: "Projects | Lighthouse",
+    description:
+      "Explore our lighting projects, where thoughtful design and carefully selected fixtures transform spaces into warm, elegant, and inviting environments.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/projects",
+  },
 };
 
 export default async function ProjectsPage() {

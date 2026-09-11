@@ -19,7 +19,7 @@ export async function generateMetadata({
 
   if (!post || post.status !== "published") {
     return {
-      title: "Post Not Found",
+      title: "Post Not Found | Lighthouse",
     };
   }
 
@@ -36,7 +36,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const jsonLd = generateBlogPostJsonLd(post, process.env.NEXT_PUBLIC_SITE_URL);
 
-  // Fetch recent posts for sidebar (latest published, excluding current)
   const recentResult = await listBlogPosts({
     page: 1,
     pageSize: 5,
@@ -47,7 +46,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     .filter((p) => p.slug !== post.slug)
     .slice(0, 4);
 
-  // Fetch related posts by first tag, excluding current post
   const firstTag = post.tags[0] || "";
   const relatedResult = firstTag
     ? await listBlogPosts({

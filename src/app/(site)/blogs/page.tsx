@@ -9,6 +9,15 @@ export const metadata: Metadata = {
   title: "Blog | Lighthouse",
   description:
     "Discover lighting design tips, trends, and inspiration for your home and commercial spaces.",
+  openGraph: {
+    title: "Blog | Lighthouse",
+    description:
+      "Discover lighting design tips, trends, and inspiration for your home and commercial spaces.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/blogs",
+  },
 };
 
 export default async function BlogPage() {

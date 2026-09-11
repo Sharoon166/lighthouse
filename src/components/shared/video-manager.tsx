@@ -105,7 +105,6 @@ export function VideoManager({
 
   const handleRemove = async (index: number) => {
     const videoToRemove = videos[index];
-    console.log("[VideoManager] removing video:", videoToRemove.publicId);
 
     // Optimistically update UI
     onChange(videos.filter((_, i) => i !== index));
@@ -113,8 +112,7 @@ export function VideoManager({
     // Delete from Cloudinary if deleteVideo function is provided
     if (deleteVideo && videoToRemove.publicId) {
       try {
-        const result = await deleteVideo(videoToRemove.publicId);
-        console.log("[VideoManager] delete result:", result);
+        await deleteVideo(videoToRemove.publicId);
       } catch (error) {
         console.error("Failed to delete video from cloud:", error);
       }

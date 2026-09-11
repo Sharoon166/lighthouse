@@ -1,14 +1,27 @@
 import type { Metadata } from "next";
 import { CTA } from "@/components/hero/cta";
+import { PageHero } from "@/components/shared/page-hero";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
-import { fetchStoreProducts, fetchFilterMetadata, type ShopProductItem } from "@/lib/shop-data";
-import { PageHero } from "@/components/shared/page-hero";
+import {
+  fetchFilterMetadata,
+  fetchStoreProducts,
+  type ShopProductItem,
+} from "@/lib/shop-data";
 
 export const metadata: Metadata = {
-  title: "Our Collection · Light House",
+  title: "Our Collection | Lighthouse",
   description:
     "Explore our curated lighting collections, thoughtfully selected to bring warmth, character, and style to every space.",
+  openGraph: {
+    title: "Our Collection | Lighthouse",
+    description:
+      "Explore our curated lighting collections, thoughtfully selected to bring warmth, character, and style to every space.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/products",
+  },
 };
 
 interface ProductsPageProps {
@@ -58,7 +71,12 @@ export default async function ProductsPage({
     JSON.stringify(newArrivalsResult.products.slice(0, 20)),
   );
 
-  const showNewArrivals = !categorySlug && !search && !brandSlug?.length && !priceRange?.length && !sortBy;
+  const showNewArrivals =
+    !categorySlug &&
+    !search &&
+    !brandSlug?.length &&
+    !priceRange?.length &&
+    !sortBy;
 
   return (
     <main className="min-h-screen bg-background">
@@ -95,19 +113,19 @@ export default async function ProductsPage({
 
       {/* Main Collection Container */}
       <section className="container">
-          <div className="flex flex-col lg:flex-row gap-8">
-            <ProductFiltersSidebar
-              categories={filterMeta.categories}
-              brands={filterMeta.brands}
-              priceRange={filterMeta.priceRange}
-              products={products}
-            />
+        <div className="flex flex-col lg:flex-row gap-8">
+          <ProductFiltersSidebar
+            categories={filterMeta.categories}
+            brands={filterMeta.brands}
+            priceRange={filterMeta.priceRange}
+            products={products}
+          />
 
-            {/* Product Grid */}
-            <div className="flex-1 min-w-0 mt-6 lg:mt-0">
-              <ProductGridToolbar products={products} total={total} />
-            </div>
+          {/* Product Grid */}
+          <div className="flex-1 min-w-0 mt-6 lg:mt-0">
+            <ProductGridToolbar products={products} total={total} />
           </div>
+        </div>
       </section>
 
       {/* CTA Banner */}

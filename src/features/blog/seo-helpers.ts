@@ -116,7 +116,7 @@ export function generateBlogPostJsonLd(
     description: post.summary,
     image: post.heroImage?.url,
     datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
+    dateModified: post.updatedAt || post.publishedAt,
     author: {
       "@type": "Person",
       name: post.author.name,

@@ -16,8 +16,8 @@ import { slugify } from "@/lib/utils";
 import {
   type Project,
   type ProjectImage,
-  type ProjectVideo,
   ProjectModel,
+  type ProjectVideo,
 } from "@/models/project";
 import { projectInputSchema } from "./validation";
 
@@ -66,7 +66,6 @@ function flattenValidation(error: z.ZodError) {
 }
 
 function buildProjectData(data: z.infer<typeof projectInputSchema>) {
-  console.log("[buildProjectData] videos:", JSON.stringify(data.videos));
   return {
     title: data.title,
     subtitle: data.subtitle,
@@ -235,12 +234,6 @@ export async function updateProject(
 
     await existing.save();
 
-    // Debug: verify videos were saved
-    const saved = await ProjectModel.findOne({ slug: nextSlug, deletedAt: null })
-      .select("videos")
-      .lean();
-    console.log("[updateProject] saved videos count:", saved?.videos?.length ?? 0);
-
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/edit/${nextSlug}`);
     revalidatePath(`/projects/${nextSlug}`);
@@ -266,8 +259,6 @@ const cachedGetProject = unstable_cache(
       deletedAt: null,
     }).lean();
     if (!document) return null;
-
-    console.log("[getProject] raw videos from DB:", document.videos?.length ?? 0);
 
     return {
       slug: document.slug,
@@ -738,10 +729,8 @@ export async function uploadProjectVideo(
 export async function deleteProjectVideo(
   publicId: string,
 ): Promise<{ ok: boolean }> {
-  console.log("[deleteProjectVideo] deleting:", publicId);
   try {
     await deleteVideo(publicId);
-    console.log("[deleteProjectVideo] deleted successfully");
     return { ok: true };
   } catch (error) {
     console.error("[deleteProjectVideo] failed:", error);

@@ -3,12 +3,21 @@ import { CTA } from "@/components/hero/cta";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
-import { fetchStoreProducts, fetchFilterMetadata } from "@/lib/shop-data";
+import { fetchFilterMetadata, fetchStoreProducts } from "@/lib/shop-data";
 
 export const metadata: Metadata = {
-  title: "OPPLE Collection · Light House",
+  title: "OPPLE Collection | Lighthouse",
   description:
-    "Explore our curated OPPLE lighting collection, official distributor in Rawalpindi & Islamabad.",
+    "Explore our curated OPPLE lighting collection, official distributor in Rawalpindi and Islamabad.",
+  openGraph: {
+    title: "OPPLE Collection | Lighthouse",
+    description:
+      "Explore our curated OPPLE lighting collection, official distributor in Rawalpindi and Islamabad.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/opple",
+  },
 };
 
 interface OpplePageProps {

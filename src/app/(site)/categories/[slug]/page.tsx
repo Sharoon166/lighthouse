@@ -2,17 +2,18 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { CTA } from "@/components/hero/cta";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
 import {
   getCategoryBySlug,
   getSubcategories,
 } from "@/features/shop/actions/category-actions";
+import { generateSeoMetadata } from "@/lib/seo-helpers";
 import {
-  fetchStoreProducts,
   fetchFilterMetadata,
+  fetchStoreProducts,
   type ShopProductItem,
 } from "@/lib/shop-data";
 
@@ -36,13 +37,15 @@ export async function generateMetadata({
     return { title: "Category Not Found | Lighthouse" };
   }
 
-  return {
+  return generateSeoMetadata({
     title: category.seo?.metaTitle || `${category.name} | Lighthouse`,
     description:
       category.seo?.metaDescription ||
       category.description ||
       `Explore our ${category.name} collection at Lighthouse.`,
-  };
+    path: `/categories/${category.slug}`,
+    image: category.image,
+  });
 }
 
 export default async function CategoryPage({
@@ -58,7 +61,6 @@ export default async function CategoryPage({
   const categoryId = String((category as any)._id);
   const subcategories = await getSubcategories(categoryId);
 
-  // Parse search params for product fetching
   const brandSlug = Array.isArray(sp.brand)
     ? sp.brand
     : sp.brand
@@ -70,7 +72,6 @@ export default async function CategoryPage({
       ? [sp.price]
       : undefined;
 
-  // Fetch products for this category
   const [{ products: rawProducts, total }, filterMeta] = await Promise.all([
     fetchStoreProducts({
       categorySlug: slug,
@@ -84,7 +85,6 @@ export default async function CategoryPage({
 
   const products: ShopProductItem[] = JSON.parse(JSON.stringify(rawProducts));
 
-  // Filter out category from sidebar filters (we don't want category filter on category page)
   const filteredBrands = filterMeta.brands.filter((b) => {
     return products.some(
       (p) =>
@@ -98,10 +98,8 @@ export default async function CategoryPage({
 
   return (
     <main className="min-h-screen bg-background">
-      {/* Hero Section — About-page style header */}
-      <section className="bg-noise pb-0 lg:pt-0 grid lg:grid-cols-5 place-items-center overflow-hidden">
-        {/* LEFT: Text content */}
-        <div className="container max-lg:pt-10 lg:ml-28 space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10">
+      <section className="bg-noise grid overflow-hidden pb-0 lg:grid-cols-5 lg:pt-0 place-items-center">
+        <div className="container space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10 max-lg:pt-10 lg:ml-28">
           <Breadcrumb
             items={[
               { label: "Home", href: "/" },
@@ -115,28 +113,16 @@ export default async function CategoryPage({
           )}
         </div>
 
-        {/* RIGHT: Image */}
         <Image
           src={category.image || "/about-image.webp"}
           width={1024}
           height={1024}
           priority
           alt={category.name}
-          className="
-            max-h-96
-            object-contain
-            w-full
-            lg:col-start-3
-            lg:col-span-5
-            lg:row-start-1
-            brightness-125
-            transition-all
-            duration-500
-          "
+          className="max-h-96 w-full object-contain brightness-125 transition-all duration-500 lg:col-start-3 lg:col-span-5 lg:row-start-1"
         />
       </section>
 
-      {/* Subcategories as badges/mini cards */}
       {subcategories.length > 0 && (
         <section className="p-0">
           <div className="container py-6">
@@ -145,7 +131,7 @@ export default async function CategoryPage({
                 <Link
                   key={sub.id}
                   href={`/categories/${sub.slug}`}
-                  className="group flex items-center gap-3 shrink-0 rounded-full border border-border bg-background px-4 py-2.5 transition-all hover:border-gold hover:bg-gold/5"
+                  className="group flex shrink-0 items-center gap-3 rounded-full border border-border bg-background px-4 py-2.5 transition-all hover:border-gold hover:bg-gold/5"
                 >
                   <div className="relative size-8 shrink-0 overflow-hidden rounded-full bg-muted">
                     {sub.image && (
@@ -158,7 +144,7 @@ export default async function CategoryPage({
                       />
                     )}
                   </div>
-                  <span className="text-sm font-medium whitespace-nowrap group-hover:text-gold transition-colors">
+                  <span className="whitespace-nowrap text-sm font-medium transition-colors group-hover:text-gold">
                     {sub.name}
                   </span>
                   {sub.productCount > 0 && (
@@ -173,9 +159,8 @@ export default async function CategoryPage({
         </section>
       )}
 
-      {/* Product Grid with Filters */}
       <section className="container">
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col gap-8 lg:flex-row">
           <ProductFiltersSidebar
             categories={[]}
             brands={filteredBrands}
@@ -183,14 +168,13 @@ export default async function CategoryPage({
             products={products}
           />
 
-          <div className="flex-1 min-w-0 mt-6 lg:mt-0">
+          <div className="min-w-0 flex-1 mt-6 lg:mt-0">
             <ProductGridToolbar products={products} total={total} />
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <div className="mt-8 container">
+      <div className="container mt-8">
         <CTA />
       </div>
     </main>

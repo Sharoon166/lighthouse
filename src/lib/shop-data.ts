@@ -78,6 +78,12 @@ export interface ShopProductItem {
   designStyle: string;
   material: string;
   inStock: boolean;
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+    focusKeyword: string;
+    noIndex: boolean;
+  };
 }
 
 export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
@@ -669,7 +675,11 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
         { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
         {
           $group: {
-            _id: { name: "$brand.name", slug: "$brand.slug", logo: "$brand.logo" },
+            _id: {
+              name: "$brand.name",
+              slug: "$brand.slug",
+              logo: "$brand.logo",
+            },
             count: { $sum: 1 },
           },
         },
@@ -763,12 +773,14 @@ export async function fetchStoreProducts(
             id: String(v._id),
             sku: v.sku,
             title: v.title,
-            attributes: v.attributes instanceof Map
-              ? Object.fromEntries(v.attributes)
-              : (v.attributes as Record<string, string> || {}),
+            attributes:
+              v.attributes instanceof Map
+                ? Object.fromEntries(v.attributes)
+                : (v.attributes as Record<string, string>) || {},
             colorHex: v.colorHex || "",
             price: v.salePrice || v.price,
-            salePrice: v.salePrice && v.salePrice < v.price ? v.salePrice : undefined,
+            salePrice:
+              v.salePrice && v.salePrice < v.price ? v.salePrice : undefined,
             images: v.images?.length ? v.images : [],
             stock: v.stock,
             availability: v.availability,
@@ -867,6 +879,12 @@ export async function fetchStoreProducts(
           designStyle: "Modern",
           material: "Brass",
           inStock: p.inStock ?? true,
+          seo: {
+            metaTitle: p.seo?.metaTitle || "",
+            metaDescription: p.seo?.metaDescription || "",
+            focusKeyword: p.seo?.focusKeyword || "",
+            noIndex: p.seo?.noIndex ?? false,
+          },
         };
       });
     }

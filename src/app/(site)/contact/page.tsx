@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   title: "Contact | Lighthouse",
   description:
     "Get in touch with Lighthouse — questions, complaints, or product help. Visit our showrooms in Islamabad, Lahore, and Karachi.",
+  openGraph: {
+    title: "Contact | Lighthouse",
+    description:
+      "Get in touch with Lighthouse — questions, complaints, or product help. Visit our showrooms in Islamabad, Lahore, and Karachi.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/contact",
+  },
 };
 
 export default function ContactPage() {

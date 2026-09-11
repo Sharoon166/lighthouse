@@ -2,18 +2,27 @@ import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { CTA } from "@/components/hero/cta";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Clients } from "@/components/shared/clients";
 import { Partners } from "@/components/shared/partners";
 import { Button } from "@/components/ui/button";
 import { aboutStats, ceoMessage, howWeWork } from "@/lib/constants";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About | Lighthouse",
   description:
     "Learn about Lighthouse — our craftsmanship, approach, and the team behind Pakistan's premium lighting solutions.",
+  openGraph: {
+    title: "About | Lighthouse",
+    description:
+      "Learn about Lighthouse — our craftsmanship, approach, and the team behind Pakistan's premium lighting solutions.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default function AboutPage() {
@@ -27,7 +36,9 @@ export default function AboutPage() {
           />
           <h1 className="lg:text-5xl">About Lighthouse</h1>
           <p className="max-w-2xl">
-            Premium lighting, carefully chosen for quality, style, and performance. Beautiful fixtures that make every space feel warm and inviting.
+            Premium lighting, carefully chosen for quality, style, and
+            performance. Beautiful fixtures that make every space feel warm and
+            inviting.
           </p>
           <Link href="#ceo-message">
             <Button size="lg" className="mt-2">
@@ -60,10 +71,7 @@ export default function AboutPage() {
         <div className="container">
           <div className="w-full grid grid-cols-2 md:grid-cols-4 divide-x max-md:divide-y divide-border border">
             {aboutStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="py-10 px-6 space-y-2"
-              >
+              <div key={stat.label} className="py-10 px-6 space-y-2">
                 <p className="text-4xl font-heading font-semibold text-primary-foreground">
                   {stat.value}
                 </p>

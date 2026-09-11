@@ -36,6 +36,7 @@ export type BlogPostDraftData = {
   };
   status: "draft" | "published";
   publishedAt: string | null;
+  updatedAt: string | null;
   featured: boolean;
   heroImage: BlogPostHeroImage | null;
   seo: {
@@ -270,6 +271,7 @@ const cachedGetBlogPost = unstable_cache(
       publishedAt: document.publishedAt
         ? document.publishedAt.toISOString()
         : null,
+      updatedAt: document.updatedAt ? document.updatedAt.toISOString() : null,
       featured: document.featured,
       heroImage: document.heroImage,
       seo: {

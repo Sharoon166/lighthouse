@@ -74,6 +74,8 @@ export interface Product {
   seo: {
     metaTitle: string;
     metaDescription: string;
+    focusKeyword: string;
+    noIndex: boolean;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -145,6 +147,8 @@ const seoSchema = new Schema(
       trim: true,
       maxlength: 160,
     },
+    focusKeyword: { type: String, default: "", trim: true, maxlength: 100 },
+    noIndex: { type: Boolean, default: false },
   },
   { _id: false },
 );
@@ -240,7 +244,9 @@ productSchema.pre("save", function () {
       const count = slugCounts.get(variant.slug) || 0;
       slugCounts.set(variant.slug, count + 1);
       if (count > 0) {
-        throw new Error(`Duplicate variant slug "${variant.slug}" found. Each variant within a product must have a unique slug.`);
+        throw new Error(
+          `Duplicate variant slug "${variant.slug}" found. Each variant within a product must have a unique slug.`,
+        );
       }
     }
 

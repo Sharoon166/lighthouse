@@ -191,6 +191,17 @@ const productBaseSchema = z.object({
           `Meta description must be ${FIELD_LIMITS.seo.metaDescription} characters or fewer`,
         )
         .optional(),
+
+      focusKeyword: z
+        .string()
+        .trim()
+        .max(
+          FIELD_LIMITS.seo.focusKeyword,
+          `Focus keyword must be ${FIELD_LIMITS.seo.focusKeyword} characters or fewer`,
+        )
+        .optional(),
+
+      noIndex: z.boolean().optional(),
     })
     .optional(),
 

@@ -3,18 +3,19 @@ import {
   ArrowUpRight01FreeIcons,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import HeroImage from "@/assets/hero-img.webp";
 import MobileHeroImage from "@/assets/hero-img-mobile.png";
-import { HeroLinks } from "@/components/hero/hero-links";
 import { CTA } from "@/components/hero/cta";
+import { HeroLinks } from "@/components/hero/hero-links";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
 import { BlogCard } from "@/components/shared/blog-card";
 import { Clients } from "@/components/shared/clients";
 import { Marquee } from "@/components/shared/marquee";
-import { SectionHeader } from "@/components/shared/section-header";
 import { Partners } from "@/components/shared/partners";
+import { SectionHeader } from "@/components/shared/section-header";
 import { Button } from "@/components/ui/button";
 import {
   dummyCategories,
@@ -25,35 +26,49 @@ import {
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
+export const metadata: Metadata = {
+  title: "Lighthouse | Premium Lighting Solutions in Pakistan",
+  description:
+    "Premium pendants, chandeliers, and architectural lighting fixtures for homes and commercial spaces across Pakistan. Chosen for how a room feels once the switch is on.",
+  openGraph: {
+    title: "Lighthouse | Premium Lighting Solutions in Pakistan",
+    description:
+      "Premium pendants, chandeliers, and architectural lighting fixtures for homes and commercial spaces across Pakistan.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/",
+  },
+};
+
 export default function Home() {
   return (
     <main>
-      <section className="relative h-[95dvh] overflow-hidden flex justify-center items-center px-6">
+      <section className="relative flex h-[95dvh] items-center justify-center overflow-hidden px-6">
         <Image
           src={HeroImage}
-          alt="hero image"
+          alt="Modern lighting fixtures illuminating a living space"
           priority
-          className="absolute top-0 right-0 -z-10 h-full w-full object-cover"
+          className="absolute -z-10 right-0 top-0 h-full w-full object-cover"
         />
         <Image
           src={MobileHeroImage}
-          alt="hero image"
+          alt="Modern lighting fixtures illuminating a living space"
           priority
-          className="absolute inset-0 -z-10 block w-full h-full object-cover object-top sm:hidden"
+          className="absolute inset-0 -z-10 block h-full w-full object-cover object-top sm:hidden"
         />
-        <div className="space-y-6 sm:space-y-8 container max-sm:mt-auto max-sm:mb-[20%]">
-          <div className="lg:w-[65%] space-y-4">
+        <div className="container space-y-6 sm:space-y-8 max-sm:mb-[20%] max-sm:mt-auto">
+          <div className="space-y-4 lg:w-[65%]">
             <h1 className="text-pretty max-sm:text-4xl">
               A house is only as warm as its{" "}
               <span className="text-gold">light</span>
             </h1>
-            <p className=" lg:text-lg">
+            <p className="lg:text-lg">
               Pendants, chandeliers, and architectural fixtures for homes and
               commercial spaces across Pakistan.
-              <span className="max-sm:hidden">  
-              Chosen for how a room feels
-              once the switch is on, not just how the fixture looks when
-              it&apos;s off.
+              <span className="max-sm:hidden">
+                Chosen for how a room feels once the switch is on, not just how
+                the fixture looks when it&apos;s off.
               </span>
             </p>
           </div>
@@ -62,14 +77,14 @@ export default function Home() {
             Shop Collection
             <HugeiconsIcon
               icon={ArrowUpRight01FreeIcons}
-              className="bg-primary-foreground text-primary p-1 rounded-full size-8 group-hover:rotate-45 transition-transform"
+              className="size-8 rounded-full bg-primary-foreground p-1 text-primary transition-transform group-hover:rotate-45"
             />
           </Button>
         </div>
         <HeroLinks />
       </section>
 
-      <Marquee duration="10s" className="bg-gray-900 text-gold py-2">
+      <Marquee duration="10s" className="bg-gray-900 py-2 text-gold">
         {marqueeText.map((text) => (
           <div key={text} className="contents">
             <span>{text}</span>
@@ -91,23 +106,23 @@ export default function Home() {
                 key={category.id}
                 href="#"
                 className={cn(
-                  "p-6 min-h-66 bg-contain relative overflow-hidden",
+                  "relative overflow-hidden bg-contain p-6 min-h-66",
                   {
-                    "row-span-1 col-span-12 md:col-span-6 lg:col-span-8":
+                    "col-span-12 row-span-1 md:col-span-6 lg:col-span-8":
                       index === 0,
-                    "lg:row-span-2 col-span-6 md:col-span-6 lg:col-span-4":
+                    "col-span-6 row-span-2 md:col-span-6 lg:col-span-4 lg:row-span-2":
                       index === 1,
-                    "row-span-1 col-span-6 md:col-span-6 lg:col-span-4 min-h-62":
+                    "col-span-6 row-span-1 min-h-62 md:col-span-6 lg:col-span-4":
                       index === 2,
-                    "row-span-1 col-span-12 md:col-span-6 lg:col-span-4 min-h-62":
+                    "col-span-12 row-span-1 min-h-62 md:col-span-6 lg:col-span-4":
                       index === 3,
                   },
                 )}
               >
-                <h3 className="text-primary text-xl font-normal tracking-tight">
+                <h3 className="text-xl font-normal tracking-tight text-primary">
                   {category.title}
                 </h3>
-                <p className="text-gold uppercase tracking-widest">
+                <p className="uppercase tracking-widest text-gold">
                   {category.items} Designs
                 </p>
 
@@ -115,8 +130,8 @@ export default function Home() {
                   src={`/${category.id}.png`}
                   width={1024}
                   height={1024}
-                  alt={category.id}
-                  className="absolute top-0 right-0 w-full h-full -z-10 object-cover brightness-180"
+                  alt={`${category.title} lighting collection`}
+                  className="absolute -z-10 right-0 top-0 h-full w-full object-cover brightness-180"
                 />
               </Link>
             ))}
@@ -130,10 +145,10 @@ export default function Home() {
             ctaText="View all Products"
           />
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
             {dummyProducts.map((product, index) => (
               <div key={product.id} className="group border">
-                <div className="relative aspect-square overflow-hidden bg-muted">
+                <div className="relative overflow-hidden bg-muted aspect-square">
                   <Image
                     src={`/products/${index + 1}.png`}
                     alt={product.title}
@@ -143,10 +158,10 @@ export default function Home() {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-xl font-sans hover:text-gold transition-colors">
+                  <h3 className="font-sans text-xl transition-colors hover:text-gold">
                     {product.title}
                   </h3>
-                  <p className="text-muted-foreground font-semibold uppercase font-heading">
+                  <p className="font-heading font-semibold uppercase text-muted-foreground">
                     {product.price}
                   </p>
                 </div>
@@ -156,8 +171,8 @@ export default function Home() {
         </section>
       </div>
 
-      <section className="bg-noise pb-0 lg:pt-0 grid lg:grid-cols-5 place-items-center overflow-hidden">
-        <div className="container lg:ml-28 space-y-6 lg:col-start-1 lg:col-span-3 lg:row-start-1 z-10">
+      <section className="grid overflow-hidden bg-noise pb-0 place-items-center lg:grid-cols-5 lg:pt-0">
+        <div className="container space-y-6 lg:col-start-1 lg:col-span-3 lg:row-start-1 z-10 lg:ml-28">
           <h2 className="text-primary">About Lighthouse</h2>
 
           <p className="max-w-2xl">
@@ -181,17 +196,8 @@ export default function Home() {
           width={1024}
           height={1024}
           priority
-          alt=""
-          className="
-          w-full
-            lg:col-start-3
-            lg:col-span-5
-            lg:row-start-1
-            brightness-75
-            hover:brightness-150
-            transition-all
-            duration-500
-          "
+          alt="Lighthouse showroom with curated lighting displays"
+          className="w-full brightness-75 transition-all duration-500 hover:brightness-150 lg:col-start-3 lg:col-span-5 lg:row-start-1"
         />
       </section>
 
@@ -202,14 +208,14 @@ export default function Home() {
             description="Explore a selection of residential and commercial projects featuring our premium lighting solutions, designed to enhance ambience, functionality and style."
             ctaText="View all Projects"
           />
-          <div className="grid grid-cols-5 gap-4 h-136">
+          <div className="grid h-136 grid-cols-5 gap-4">
             {dummyProjects.map((project, index) => (
               <Link
                 key={project.id}
                 href={project.link}
                 style={{ backgroundImage: `url(${project.image})` }}
                 className={cn(
-                  `border p-4 bg-cover max-md:col-span-5 place-content-end col-span-2`,
+                  `border bg-cover p-4 place-content-end col-span-2 max-md:col-span-5`,
                   {
                     "md:col-span-3 md:row-span-2": index === 0,
                   },
@@ -240,7 +246,7 @@ export default function Home() {
             description="Explore expert tips, interior design trends, and practical lighting guides to help you create beautiful, functional spaces with confidence."
             ctaText="View All Articles"
           />
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid gap-4 md:grid-cols-3">
             {featuredBlogs.map((blog) => (
               <BlogCard key={blog.title} {...blog} />
             ))}

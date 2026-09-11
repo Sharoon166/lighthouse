@@ -5,9 +5,18 @@ import { CategorySearchFilter } from "@/components/shop/category-search-filter";
 import { fetchStoreCategories } from "@/lib/shop-data";
 
 export const metadata: Metadata = {
-  title: "Our Categories · Light House",
+  title: "Our Categories | Lighthouse",
   description:
     "Explore our curated lighting collections, thoughtfully selected to bring warmth, character, and style to every space.",
+  openGraph: {
+    title: "Our Categories | Lighthouse",
+    description:
+      "Explore our curated lighting collections, thoughtfully selected to bring warmth, character, and style to every space.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/categories",
+  },
 };
 
 export default async function CategoriesPage() {

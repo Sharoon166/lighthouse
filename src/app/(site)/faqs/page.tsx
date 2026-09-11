@@ -1,19 +1,30 @@
+import { CallIcon, MailIcon, WhatsappIcon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PageHero } from "@/components/shared/page-hero";
 import { FAQAccordion } from "@/components/shared/faq-accordion";
-import { MailIcon, CallIcon, WhatsappIcon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
+import { PageHero } from "@/components/shared/page-hero";
 
 export const metadata: Metadata = {
-  title: "Frequently Asked Questions · Light House",
-  description: "Find answers to common questions about Light House products, orders, shipping, and returns.",
+  title: "Frequently Asked Questions | Lighthouse",
+  description:
+    "Find answers to common questions about Lighthouse products, orders, shipping, and returns.",
+  openGraph: {
+    title: "Frequently Asked Questions | Lighthouse",
+    description:
+      "Find answers to common questions about Lighthouse products, orders, shipping, and returns.",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/faqs",
+  },
 };
 
 const FAQ_SECTIONS = [
   {
     title: "Orders & Payment",
-    description: "Everything you need to know about placing orders and payment options",
+    description:
+      "Everything you need to know about placing orders and payment options",
     faqs: [
       {
         question: "How can I place an order?",
@@ -132,7 +143,10 @@ export default function FAQsPage() {
           <div className="text-center mb-16">
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Can't find the answer you're looking for? Reach out to our{" "}
-              <Link href="/contact" className="text-gold hover:underline font-medium">
+              <Link
+                href="/contact"
+                className="text-gold hover:underline font-medium"
+              >
                 customer support team
               </Link>
               .
@@ -147,9 +161,7 @@ export default function FAQsPage() {
                   <h2 className="text-2xl font-heading text-secondary mb-2">
                     {section.title}
                   </h2>
-                  <p className="text-muted-foreground">
-                    {section.description}
-                  </p>
+                  <p className="text-muted-foreground">{section.description}</p>
                 </div>
                 <FAQAccordion items={section.faqs} />
               </article>
@@ -164,7 +176,8 @@ export default function FAQsPage() {
                   Still have questions?
                 </h3>
                 <p className="text-muted-foreground">
-                  We're here to help. Contact our support team through any of these channels.
+                  We're here to help. Contact our support team through any of
+                  these channels.
                 </p>
               </div>
 
@@ -174,11 +187,17 @@ export default function FAQsPage() {
                   className="flex flex-col items-center gap-3 p-6 rounded-xl border border-border bg-background hover:border-gold/30 hover:bg-muted/30 transition-all group"
                 >
                   <div className="size-12 rounded-full bg-gold/10 flex items-center justify-center group-hover:bg-gold/20 transition-colors">
-                    <HugeiconsIcon icon={MailIcon} size={24} className="text-gold" />
+                    <HugeiconsIcon
+                      icon={MailIcon}
+                      size={24}
+                      className="text-gold"
+                    />
                   </div>
                   <div className="text-center">
                     <p className="font-medium text-foreground">Email Us</p>
-                    <p className="text-sm text-muted-foreground">hello@lighthouse.pk</p>
+                    <p className="text-sm text-muted-foreground">
+                      hello@lighthouse.pk
+                    </p>
                   </div>
                 </a>
 
@@ -187,11 +206,17 @@ export default function FAQsPage() {
                   className="flex flex-col items-center gap-3 p-6 rounded-xl border border-border bg-background hover:border-gold/30 hover:bg-muted/30 transition-all group"
                 >
                   <div className="size-12 rounded-full bg-gold/10 flex items-center justify-center group-hover:bg-gold/20 transition-colors">
-                    <HugeiconsIcon icon={CallIcon} size={24} className="text-gold" />
+                    <HugeiconsIcon
+                      icon={CallIcon}
+                      size={24}
+                      className="text-gold"
+                    />
                   </div>
                   <div className="text-center">
                     <p className="font-medium text-foreground">Call Us</p>
-                    <p className="text-sm text-muted-foreground">+92 21 3456 7890</p>
+                    <p className="text-sm text-muted-foreground">
+                      +92 21 3456 7890
+                    </p>
                   </div>
                 </a>
 
@@ -202,11 +227,17 @@ export default function FAQsPage() {
                   className="flex flex-col items-center gap-3 p-6 rounded-xl border border-border bg-background hover:border-gold/30 hover:bg-muted/30 transition-all group"
                 >
                   <div className="size-12 rounded-full bg-gold/10 flex items-center justify-center group-hover:bg-gold/20 transition-colors">
-                    <HugeiconsIcon icon={WhatsappIcon} size={24} className="text-gold" />
+                    <HugeiconsIcon
+                      icon={WhatsappIcon}
+                      size={24}
+                      className="text-gold"
+                    />
                   </div>
                   <div className="text-center">
                     <p className="font-medium text-foreground">WhatsApp</p>
-                    <p className="text-sm text-muted-foreground">+92 300 1234 567</p>
+                    <p className="text-sm text-muted-foreground">
+                      +92 300 1234 567
+                    </p>
                   </div>
                 </a>
               </div>

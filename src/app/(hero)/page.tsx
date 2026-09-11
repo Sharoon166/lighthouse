@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main>
-      <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto  items-center justify-center overflow-hidden px-6">
+      <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto items-end sm:items-center justify-center overflow-hidden px-6 pb-20 sm:pb-0">
         <Image
           src={HeroImage}
           alt="Modern lighting fixtures illuminating a living space"
@@ -58,9 +58,9 @@ export default function Home() {
           src={MobileHeroImage}
           alt="Modern lighting fixtures illuminating a living space"
           priority
-          className="absolute inset-0 -z-10 block h-full w-full object-cover object-top sm:hidden"
+          className="absolute inset-0 -z-10 block h-full w-full object-cover object-[center_30%] sm:hidden"
         />
-        <div className="container space-y-6 sm:space-y-8 max-sm:mt-[25vw]">
+        <div className="container space-y-6 sm:space-y-8">
           <div className="space-y-4 lg:w-[65%]">
             <h1 className="text-pretty max-sm:text-4xl">
               A house is only as warm as its{" "}

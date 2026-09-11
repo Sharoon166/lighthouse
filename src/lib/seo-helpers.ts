@@ -48,7 +48,7 @@ export function generateSeoMetadata({
           alt: title,
         },
       ],
-      type,
+      type: type as "website" | "article",
       ...(publishedAt ? { publishedTime: publishedAt } : {}),
       ...(updatedAt ? { modifiedTime: updatedAt } : {}),
     },

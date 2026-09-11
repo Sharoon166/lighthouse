@@ -329,6 +329,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     designStyle: "Modern",
     material: "Brass",
     inStock: true,
+    seo: {
+      metaTitle: "Aurora Brass Desk Lamp | Lighthouse",
+      metaDescription: "A refined desk lamp combining solid brass construction with a warm ambient glow.",
+      focusKeyword: "brass desk lamp",
+      noIndex: false,
+    },
   },
   {
     id: "marble-aura-table-lamp",
@@ -401,6 +407,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     designStyle: "Art Deco",
     material: "Ceramic",
     inStock: true,
+    seo: {
+      metaTitle: "Marble Aura Table Lamp | Lighthouse",
+      metaDescription: "Hand-carved Italian marble pedestal with an etched globe glass shade.",
+      focusKeyword: "marble table lamp",
+      noIndex: false,
+    },
   },
   {
     id: "luna-arc-floor-lamp",
@@ -469,6 +481,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     designStyle: "Nordic",
     material: "Steel",
     inStock: true,
+    seo: {
+      metaTitle: "Luna Arc Floor Lamp | Lighthouse",
+      metaDescription: "Sweeping arc floor lamp with a minimalist Nordic silhouette.",
+      focusKeyword: "arc floor lamp",
+      noIndex: false,
+    },
   },
   {
     id: "elysian-feather-floor-lamp",
@@ -519,6 +537,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     designStyle: "Art Deco",
     material: "Brass",
     inStock: true,
+    seo: {
+      metaTitle: "Elysian Feather Floor Lamp | Lighthouse",
+      metaDescription: "Luxury Art Deco floor lamp with feather-inspired brass design.",
+      focusKeyword: "luxury floor lamp",
+      noIndex: false,
+    },
   },
   {
     id: "crystal-bloom-table-lamp",
@@ -571,6 +595,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     designStyle: "Industrial",
     material: "Hand-blown Glass",
     inStock: true,
+    seo: {
+      metaTitle: "Crystal Bloom Table Lamp | Lighthouse",
+      metaDescription: "Industrial crystal table lamp with hand-blown glass shade.",
+      focusKeyword: "crystal table lamp",
+      noIndex: false,
+    },
   },
   {
     id: "globe-marble-floor-lamp",
@@ -623,6 +653,12 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     designStyle: "Rustic",
     material: "Wood",
     inStock: true,
+    seo: {
+      metaTitle: "Globe Marble Floor Lamp | Lighthouse",
+      metaDescription: "Rustic floor lamp with globe marble shade and wood base.",
+      focusKeyword: "marble floor lamp",
+      noIndex: false,
+    },
   },
 ];
 

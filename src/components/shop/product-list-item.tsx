@@ -91,22 +91,7 @@ export function ProductListItem({
                   variant="secondary"
                   size="sm"
                   className="rounded-full"
-                  onClick={() =>
-                    open({
-                      id: product.id,
-                      name: product.name,
-                      slug: product.slug,
-                      tag: product.tag,
-                      price: product.price,
-                      originalPrice: product.originalPrice,
-                      discountPercentage: product.discountPercentage,
-                      shortDescription: product.shortDescription,
-                      images: product.images,
-                      finishes: product.finishes,
-                      ratings: product.ratings,
-                      inStock: product.inStock,
-                    })
-                  }
+                  onClick={() => open(product)}
                   aria-label={`Quick view ${product.name}`}
                 >
                   <HugeiconsIcon icon={ExpandIcon} size={16} />

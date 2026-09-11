@@ -55,7 +55,7 @@ export function BlogTrashManager({
       renderItemContent={(post) => (
         <>
           {post.heroImage ? (
-            <div className="relative aspect-[16/9] w-24 shrink-0 overflow-hidden rounded-lg border border-border">
+            <div className="relative aspect-video w-24 shrink-0 overflow-hidden rounded-lg border border-border">
               <Image
                 src={post.heroImage.url}
                 alt=""
@@ -65,7 +65,7 @@ export function BlogTrashManager({
               />
             </div>
           ) : (
-            <div className="flex aspect-[16/9] w-24 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/40 text-muted-foreground">
+            <div className="flex aspect-video w-24 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/40 text-muted-foreground">
               No image
             </div>
           )}

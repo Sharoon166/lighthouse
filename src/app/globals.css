@@ -232,7 +232,7 @@
 
   h1 {
     @apply text-6xl font-bold;
-    font-size: clamp(70px, 5vw, 60px);
+    font-size: clamp(45px, 6vw, 65px);
   }
 
   h2 {

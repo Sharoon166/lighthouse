@@ -36,7 +36,7 @@ export function calculateReadingTime(
  */
 export function generateBlogPostMetadata(
   post: BlogPostDraftData,
-  siteUrl: string = "https://lighthouse.example.com",
+  siteUrl: string = "https://lighthouse.pk",
 ): Metadata {
   const metaTitle = post.seo?.metaTitle?.trim() || post.title;
   const metaDescription =
@@ -107,7 +107,7 @@ export function truncate(text: string, maxLength: number): string {
  */
 export function generateBlogPostJsonLd(
   post: BlogPostDraftData,
-  siteUrl: string = "https://lighthouse.example.com",
+  siteUrl: string = "https://lighthouse.pk",
 ) {
   return {
     "@context": "https://schema.org",

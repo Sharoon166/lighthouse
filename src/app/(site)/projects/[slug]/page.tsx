@@ -39,8 +39,28 @@ export default async function ProjectPage({ params }: Props) {
 
   const relatedProjects = await getRelatedProjects(slug, project.categories, 3);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lighthouse.pk";
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CreativeWork",
+    name: project.title,
+    description: project.subtitle || project.seo.metaDescription,
+    image: project.heroImage?.url,
+    url: `${siteUrl}/projects/${project.slug}`,
+    author: {
+      "@type": "Organization",
+      name: "Lighthouse",
+    },
+    keywords: project.categories.join(", "),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ProjectDetail project={project} relatedProjects={relatedProjects} />
       <div className="container">
         <CTA />

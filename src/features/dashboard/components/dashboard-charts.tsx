@@ -77,7 +77,7 @@ function ProductsByCategory({
       <p className="mb-6 text-sm text-muted-foreground">
         {items.length} of {data.length} categories shown
       </p>
-      <ChartContainer config={categoryChartConfig} className="h-[280px] w-full">
+      <ChartContainer config={categoryChartConfig} className="h-70 w-full">
         <BarChart
           data={chartData}
           layout="vertical"
@@ -153,7 +153,7 @@ function PublishingActivity({
       </p>
       <ChartContainer
         config={publishingChartConfig}
-        className="h-[200px] w-full"
+        className="h-50 w-full"
       >
         <AreaChart
           data={chartData}
@@ -242,7 +242,7 @@ function ProductStatusDonut({
       <div className="flex flex-1 flex-col items-center justify-center">
         <ChartContainer
           config={productStatusConfig}
-          className="mx-auto aspect-video h-[160px]"
+          className="mx-auto aspect-video h-40"
         >
           <PieChart>
             <Pie

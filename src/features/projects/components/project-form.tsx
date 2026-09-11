@@ -1041,7 +1041,7 @@ export function ProjectForm({
                     <Label htmlFor="seo-meta-description">
                       Meta Description
                     </Label>
-                    <InputGroup className="min-h-[5rem]">
+                    <InputGroup className="min-h-20">
                       <InputGroupTextarea
                         id="seo-meta-description"
                         value={seoMetaDescription}

@@ -36,6 +36,9 @@ export const metadata: Metadata = {
       "Premium pendants, chandeliers, and architectural lighting fixtures for homes and commercial spaces across Pakistan.",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+  },
   alternates: {
     canonical: "/",
   },
@@ -44,7 +47,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main>
-      <section className="relative flex h-[95dvh] items-center justify-center overflow-hidden px-6">
+      <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto  items-center justify-center overflow-hidden px-6">
         <Image
           src={HeroImage}
           alt="Modern lighting fixtures illuminating a living space"
@@ -57,7 +60,7 @@ export default function Home() {
           priority
           className="absolute inset-0 -z-10 block h-full w-full object-cover object-top sm:hidden"
         />
-        <div className="container space-y-6 sm:space-y-8 max-sm:mb-[20%] max-sm:mt-auto">
+        <div className="container space-y-6 sm:space-y-8 max-sm:mt-[25vw]">
           <div className="space-y-4 lg:w-[65%]">
             <h1 className="text-pretty max-sm:text-4xl">
               A house is only as warm as its{" "}

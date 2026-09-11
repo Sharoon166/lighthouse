@@ -344,7 +344,6 @@ import {
 const IS_PHASE_2 = false;
 
 const NAV_LINKS = [
-  { href: "/products", label: "Products" },
   { href: "/projects", label: "Projects" },
   { href: "/blogs", label: "Blog" },
   { href: "/about", label: "About" },
@@ -481,7 +480,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
             LOGO
         ================================================================= */}
 
-        <Link href="/" className="relative z-[60] shrink-0">
+        <Link href="/" className="relative z-60 shrink-0">
           <LogoImage dark={variant === "page" || mobileOpen} />
         </Link>
 
@@ -490,7 +489,6 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         ================================================================= */}
 
         <NavigationMenu
-          viewport={false}
           className={cn(
             "hidden md:flex",
             "rounded-full px-2 py-2",
@@ -499,7 +497,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         >
           <NavigationMenuList className="gap-1">
             {/* ------------------------------------------------------------
-                CATEGORIES MEGA MENU
+                PRODUCTS MEGA MENU
             ------------------------------------------------------------- */}
 
             <NavigationMenuItem>
@@ -513,21 +511,19 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                   "data-[state=open]:bg-transparent",
                   "data-[state=open]:hover:bg-transparent",
 
-                  isActive("/categories")
+                  isActive("/products")
                     ? "text-gold"
                     : isHero
                       ? "text-background hover:text-gold data-[state=open]:text-gold"
                       : "text-foreground hover:bg-muted data-[state=open]:text-gold",
                 )}
               >
-                Categories
+                Products
               </NavigationMenuTrigger>
 
               <NavigationMenuContent
                 className={cn(
-                  "!rounded-[22px] !border !border-border/70",
-                  "!bg-background/95 !p-2",
-                  "!shadow-[0_24px_80px_-20px_rgba(0,0,0,0.25)]",
+                  "rounded-3xl shadow-lg",
                   "backdrop-blur-xl",
                   "data-[motion=from-start]:animate-none",
                   "data-[motion=from-end]:animate-none",
@@ -554,7 +550,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                             Collections
                           </p>
 
-                          <h3 className="font-heading text-xl font-semibold tracking-tight text-foreground">
+                          <h3 className="font-heading text-xl font-semibold tracking-tight text-secondary">
                             Shop by category
                           </h3>
                         </div>
@@ -569,7 +565,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                       {displayedCategories.length > 0 ? (
                         <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                           {displayedCategories.map((category) => (
-                            <NavigationMenuLink key={category.id} >
+                            <NavigationMenuLink key={category.id}>
                               <Link
                                 href={`/categories/${category.slug}`}
                                 className="group flex items-center gap-3 rounded-xl transition-all duration-200 hover:bg-muted/70"
@@ -635,7 +631,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                         RIGHT - FEATURED
                     ============================================================== */}
 
-                    <div className="relative m-1.5 min-h-[350px] overflow-hidden rounded-[14px] bg-muted">
+                    <div className="relative m-1.5 min-h-87.5 overflow-hidden rounded-4xl bg-muted">
                       {featuredCategory && (
                         <>
                           {/* Image */}
@@ -650,10 +646,8 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
 
                           {/* Content */}
                           <div className="absolute inset-x-0 bottom-0 p-6">
-                            <div className="mb-3 flex items-center gap-2">
-                              <span className="text-xs text-gold font-semibold uppercase">
-                                Featured collection
-                              </span>
+                            <div className="text-xs text-gold font-semibold uppercase">
+                              Featured collection
                             </div>
 
                             <h3 className="font-heading text-2xl font-semibold tracking-tight text-white">
@@ -661,14 +655,14 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                             </h3>
 
                             {featuredCategory.description && (
-                              <p className="mt-1.5 line-clamp-2 max-w-[280px] text-xs leading-relaxed text-white/70">
+                              <p className="mt-1.5 line-clamp-2 max-w-70 text-xs leading-relaxed text-white/70">
                                 {featuredCategory.description}
                               </p>
                             )}
 
                             <Link
                               href={`/categories/${featuredCategory.slug}`}
-                              className="group mt-5 inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-medium text-background transition-all hover:bg-gold/90 hover:text-background"
+                              className="group mt-3 inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-medium text-background transition-all hover:bg-gold/90 hover:text-background"
                             >
                               Explore collection
                               <HugeiconsIcon
@@ -843,7 +837,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((prev) => !prev)}
           className={cn(
-            "relative z-[60] flex size-10 items-center justify-center rounded-full backdrop-blur-md md:hidden",
+            "relative z-60 flex size-10 items-center justify-center rounded-full backdrop-blur-md md:hidden",
             isHero
               ? "border border-border/40 bg-background/10 text-background"
               : "border border-border bg-muted/40 text-foreground",
@@ -898,7 +892,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           --------------------------------------------------------------- */}
 
           <nav className="flex flex-col gap-1.5 overflow-auto">
-            {/* Categories */}
+            {/* Products */}
 
             <div>
               <button
@@ -907,12 +901,12 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 className={cn(
                   "flex w-full items-center justify-between rounded-2xl px-5 py-3 text-xl font-medium transition-all",
 
-                  isActive("/categories") || mobileCategoriesOpen
+                  isActive("/products") || mobileCategoriesOpen
                     ? "text-3xl font-bold text-secondary"
                     : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
                 )}
               >
-                <span>Categories</span>
+                <span>Products</span>
 
                 <HugeiconsIcon
                   icon={ArrowDownIcon}
@@ -930,58 +924,60 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 className={cn(
                   "overflow-hidden transition-all duration-300",
                   mobileCategoriesOpen
-                    ? "max-h-[600px] opacity-100"
+                    ? "max-h-150 opacity-100"
                     : "max-h-0 opacity-0",
                 )}
               >
-                <div className="space-y-1 pb-2 pl-5 pt-1">
-                  {categories.length > 0 ? (
-                    <>
-                      {categories.map((category) => (
+                <div className="max-h-80 overflow-y-auto scrollbar-hide pl-5 pt-1">
+                  <div className="space-y-1 pb-2">
+                    {categories.length > 0 ? (
+                      <>
+                        {categories.map((category) => (
+                          <Link
+                            key={category.id}
+                            href={`/categories/${category.slug}`}
+                            onClick={closeMobileMenu}
+                            className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
+                          >
+                            <div className="relative size-8 shrink-0 overflow-hidden rounded-md bg-muted">
+                              {category.image ? (
+                                <Image
+                                  src={category.image}
+                                  alt={category.name}
+                                  fill
+                                  sizes="32px"
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="flex size-full items-center justify-center">
+                                  <HugeiconsIcon icon={Bulb} size={14} />
+                                </div>
+                              )}
+                            </div>
+
+                            <span>{category.name}</span>
+                          </Link>
+                        ))}
+
                         <Link
-                          key={category.id}
-                          href={`/categories/${category.slug}`}
+                          href="/categories"
                           onClick={closeMobileMenu}
-                          className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
+                          className="flex items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-medium text-gold hover:underline"
                         >
-                          <div className="relative size-8 shrink-0 overflow-hidden rounded-md bg-muted">
-                            {category.image ? (
-                              <Image
-                                src={category.image}
-                                alt={category.name}
-                                fill
-                                sizes="32px"
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="flex size-full items-center justify-center">
-                                <HugeiconsIcon icon={Bulb} size={14} />
-                              </div>
-                            )}
-                          </div>
-
-                          <span>{category.name}</span>
+                          View all categories
+                          <HugeiconsIcon icon={ArrowRight02Icon} size={12} />
                         </Link>
-                      ))}
-
+                      </>
+                    ) : (
                       <Link
                         href="/categories"
                         onClick={closeMobileMenu}
-                        className="flex items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-medium text-gold hover:underline"
+                        className="block rounded-xl px-4 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
                       >
-                        View all categories
-                        <HugeiconsIcon icon={ArrowRight02Icon} size={12} />
+                        View All Categories
                       </Link>
-                    </>
-                  ) : (
-                    <Link
-                      href="/categories"
-                      onClick={closeMobileMenu}
-                      className="block rounded-xl px-4 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
-                    >
-                      View All Categories
-                    </Link>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

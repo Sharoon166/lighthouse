@@ -3,6 +3,7 @@
 import { PauseIcon, PlayIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useRef, useState } from "react";
+import { useVideoViewer } from "@/components/shared/video-viewer";
 import type { ProjectVideo } from "@/models/project";
 
 interface ProjectVideoPlayerProps {
@@ -12,6 +13,7 @@ interface ProjectVideoPlayerProps {
 export function ProjectVideoPlayer({ video }: ProjectVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { open } = useVideoViewer();
 
   const togglePlay = () => {
     const el = videoRef.current;
@@ -44,7 +46,7 @@ export function ProjectVideoPlayer({ video }: ProjectVideoPlayerProps) {
       {!isPlaying && (
         <button
           type="button"
-          onClick={togglePlay}
+          onClick={() => open(video.url, video.title)}
           className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity hover:bg-black/30"
           aria-label={`Play ${video.title || "video"}`}
         >

@@ -47,12 +47,12 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main>
-      <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto items-end sm:items-center justify-center overflow-hidden px-6 pb-20 sm:pb-0">
+      <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto items-end sm:items-center justify-center overflow-hidden px-6 pb-38 sm:pb-0">
         <Image
           src={HeroImage}
           alt="Modern lighting fixtures illuminating a living space"
           priority
-          className="absolute -z-10 right-0 top-0 h-full w-full object-cover"
+          className="absolute -z-10 right-0 top-0 h-full w-full object-cover max-sm:hidden"
         />
         <Image
           src={MobileHeroImage}
@@ -109,13 +109,13 @@ export default function Home() {
                 key={category.id}
                 href="#"
                 className={cn(
-                  "relative overflow-hidden bg-contain p-6 min-h-66",
+                  "relative overflow-hidden bg-contain p-6 min-h-66 h-full",
                   {
                     "col-span-12 row-span-1 md:col-span-6 lg:col-span-8":
                       index === 0,
-                    "col-span-6 row-span-2 md:col-span-6 lg:col-span-4 lg:row-span-2":
+                    "col-span-6 row-span-1 h-66 md:col-span-6 lg:col-span-4 lg:row-span-2":
                       index === 1,
-                    "col-span-6 row-span-1 min-h-62 md:col-span-6 lg:col-span-4":
+                    "col-span-6 row-span-1 h-66 md:col-span-6 lg:col-span-4":
                       index === 2,
                     "col-span-12 row-span-1 min-h-62 md:col-span-6 lg:col-span-4":
                       index === 3,

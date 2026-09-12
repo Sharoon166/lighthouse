@@ -489,6 +489,8 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         ================================================================= */}
 
         <NavigationMenu
+          align="center"
+          // positionerClassName="!left-1/2 !-translate-x-1/2"
           className={cn(
             "hidden md:flex",
             "rounded-full px-2 py-2",

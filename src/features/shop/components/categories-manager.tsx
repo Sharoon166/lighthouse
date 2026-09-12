@@ -3,13 +3,14 @@
 import {
   ChevronDownIcon,
   ChevronRightIcon,
-  ChevronsDownIcon,
-  ChevronsUpIcon,
+  Collapse,
   Delete02Icon,
   Edit02Icon,
+  Expand,
   ImageIcon,
   PlusSignIcon,
   Search01Icon,
+  StarIcon,
   TagsIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -36,17 +37,22 @@ import {
   type CategoryTreeNode,
   deleteCategory,
   getCategoryTree,
+  toggleFeaturedCategory,
 } from "../actions/category-actions";
 
 function TreeNode({
   node,
   depth,
   onDelete,
+  onToggleFeatured,
+  canFeatureMore,
   defaultExpanded,
 }: {
   node: CategoryTreeNode;
   depth: number;
   onDelete?: (node: CategoryTreeNode) => void;
+  onToggleFeatured?: (node: CategoryTreeNode) => void;
+  canFeatureMore?: boolean;
   defaultExpanded?: boolean;
 }) {
   const [expanded, setExpanded] = useState(
@@ -110,7 +116,43 @@ function TreeNode({
           </span>
         )}
 
+        {node.featured && (
+          <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 border border-amber-200">
+            ★ Featured
+          </span>
+        )}
+
         <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+          {onToggleFeatured && (
+            <button
+              type="button"
+              aria-label={
+                node.featured
+                  ? `Unfeature ${node.name}`
+                  : `Feature ${node.name}`
+              }
+              title={
+                node.featured
+                  ? "Remove from featured"
+                  : canFeatureMore
+                    ? "Add to featured"
+                    : "Featured limit reached"
+              }
+              disabled={!node.featured && !canFeatureMore}
+              onClick={() => onToggleFeatured(node)}
+              className={cn(
+                "flex size-7 items-center justify-center rounded-md transition-colors",
+                node.featured
+                  ? "text-amber-500 hover:bg-amber-50 hover:text-amber-600"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                !node.featured &&
+                  !canFeatureMore &&
+                  "cursor-not-allowed opacity-40",
+              )}
+            >
+              <HugeiconsIcon icon={StarIcon} size={14} />
+            </button>
+          )}
           <Link
             href={`/admin/categories/edit/${node.id}`}
             aria-label={`Edit ${node.name}`}
@@ -138,6 +180,8 @@ function TreeNode({
             node={child}
             depth={depth + 1}
             onDelete={onDelete}
+            onToggleFeatured={onToggleFeatured}
+            canFeatureMore={canFeatureMore}
             defaultExpanded={defaultExpanded}
           />
         ))}
@@ -185,6 +229,35 @@ export function CategoriesManager({
       cancelled = true;
     };
   }, [initialTree]);
+
+  const MAX_FEATURED = 4;
+
+  const countFeatured = (nodes: CategoryTreeNode[]): number =>
+    nodes.reduce(
+      (sum, n) => sum + (n.featured ? 1 : 0) + countFeatured(n.children),
+      0,
+    );
+
+  const canFeatureMore = countFeatured(tree) < MAX_FEATURED;
+
+  const handleToggleFeatured = async (node: CategoryTreeNode) => {
+    setActionError(null);
+    const result = await toggleFeaturedCategory(node.id);
+
+    if (!result.ok) {
+      setActionError(result.message);
+      return;
+    }
+
+    const updateFeatured = (nodes: CategoryTreeNode[]): CategoryTreeNode[] =>
+      nodes.map((n) =>
+        n.id === node.id
+          ? { ...n, featured: result.featured }
+          : { ...n, children: updateFeatured(n.children) },
+      );
+
+    setTree((prev) => updateFeatured(prev));
+  };
 
   const handleDelete = async (node: CategoryTreeNode) => {
     setActionError(null);
@@ -249,6 +322,11 @@ export function CategoriesManager({
   const countAll = (nodes: CategoryTreeNode[]): number =>
     nodes.reduce((sum, n) => sum + 1 + countAll(n.children), 0);
 
+  const flattenTree = (nodes: CategoryTreeNode[]): CategoryTreeNode[] =>
+    nodes.flatMap((n) => [n, ...flattenTree(n.children)]);
+
+  const featuredCategories = flattenTree(tree).filter((n) => n.featured);
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -265,6 +343,45 @@ export function CategoriesManager({
           New category
         </Link>
       </div>
+
+      {/* Featured Section */}
+      {!isLoading && featuredCategories.length > 0 && (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg bg-muted/40 px-4 py-3">
+          <HugeiconsIcon
+            icon={StarIcon}
+            size={14}
+            className="shrink-0 text-muted-foreground"
+          />
+          <span className="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Featured
+          </span>
+          <div className="hidden h-4 w-px bg-border sm:block" />
+          {featuredCategories.map((cat) => (
+            <div key={cat.id} className="group flex items-center gap-2.5">
+              {cat.image ? (
+                <img
+                  src={cat.image}
+                  alt=""
+                  className="size-8 shrink-0 rounded object-cover"
+                />
+              ) : (
+                <div className="size-8 shrink-0 rounded bg-border" />
+              )}
+              <span className="max-w-50 truncate text-sm text-foreground">
+                {cat.name}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleToggleFeatured(cat)}
+                className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-all hover:text-destructive group-hover:opacity-100"
+                title="Unfeature"
+              >
+                <HugeiconsIcon icon={Delete02Icon} size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <InputGroup className="h-10 w-full rounded-full bg-card md:w-72">
@@ -287,7 +404,7 @@ export function CategoriesManager({
               onClick={handleExpandAll}
               aria-label="Expand all categories"
             >
-              <HugeiconsIcon icon={ChevronsDownIcon} size={16} />
+              <HugeiconsIcon icon={Expand} size={16} />
             </Button>
             <Button
               type="button"
@@ -296,7 +413,7 @@ export function CategoriesManager({
               onClick={handleCollapseAll}
               aria-label="Collapse all categories"
             >
-              <HugeiconsIcon icon={ChevronsUpIcon} size={16} />
+              <HugeiconsIcon icon={Collapse} size={16} />
             </Button>
           </div>
         )}
@@ -368,6 +485,8 @@ export function CategoriesManager({
                 node={node}
                 depth={0}
                 onDelete={isAdmin ? handleDelete : undefined}
+                onToggleFeatured={isAdmin ? handleToggleFeatured : undefined}
+                canFeatureMore={canFeatureMore}
                 defaultExpanded={
                   forceExpand !== null ? forceExpand : undefined
                 }

@@ -23,7 +23,7 @@ export function ImagePicker({ images, value, onChange }: ImagePickerProps) {
             onClick={() => onChange(image.src)}
             aria-pressed={selected}
             className={cn(
-              "group relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-background outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50",
+              "group relative aspect-4/3 overflow-hidden rounded-lg border border-border bg-background outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50",
               selected && "border-chart-2 ring-2 ring-chart-2/40",
             )}
           >

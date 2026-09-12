@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ImageCropDialog } from "./image-crop-dialog";
 import { ImageZoom } from "./image-zoom";
+import { IMAGE_OPTIMIZATION_PRESETS } from "@/lib/image-optimizer";
 
 export type UploadedImage = { url: string; publicId: string };
 
@@ -34,8 +35,10 @@ interface ImageDropzoneProps {
   upload: (formData: FormData) => Promise<UploadImageResult>;
   deleteImage?: (publicId: string) => Promise<{ ok: boolean }>;
   aspectRatio?: number;
+  lockAspect?: boolean;
   maxSizeMB?: number;
   emptyLabel?: string;
+  optimizationPreset?: keyof typeof IMAGE_OPTIMIZATION_PRESETS;
 }
 
 const MAX_SIZE_MB_DEFAULT = 10;
@@ -46,8 +49,10 @@ export function ImageDropzone({
   upload,
   deleteImage,
   aspectRatio = 16 / 9,
+  lockAspect = false,
   maxSizeMB = MAX_SIZE_MB_DEFAULT,
   emptyLabel = "Cover image",
+  optimizationPreset,
 }: ImageDropzoneProps) {
   const [isUploading, startUpload] = useTransition();
   const [isDragActive, setIsDragActive] = useState(false);
@@ -269,7 +274,8 @@ export function ImageDropzone({
           open
           imageUrl={pendingUrl}
           aspectRatio={aspectRatio}
-          optimizationPreset="blogHero"
+          lockAspect={lockAspect}
+          optimizationPreset={optimizationPreset}
           onCancel={() => {
             setCropOpen(false);
             if (pendingUrlRef.current) {

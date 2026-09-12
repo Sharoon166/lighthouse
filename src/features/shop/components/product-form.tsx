@@ -1206,6 +1206,9 @@ export function ProductForm({
                   upload={uploadShopImage}
                   deleteImage={deleteShopImage}
                   emptyLabel="Primary product image"
+                  aspectRatio={1}
+                  lockAspect
+                  optimizationPreset="product"
                 />
                 {fieldError("images") && (
                   <p className="text-xs text-destructive">

@@ -7,13 +7,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
-  BanIcon,
+  ShieldBanIcon,
   Delete02Icon,
   Edit02Icon,
   Key01Icon,
   LogoutIcon,
   PlusSignIcon,
-  SquareUnlock01Icon,
+  ShieldCheck,
   UserShield01Icon,
   ViewIcon,
   ViewOffIcon,
@@ -23,9 +23,21 @@ import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { formatDate } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
@@ -46,9 +58,37 @@ type Notice = { type: "ok" | "err"; text: string } | null;
 
 function EyeIcons({ show }: { show: boolean }) {
   return show ? (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
   ) : (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
   );
 }
 
@@ -153,7 +193,13 @@ function CreateStaffDialog({
               disabled={loading}
             />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton type="button" size="icon-xs" onClick={() => setShowPassword((s) => !s)} tabIndex={-1} aria-label={showPassword ? "Hide password" : "Show password"}>
+              <InputGroupButton
+                type="button"
+                size="icon-xs"
+                onClick={() => setShowPassword((s) => !s)}
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
                 <EyeIcons show={showPassword} />
               </InputGroupButton>
             </InputGroupAddon>
@@ -172,7 +218,13 @@ function CreateStaffDialog({
               disabled={loading}
             />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton type="button" size="icon-xs" onClick={() => setShowConfirm((s) => !s)} tabIndex={-1} aria-label={showConfirm ? "Hide password" : "Show password"}>
+              <InputGroupButton
+                type="button"
+                size="icon-xs"
+                onClick={() => setShowConfirm((s) => !s)}
+                tabIndex={-1}
+                aria-label={showConfirm ? "Hide password" : "Show password"}
+              >
                 <EyeIcons show={showConfirm} />
               </InputGroupButton>
             </InputGroupAddon>
@@ -182,7 +234,12 @@ function CreateStaffDialog({
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <Button type="submit" size="sm" disabled={loading}>
@@ -222,7 +279,11 @@ function EditStaffDialog({
     e.preventDefault();
     setError(null);
     setLoading(true);
-    const result = await updateStaffDetails({ userId: account.id, name, email });
+    const result = await updateStaffDetails({
+      userId: account.id,
+      name,
+      email,
+    });
     setLoading(false);
     if (!result.ok) {
       setError(result.message);
@@ -266,7 +327,12 @@ function EditStaffDialog({
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <Button type="submit" size="sm" disabled={loading}>
@@ -350,7 +416,13 @@ function PasswordDialog({
               disabled={loading}
             />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton type="button" size="icon-xs" onClick={() => setShowPassword((s) => !s)} tabIndex={-1} aria-label={showPassword ? "Hide password" : "Show password"}>
+              <InputGroupButton
+                type="button"
+                size="icon-xs"
+                onClick={() => setShowPassword((s) => !s)}
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
                 <EyeIcons show={showPassword} />
               </InputGroupButton>
             </InputGroupAddon>
@@ -369,7 +441,13 @@ function PasswordDialog({
               disabled={loading}
             />
             <InputGroupAddon align="inline-end">
-              <InputGroupButton type="button" size="icon-xs" onClick={() => setShowConfirm((s) => !s)} tabIndex={-1} aria-label={showConfirm ? "Hide password" : "Show password"}>
+              <InputGroupButton
+                type="button"
+                size="icon-xs"
+                onClick={() => setShowConfirm((s) => !s)}
+                tabIndex={-1}
+                aria-label={showConfirm ? "Hide password" : "Show password"}
+              >
                 <EyeIcons show={showConfirm} />
               </InputGroupButton>
             </InputGroupAddon>
@@ -379,7 +457,12 @@ function PasswordDialog({
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Button type="button" variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <Button type="submit" size="sm" disabled={loading}>
@@ -417,20 +500,25 @@ function StaffTable({
       header: "Staff",
       cell: (info) => {
         const account = info.row.original;
-        const initials = account.name
-          .split(" ")
-          .map((p) => p[0])
-          .join("")
-          .slice(0, 2)
-          .toUpperCase() || "ST";
+        const initials =
+          account.name
+            .split(" ")
+            .map((p) => p[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase() || "ST";
 
-return (
+        return (
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className={cn(
-                "flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white",
-                account.isBlocked ? "bg-muted text-muted-foreground" : "bg-[#2a1b45]",
-              )}>
+              <div
+                className={cn(
+                  "flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white",
+                  account.isBlocked
+                    ? "bg-muted text-muted-foreground"
+                    : "bg-[#2a1b45]",
+                )}
+              >
                 {initials}
               </div>
               {account.isOnline && !account.isBlocked && (
@@ -439,10 +527,14 @@ return (
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <p className={cn(
-                  "truncate font-medium",
-                  account.isBlocked ? "text-muted-foreground line-through" : "text-foreground",
-                )}>
+                <p
+                  className={cn(
+                    "truncate font-medium",
+                    account.isBlocked
+                      ? "text-muted-foreground line-through"
+                      : "text-foreground",
+                  )}
+                >
                   {account.name}
                 </p>
                 {account.isBlocked && (
@@ -492,7 +584,10 @@ return (
               className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               aria-label={isRevealed ? "Hide password" : "Show password"}
             >
-              <HugeiconsIcon icon={isRevealed ? ViewIcon : ViewOffIcon} size={14} />
+              <HugeiconsIcon
+                icon={isRevealed ? ViewIcon : ViewOffIcon}
+                size={14}
+              />
             </button>
           </div>
         );
@@ -543,7 +638,11 @@ return (
             </button>
             <button
               type="button"
-              aria-label={account.isBlocked ? `Unblock ${account.name}` : `Block ${account.name}`}
+              aria-label={
+                account.isBlocked
+                  ? `Unblock ${account.name}`
+                  : `Block ${account.name}`
+              }
               title={account.isBlocked ? "Unblock" : "Block"}
               onClick={() => onBlock(account)}
               className={cn(
@@ -553,7 +652,10 @@ return (
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
-              <HugeiconsIcon icon={account.isBlocked ? SquareUnlock01Icon : BanIcon} size={16} />
+              <HugeiconsIcon
+                icon={account.isBlocked ? ShieldBanIcon : ShieldCheck}
+                size={16}
+              />
             </button>
             <button
               type="button"
@@ -630,7 +732,11 @@ function SkeletonTable() {
   );
 }
 
-export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) {
+export function StaffManager({
+  initialData,
+}: {
+  initialData?: StaffAccount[];
+}) {
   const [staff, setStaff] = useState<StaffAccount[]>(initialData ?? []);
   const [loading, setLoading] = useState(!initialData);
   const [error, setError] = useState<string | null>(null);
@@ -638,7 +744,9 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<StaffAccount | null>(null);
-  const [passwordTarget, setPasswordTarget] = useState<StaffAccount | null>(null);
+  const [passwordTarget, setPasswordTarget] = useState<StaffAccount | null>(
+    null,
+  );
   const [busyAction, setBusyAction] = useState(false);
   const { confirm } = useConfirm();
   const skipInitialFetch = useRef(Boolean(initialData));
@@ -663,7 +771,10 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
     void refresh();
   }, []);
 
-  function showResult(result: { ok: boolean; message?: string }, fallback: string) {
+  function showResult(
+    result: { ok: boolean; message?: string },
+    fallback: string,
+  ) {
     setNotice(
       result.ok
         ? { type: "ok", text: result.message || fallback }
@@ -679,7 +790,8 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
   async function handleLogout(account: StaffAccount) {
     const ok = await confirm({
       title: `Log out ${account.name}?`,
-      description: "This signs them out on every device. They can log back in with their password.",
+      description:
+        "This signs them out on every device. They can log back in with their password.",
       confirmLabel: "Log out",
       danger: true,
     });
@@ -721,7 +833,8 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
     } else {
       const ok = await confirm({
         title: `Block ${account.name}?`,
-        description: "They will be signed out immediately and cannot log in until unblocked.",
+        description:
+          "They will be signed out immediately and cannot log in until unblocked.",
         confirmLabel: "Block",
         danger: true,
       });
@@ -757,11 +870,17 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
             Staff
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Staff members can manage the dashboard. A maximum of one staff account is allowed.
+            Staff members can manage the dashboard. A maximum of one staff
+            account is allowed.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => void handleLogoutAll()} disabled={busyAction || staff.length === 0}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void handleLogoutAll()}
+            disabled={busyAction || staff.length === 0}
+          >
             <HugeiconsIcon icon={LogoutIcon} size={15} className="mr-1.5" />
             Log out all staff
           </Button>
@@ -803,8 +922,8 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
           <EmptyHeader>
             <EmptyTitle>No staff accounts yet</EmptyTitle>
             <EmptyDescription>
-              Add a staff member to give them dashboard access, then use this page to manage their
-              email, password and sessions.
+              Add a staff member to give them dashboard access, then use this
+              page to manage their email, password and sessions.
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
@@ -824,8 +943,8 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
             }
             onEdit={setEditing}
             onChangePassword={setPasswordTarget}
+            onBlock={(account) => console.log("")}
             onLogout={(account) => void handleLogout(account)}
-            onBlock={(account) => void handleBlock(account)}
             onDelete={(account) => void handleDelete(account)}
           />
         </div>
@@ -838,11 +957,21 @@ export function StaffManager({ initialData }: { initialData?: StaffAccount[] }) 
       />
 
       {editing && (
-        <EditStaffDialog account={editing} open onOpenChange={(open) => !open && setEditing(null)} onUpdated={refresh} />
+        <EditStaffDialog
+          account={editing}
+          open
+          onOpenChange={(open) => !open && setEditing(null)}
+          onUpdated={refresh}
+        />
       )}
 
       {passwordTarget && (
-        <PasswordDialog account={passwordTarget} open onOpenChange={(open) => !open && setPasswordTarget(null)} onUpdated={refresh} />
+        <PasswordDialog
+          account={passwordTarget}
+          open
+          onOpenChange={(open) => !open && setPasswordTarget(null)}
+          onUpdated={refresh}
+        />
       )}
     </div>
   );

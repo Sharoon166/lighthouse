@@ -24,6 +24,8 @@ export interface Category {
     metaDescription: string;
   };
   productCount: number;
+  featured: boolean;
+  featuredImage: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -81,6 +83,8 @@ const categorySchema = new Schema<Category>(
     attributes: { type: [categoryAttributeAssignmentSchema], default: [] },
     seo: { type: seoSchema, default: () => ({}) },
     productCount: { type: Number, default: 0 },
+    featured: { type: Boolean, default: false },
+    featuredImage: { type: String, default: "" },
   },
   {
     timestamps: true,
@@ -89,6 +93,7 @@ const categorySchema = new Schema<Category>(
 
 categorySchema.index({ parent: 1, isActive: 1, sortOrder: 1 });
 categorySchema.index({ ancestors: 1, isActive: 1 });
+categorySchema.index({ featured: 1, isActive: 1 });
 
 categorySchema.pre("save", async function () {
   if (!this.isModified("parent")) return;

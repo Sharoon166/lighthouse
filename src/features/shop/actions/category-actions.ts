@@ -16,6 +16,7 @@ export type { Category };
 import { categoryInputSchema } from "../validation/category";
 
 const MAX_CATEGORY_DEPTH = 4;
+const MAX_FEATURED_CATEGORIES = 4;
 
 async function cascadeDescendants(
   categoryId: string,
@@ -74,6 +75,8 @@ export type CategoryTreeNode = {
   isActive: boolean;
   sortOrder: number;
   productCount: number;
+  featured: boolean;
+  featuredImage: string;
   children: CategoryTreeNode[];
 };
 
@@ -165,6 +168,8 @@ export async function createCategory(
         metaTitle: data.seo?.metaTitle?.trim() || "",
         metaDescription: data.seo?.metaDescription?.trim() || "",
       },
+      featured: data.featured ?? false,
+      featuredImage: data.featuredImage ?? "",
     });
 
     revalidatePath("/admin/categories");
@@ -301,6 +306,8 @@ export async function updateCategory(
         metaTitle: data.seo?.metaTitle?.trim() || "",
         metaDescription: data.seo?.metaDescription?.trim() || "",
       },
+      featured: data.featured ?? existing.featured,
+      featuredImage: data.featuredImage ?? existing.featuredImage,
     });
 
     await existing.save();
@@ -391,6 +398,8 @@ export type CategoryListItem = {
   sortOrder: number;
   productCount: number;
   childCount: number;
+  featured: boolean;
+  featuredImage: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -459,6 +468,8 @@ export async function listCategories(
     sortOrder: document.sortOrder,
     productCount: document.productCount,
     childCount: childCountMap.get(String(document._id)) ?? 0,
+    featured: document.featured,
+    featuredImage: document.featuredImage,
     createdAt: document.createdAt.toISOString(),
     updatedAt: document.updatedAt.toISOString(),
   }));
@@ -496,6 +507,8 @@ export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
       isActive: doc.isActive,
       sortOrder: doc.sortOrder,
       productCount: doc.productCount,
+      featured: doc.featured ?? false,
+      featuredImage: doc.featuredImage ?? "",
       children: [],
     };
     nodeMap.set(node.id, node);
@@ -518,13 +531,13 @@ export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
 }
 
 export async function getAllCategories(): Promise<
-  { id: string; name: string; slug: string; level: number }[]
+  { id: string; name: string; slug: string; level: number; featured: boolean; featuredImage: string }[]
 > {
   await connectToDatabase();
 
   const categories = await CategoryModel.find({ isActive: true })
     .sort({ level: 1, sortOrder: 1, name: 1 })
-    .select("name slug level")
+    .select("name slug level featured featuredImage")
     .lean();
 
   return categories.map((c) => ({
@@ -532,25 +545,39 @@ export async function getAllCategories(): Promise<
     name: c.name,
     slug: c.slug,
     level: c.level,
+    featured: c.featured ?? false,
+    featuredImage: c.featuredImage ?? "",
   }));
 }
 
 export async function getCategoryById(id: string): Promise<Category | null> {
   await connectToDatabase();
-  return CategoryModel.findById(id).lean();
+  const doc = await CategoryModel.findById(id).lean();
+  if (!doc) return null;
+  return {
+    ...doc,
+    featured: doc.featured ?? false,
+    featuredImage: doc.featuredImage ?? "",
+  };
 }
 
 export async function getCategoryBySlug(
   slug: string,
 ): Promise<Category | null> {
   await connectToDatabase();
-  return CategoryModel.findOne({ slug, isActive: true }).lean();
+  const doc = await CategoryModel.findOne({ slug, isActive: true }).lean();
+  if (!doc) return null;
+  return {
+    ...doc,
+    featured: doc.featured ?? false,
+    featuredImage: doc.featuredImage ?? "",
+  };
 }
 
 export async function getSubcategories(
   parentId: string,
 ): Promise<
-  { id: string; name: string; slug: string; description: string; image: string; productCount: number }[]
+  { id: string; name: string; slug: string; description: string; image: string; productCount: number; featured: boolean; featuredImage: string }[]
 > {
   await connectToDatabase();
   const children = await CategoryModel.find({
@@ -567,6 +594,8 @@ export async function getSubcategories(
     description: c.description || "",
     image: c.image || "/1.png",
     productCount: c.productCount || 0,
+    featured: c.featured ?? false,
+    featuredImage: c.featuredImage ?? "",
   }));
 }
 
@@ -578,6 +607,8 @@ export async function getAllCategoriesAdmin(): Promise<
     level: number;
     ancestors: string[];
     parent: string | null;
+    featured: boolean;
+    featuredImage: string;
     attributes: {
       attributeId: string;
       required: boolean;
@@ -590,7 +621,7 @@ export async function getAllCategoriesAdmin(): Promise<
 
   const categories = await CategoryModel.find()
     .sort({ level: 1, sortOrder: 1, name: 1 })
-    .select("name slug level parent ancestors attributes")
+    .select("name slug level parent ancestors attributes featured featuredImage")
     .lean();
 
   return categories.map((c) => ({
@@ -600,6 +631,8 @@ export async function getAllCategoriesAdmin(): Promise<
     level: c.level,
     ancestors: c.ancestors.map((a) => String(a)),
     parent: c.parent ? String(c.parent) : null,
+    featured: c.featured ?? false,
+    featuredImage: c.featuredImage ?? "",
     attributes: (c.attributes ?? []).map((a) => ({
       attributeId: String(a.attributeId),
       required: a.required,
@@ -696,4 +729,74 @@ export async function getCategoryAttributes(categoryId: string): Promise<
   }
 
   return result.sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+export type ToggleFeaturedResult =
+  | { ok: true; featured: boolean }
+  | { ok: false; message: string };
+
+export async function toggleFeaturedCategory(
+  id: string,
+): Promise<ToggleFeaturedResult> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
+  await connectToDatabase();
+
+  const existing = await CategoryModel.findById(id);
+  if (!existing) {
+    return { ok: false, message: "This category no longer exists." };
+  }
+
+  if (!existing.featured) {
+    const count = await CategoryModel.countDocuments({
+      featured: true,
+      isActive: true,
+    });
+    if (count >= MAX_FEATURED_CATEGORIES) {
+      return {
+        ok: false,
+        message: `Maximum ${MAX_FEATURED_CATEGORIES} featured categories allowed. Unfeature another category first.`,
+      };
+    }
+  }
+
+  existing.featured = !existing.featured;
+  await existing.save();
+
+  revalidatePath("/admin/categories");
+
+  return { ok: true, featured: existing.featured };
+}
+
+export type PublicFeaturedCategory = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  image: string;
+  featuredImage: string;
+  productCount: number;
+};
+
+export async function getFeaturedCategories(): Promise<PublicFeaturedCategory[]> {
+  await connectToDatabase();
+
+  const categories = await CategoryModel.find({
+    featured: true,
+    isActive: true,
+  })
+    .sort({ sortOrder: 1, name: 1 })
+    .limit(MAX_FEATURED_CATEGORIES)
+    .lean();
+
+  return categories.map((c) => ({
+    id: String(c._id),
+    name: c.name,
+    slug: c.slug,
+    description: c.description || "",
+    image: c.featuredImage || c.image || "/products/6.png",
+    featuredImage: c.featuredImage,
+    productCount: c.productCount || 0,
+  }));
 }

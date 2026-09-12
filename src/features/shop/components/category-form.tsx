@@ -160,6 +160,15 @@ export function CategoryForm({
     initialData?.seo?.metaDescription ?? "",
   );
   const [showParentChangeWarning, setShowParentChangeWarning] = useState(false);
+  const [featured, setFeatured] = useState(initialData?.featured ?? false);
+  const [featuredImage, setFeaturedImage] = useState<{
+    url: string;
+    publicId: string;
+  } | null>(
+    initialData?.featuredImage
+      ? { url: initialData.featuredImage, publicId: initialData.featuredImage }
+      : null,
+  );
 
   const [fieldErrors, setFieldErrors] = useState<{
     [key: string]: string[] | undefined;
@@ -287,6 +296,8 @@ export function CategoryForm({
       metaTitle: seoMetaTitle.trim() || undefined,
       metaDescription: seoMetaDescription.trim() || undefined,
     },
+    featured,
+    featuredImage: featuredImage?.url ?? "",
   });
 
   const run = () => {
@@ -405,7 +416,7 @@ export function CategoryForm({
       )}
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-6 *:p-0 *:ring-0">
           <Card>
             <CardHeader>
               <CardTitle>Details</CardTitle>
@@ -511,6 +522,9 @@ export function CategoryForm({
                   upload={uploadShopImage}
                   deleteImage={deleteShopImage}
                   emptyLabel="Category image"
+                  aspectRatio={3 / 2}
+                  lockAspect
+                  optimizationPreset="product"
                 />
               </div>
             </CardContent>
@@ -747,6 +761,61 @@ export function CategoryForm({
         </div>
 
         <div className="min-w-0 space-y-6 lg:sticky lg:top-8 lg:self-start">
+          <Card>
+            <CardHeader>
+              <CardTitle>Featured</CardTitle>
+              <CardDescription>
+                Feature this category on the homepage. Up to 4 categories can be
+                featured.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/30 px-4 py-3">
+                <Switch
+                  id="featured"
+                  checked={featured}
+                  onCheckedChange={setFeatured}
+                />
+                <div className="flex-1">
+                  <Label
+                    htmlFor="featured"
+                    className="cursor-pointer font-medium"
+                  >
+                    Featured
+                  </Label>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {featured
+                      ? "This category is featured."
+                      : "Up to 4 categories can be featured."}
+                  </p>
+                </div>
+              </div>
+
+              {featured && (
+                <div className="space-y-2" data-field="featuredImage">
+                  <Label>Featured image</Label>
+                  <ImageDropzone
+                    value={featuredImage}
+                    onChange={(img) => {
+                      setFeaturedImage(img);
+                      clearFieldError("featuredImage");
+                    }}
+                    upload={uploadShopImage}
+                    deleteImage={deleteShopImage}
+                    emptyLabel="Featured image (optional)"
+                    aspectRatio={1}
+                    lockAspect
+                    optimizationPreset="product"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Optional. Overrides the category image on the homepage
+                    featured section.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>SEO (Optional)</CardTitle>

@@ -8,7 +8,7 @@ export default function LogoImage({ dark }: { dark?: boolean }) {
       src={dark ? darkLogo : logo}
       alt="Lighthouse logo"
       priority
-      className="w-28"
+      className="w-28 aspect-auto object-contain"
     />
   );
 }

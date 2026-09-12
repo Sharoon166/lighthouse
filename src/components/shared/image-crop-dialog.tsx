@@ -2,9 +2,14 @@
 
 import {
   Cancel01Icon,
+  CheckIcon,
   CropIcon,
-  RotateLeft01Icon,
-  RotateRight01Icon,
+  Rotate01Icon,
+  Rotate02Icon,
+  RotateCcw,
+  RotateClockwiseIcon,
+  ZoomInAreaIcon,
+  ZoomOutAreaIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useCallback, useEffect, useState } from "react";
@@ -27,7 +32,6 @@ async function getCroppedBlob(
   rotation: number,
 ): Promise<Blob> {
   try {
-    // Get blob from File or URL
     let blob: Blob;
     if (imageSource instanceof File) {
       blob = imageSource;
@@ -84,8 +88,6 @@ async function getCroppedBlob(
 
     bitmap.close();
 
-    // Return PNG at max quality to avoid double compression
-    // The shared optimizer will handle final compression and format
     return new Promise((resolve, reject) => {
       cropCanvas.toBlob(
         (blob) => {
@@ -107,6 +109,7 @@ interface ImageCropDialogProps {
   imageFile?: File;
   imageUrl?: string;
   aspectRatio?: number;
+  lockAspect?: boolean;
   onCancel: () => void;
   onConfirm: (blob: Blob) => void;
   isProcessing?: boolean;
@@ -129,6 +132,7 @@ export function ImageCropDialog({
   imageFile,
   imageUrl: externalImageUrl,
   aspectRatio: defaultAspectRatio = 16 / 9,
+  lockAspect = false,
   onCancel,
   onConfirm,
   isProcessing = false,
@@ -143,6 +147,17 @@ export function ImageCropDialog({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isProcessingCrop, setIsProcessingCrop] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+
+  // Trigger entrance animation after mount
+  useEffect(() => {
+    if (open) {
+      // Small delay to ensure the DOM is ready before animating in
+      const raf = requestAnimationFrame(() => setMounted(true));
+      return () => cancelAnimationFrame(raf);
+    }
+    setMounted(false);
+  }, [open]);
 
   // Create object URL from File when component mounts/updates
   useEffect(() => {
@@ -156,7 +171,6 @@ export function ImageCropDialog({
       setImageUrl(externalImageUrl);
     }
 
-    // Cleanup function
     return () => {
       if (url) {
         URL.revokeObjectURL(url);
@@ -179,17 +193,14 @@ export function ImageCropDialog({
 
     setIsProcessingCrop(true);
     try {
-      // Use File directly if available, otherwise use URL
       const imageSource = imageFile || imageUrl;
 
-      // Step 1: Crop (uncompressed)
       const croppedBlob = await getCroppedBlob(
         imageSource,
         croppedAreaPixels,
         rotation,
       );
 
-      // Step 2: Optimize (if preset provided)
       let finalBlob = croppedBlob;
       if (optimizationPreset) {
         const config = IMAGE_OPTIMIZATION_PRESETS[optimizationPreset];
@@ -224,27 +235,40 @@ export function ImageCropDialog({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+      {/* Backdrop */}
       <button
         type="button"
         aria-label="Close crop dialog"
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        className={cn(
+          "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300",
+          mounted ? "opacity-100" : "opacity-0",
+        )}
         onClick={isBusy ? undefined : onCancel}
         disabled={isBusy}
       />
+
+      {/* Dialog */}
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="image-crop-dialog-title"
-        className="relative flex w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl max-h-[90vh]"
+        className={cn(
+          "relative flex w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-white/10 bg-card shadow-2xl max-h-[90vh]",
+          "transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          mounted
+            ? "translate-y-0 opacity-100 scale-100"
+            : "translate-y-4 opacity-0 scale-[0.97]",
+        )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3.5">
+        <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3.5">
           <div className="flex items-center gap-2.5">
-            <HugeiconsIcon
-              icon={CropIcon}
-              size={18}
-              className="text-muted-foreground"
-            />
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary-foreground/6">
+              <HugeiconsIcon
+                icon={CropIcon}
+                size={16}
+              />
+            </div>
             <div>
               <h2
                 id="image-crop-dialog-title"
@@ -253,7 +277,7 @@ export function ImageCropDialog({
                 Crop Image
               </h2>
               {queueInfo && (
-                <p className="text-xs text-muted-foreground">{queueInfo}</p>
+                <p className="text-[11px] text-muted-foreground">{queueInfo}</p>
               )}
             </div>
           </div>
@@ -264,20 +288,32 @@ export function ImageCropDialog({
             aria-label="Close"
             onClick={onCancel}
             disabled={isBusy}
+            className="rounded-lg"
           >
             <HugeiconsIcon icon={Cancel01Icon} size={16} />
           </Button>
         </div>
 
         {/* Cropper Area */}
-        <div className="relative h-[500px] bg-muted/30">
+        <div className="relative h-[500px] bg-black/[0.02]">
+          {/* Processing overlay */}
           {isBusy && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/70 backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-2.5">
-                <div className="size-10 animate-spin rounded-full border-3 border-muted border-t-foreground" />
-                <p className="text-sm font-medium text-foreground">
-                  {isProcessing ? "Uploading..." : "Processing..."}
-                </p>
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">
+              <div className="flex flex-col items-center gap-3">
+                <div className="relative size-10">
+                  {/* Outer ring */}
+                  <div className="absolute inset-0 rounded-full border-2 border-muted" />
+                  {/* Spinning arc */}
+                  <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-foreground [animation-duration:0.8s]" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-medium text-foreground">
+                    {isProcessing ? "Uploading..." : "Processing..."}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    Please wait
+                  </p>
+                </div>
               </div>
             </div>
           )}
@@ -301,11 +337,11 @@ export function ImageCropDialog({
         </div>
 
         {/* Controls */}
-        <div className="space-y-4 border-t border-border px-5 py-4">
+        <div className="space-y-4 border-t border-border/60 px-5 py-4">
           {/* Aspect Ratio */}
-          {allowAspectChange && (
+          {allowAspectChange && !lockAspect && (
             <div className="space-y-2">
-              <label className="text-xs font-medium text-muted-foreground">
+              <label className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 Aspect Ratio
               </label>
               <div className="flex flex-wrap gap-1.5">
@@ -316,11 +352,11 @@ export function ImageCropDialog({
                     onClick={() => setAspectRatio(ratio.value)}
                     disabled={isBusy}
                     className={cn(
-                      "rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
+                      "rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-200",
                       aspectRatio === ratio.value
-                        ? "bg-foreground text-background"
-                        : "bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground",
-                      isBusy && "opacity-50",
+                        ? "bg-foreground text-background shadow-sm"
+                        : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground",
+                      isBusy && "pointer-events-none opacity-50",
                     )}
                   >
                     {ratio.label}
@@ -330,62 +366,84 @@ export function ImageCropDialog({
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex items-center justify-between gap-3 pt-1">
-            {/* Zoom */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label
-                  htmlFor="crop-zoom"
-                  className="text-xs font-medium text-muted-foreground"
+          {/* Actions row */}
+          <div className="flex items-center flex-wrap justify-center sm:justify-between gap-3">
+            {/* Zoom + Aspect badge */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setZoom((z) => Math.max(1, z - 0.25))}
+                  disabled={isBusy || zoom <= 1}
+                  className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
+                  aria-label="Zoom out"
                 >
-                  Zoom
-                </label>
-                <span className="text-xs text-muted-foreground">
-                  {Math.round((zoom - 1) * 100)}%
-                </span>
+                  <HugeiconsIcon icon={ZoomOutAreaIcon} size={14} />
+                </button>
+                <input
+                  id="crop-zoom"
+                  type="range"
+                  min={1}
+                  max={4}
+                  step={0.01}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  disabled={isBusy}
+                  className="h-1 w-24 cursor-pointer appearance-none rounded-full bg-muted accent-foreground [::-webkit-slider-thumb]:size-3.5 [::-webkit-slider-thumb]:appearance-none [::-webkit-slider-thumb]:rounded-full [::-webkit-slider-thumb]:bg-foreground [::-webkit-slider-thumb]:shadow-sm [::-webkit-slider-thumb]:transition-transform [::-webkit-slider-thumb]:duration-150 [::-webkit-slider-thumb]:hover:scale-125 disabled:opacity-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => setZoom((z) => Math.min(4, z + 0.25))}
+                  disabled={isBusy || zoom >= 4}
+                  className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-30"
+                  aria-label="Zoom in"
+                >
+                  <HugeiconsIcon icon={ZoomInAreaIcon} size={14} />
+                </button>
               </div>
-              <input
-                id="crop-zoom"
-                type="range"
-                min={1}
-                max={4}
-                step={0.01}
-                value={zoom}
-                onChange={(e) => setZoom(Number(e.target.value))}
-                disabled={isBusy}
-                className="w-full accent-foreground disabled:opacity-50"
-              />
+              <span className="rounded-md bg-muted/60 px-2 py-0.5 text-[11px] font-medium tabular-nums text-muted-foreground">
+                {Math.round((zoom - 1) * 100)}%
+              </span>
+              <div className="h-4 w-px bg-border" />
+              <span className="rounded-md bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                {ASPECT_RATIOS.find(
+                  (r) => Math.abs(r.value - aspectRatio) < 0.01,
+                )?.label ?? `${Math.round(aspectRatio)}:1`}
+              </span>
             </div>
+
+            {/* Rotate + Actions */}
             <div className="flex items-center gap-2">
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="icon-sm"
                 aria-label="Rotate left"
                 onClick={() => rotate(-1)}
                 disabled={isBusy}
+                className="rounded-lg"
               >
-                <HugeiconsIcon icon={RotateLeft01Icon} size={14} />
+                <HugeiconsIcon icon={RotateClockwiseIcon} size={14} />
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
+                size="icon-sm"
                 aria-label="Rotate right"
                 onClick={() => rotate(1)}
                 disabled={isBusy}
+                className="rounded-lg"
               >
-                <HugeiconsIcon icon={RotateRight01Icon} size={14} />
+                <HugeiconsIcon icon={Rotate02Icon} size={14} />
               </Button>
-            </div>
-            <div className="flex items-center gap-2">
+              <div className="h-4 w-px bg-border" />
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={onCancel}
                 disabled={isBusy}
+                className="rounded-lg"
               >
                 Cancel
               </Button>
@@ -394,8 +452,16 @@ export function ImageCropDialog({
                 size="sm"
                 onClick={() => void handleConfirm()}
                 disabled={!croppedAreaPixels || isBusy}
+                className="rounded-lg gap-1.5"
               >
-                {isProcessingCrop ? "Processing..." : "Continue"}
+                {isProcessingCrop ? (
+                  "Processing..."
+                ) : (
+                  <>
+                    <HugeiconsIcon icon={CheckIcon} size={14} />
+                    Crop
+                  </>
+                )}
               </Button>
             </div>
           </div>

@@ -75,6 +75,8 @@ export const categoryInputSchema = z.object({
         .optional(),
     })
     .optional(),
+  featured: z.boolean().optional(),
+  featuredImage: z.string().trim().optional(),
 });
 
 export type CategoryInput = z.infer<typeof categoryInputSchema>;

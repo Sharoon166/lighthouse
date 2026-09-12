@@ -8,7 +8,7 @@ export async function GET() {
     await connectToDatabase();
     const categories = await CategoryModel.find({ isActive: true })
       .sort({ sortOrder: 1, name: 1 })
-      .select("name slug description image productCount")
+      .select("name slug description image productCount featured featuredImage")
       .lean();
 
     if (categories.length > 0) {
@@ -20,6 +20,8 @@ export async function GET() {
           description: c.description || "",
           image: c.image || "/products/6.png",
           productCount: c.productCount || 0,
+          featured: c.featured,
+          featuredImage: c.featuredImage || "",
         })),
       });
     }
@@ -33,6 +35,8 @@ export async function GET() {
       description: c.description,
       image: c.image,
       productCount: c.designsCount,
+      featured: false,
+      featuredImage: "",
     })),
   });
 }

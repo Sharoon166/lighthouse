@@ -114,7 +114,7 @@ export default async function CategoryPage({
         </div>
 
         <Image
-          src={category.image || "/about-image.webp"}
+          src={category.featuredImage || category.image || "/about-image.webp"}
           width={1024}
           height={1024}
           priority

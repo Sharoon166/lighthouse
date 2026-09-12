@@ -58,16 +58,16 @@ export function CategorySearchFilter({
         {filtered.map((category) => (
           <Link
             key={category.id}
-            href={`/products?category=${category.slug}`}
+            href={`/categories/${category.slug}`}
             className="group relative flex flex-col justify-end overflow-hidden bg-noise p-6 aspect-3/2"
           >
             {/* Background Image */}
             <Image
-              src="/wall-lights.png"
+              src={category.image || "/wall-lights.png"}
               alt={category.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover object-center transition-transform duration-500 group-hover:scale-105 brightness-170"
+              className="object-cover object-top transition-transform duration-500 group-hover:scale-105 brightness-170"
             />
 
             {/* Content overlay */}

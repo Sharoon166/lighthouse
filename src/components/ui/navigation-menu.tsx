@@ -8,9 +8,12 @@ function NavigationMenu({
   align = "start",
   className,
   children,
+  positionerClassName,
   ...props
 }: NavigationMenuPrimitive.Root.Props &
-  Pick<NavigationMenuPrimitive.Positioner.Props, "align">) {
+  Pick<NavigationMenuPrimitive.Positioner.Props, "align"> & {
+    positionerClassName?: string
+  }) {
   return (
     <NavigationMenuPrimitive.Root
       data-slot="navigation-menu"
@@ -21,7 +24,7 @@ function NavigationMenu({
       {...props}
     >
       {children}
-      <NavigationMenuPositioner align={align} />
+      <NavigationMenuPositioner align={align} className={positionerClassName} />
     </NavigationMenuPrimitive.Root>
   )
 }

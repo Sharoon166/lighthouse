@@ -27,15 +27,24 @@ export async function GET(request: NextRequest) {
       .select("name slug status")
       .limit(5)
       .lean(),
-    ProductModel.find({ name: { $regex: safe, $options: "i" }, deletedAt: { $eq: null } })
+    ProductModel.find({
+      name: { $regex: safe, $options: "i" },
+      deletedAt: { $eq: null },
+    })
       .select("name slug status")
       .limit(5)
       .lean(),
-    ProjectModel.find({ title: { $regex: safe, $options: "i" }, deletedAt: null })
+    ProjectModel.find({
+      title: { $regex: safe, $options: "i" },
+      deletedAt: null,
+    })
       .select("title slug status")
       .limit(5)
       .lean(),
-    BlogPostModel.find({ title: { $regex: safe, $options: "i" }, deletedAt: null })
+    BlogPostModel.find({
+      title: { $regex: safe, $options: "i" },
+      deletedAt: null,
+    })
       .select("title slug status")
       .limit(5)
       .lean(),

@@ -47,7 +47,7 @@ export function CategorySearchFilter({
             className="absolute left-3 top-2.5 text-muted-foreground pointer-events-none"
           />
         </div>
-        
+
         <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
           {filtered.length} {filtered.length === 1 ? "category" : "categories"}
         </span>

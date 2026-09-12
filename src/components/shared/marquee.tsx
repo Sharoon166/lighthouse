@@ -126,14 +126,10 @@ export const Marquee: React.FC<MarqueeProps> = ({
         style={style}
       >
         {/* First copy of content */}
-        <div className="flex shrink-0 gap-[var(--marquee-gap)]">
-          {children}
-        </div>
-        
+        <div className="flex shrink-0 gap-[var(--marquee-gap)]">{children}</div>
+
         {/* Second copy of content - creates seamless loop */}
-        <div className="flex shrink-0 gap-[var(--marquee-gap)]">
-          {children}
-        </div>
+        <div className="flex shrink-0 gap-[var(--marquee-gap)]">{children}</div>
       </div>
     </div>
   );

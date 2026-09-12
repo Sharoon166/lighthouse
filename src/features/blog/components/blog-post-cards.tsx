@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Delete02Icon,
-  Edit02Icon,
-  StarIcon,
-} from "@hugeicons/core-free-icons";
+import { Delete02Icon, Edit02Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -128,7 +124,10 @@ export function BlogPostCards({
               ))}
             </div>
 
-            <Link href={`/admin/blog/edit/${post.slug}`} className="group/title">
+            <Link
+              href={`/admin/blog/edit/${post.slug}`}
+              className="group/title"
+            >
               <h3 className="text-base font-semibold leading-snug text-foreground transition-colors group-hover/title:text-primary">
                 {post.title}
               </h3>
@@ -147,7 +146,9 @@ export function BlogPostCards({
                     {initials(post.authorName) || "LH"}
                   </AvatarFallback>
                 </Avatar>
-                <span className="truncate">{post.authorName || "Anonymous"}</span>
+                <span className="truncate">
+                  {post.authorName || "Anonymous"}
+                </span>
               </div>
               <time className="ml-auto shrink-0 text-xs">
                 {formatDate(post.updatedAt)}

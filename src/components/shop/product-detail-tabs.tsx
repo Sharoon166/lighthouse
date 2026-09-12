@@ -120,7 +120,12 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
           </div>
           <div className="lg:col-span-5 relative aspect-square">
             <Image
-              src={product.images[2] || product.images[1] || product.images[0] || "/products/1.png"}
+              src={
+                product.images[2] ||
+                product.images[1] ||
+                product.images[0] ||
+                "/products/1.png"
+              }
               alt={`${product.name} specifications`}
               fill
               className="object-cover"

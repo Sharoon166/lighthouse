@@ -6,11 +6,11 @@ import {
   BarChart,
   Area,
   AreaChart,
-  Pie,
-  PieChart,
   Cell,
   XAxis,
   YAxis,
+  PieChart,
+  Pie,
 } from "recharts";
 import {
   ChartContainer,
@@ -151,10 +151,7 @@ function PublishingActivity({
       <p className="mb-6 text-sm text-muted-foreground">
         Content published across all channels
       </p>
-      <ChartContainer
-        config={publishingChartConfig}
-        className="h-50 w-full"
-      >
+      <ChartContainer config={publishingChartConfig} className="h-50 w-full">
         <AreaChart
           data={chartData}
           margin={{ left: 0, right: 16, top: 8, bottom: 0 }}
@@ -255,7 +252,7 @@ function ProductStatusDonut({
               outerRadius="90%"
               strokeWidth={3}
               stroke="var(--card)"
-              cornerRadius={8}              
+              cornerRadius={8}
             >
               {chartData.map((entry) => (
                 <Cell key={entry.name} fill={entry.fill} />

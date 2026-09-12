@@ -95,7 +95,7 @@
   --background: oklch(1 0 0);
   --foreground: oklch(0.2 0 0); /* Much darker text */
 
-   /*Vibrant primary for clear CTAs */
+  /*Vibrant primary for clear CTAs */
   /*--primary: oklch(0.55 0.22 264); /* Bold blue */
   --primary: #2a1b45; /* Bold blue */
   --primary-foreground: oklch(0.99 0 0);
@@ -147,7 +147,6 @@
   --sidebar-ring: oklch(0.55 0.22 264);
 
   --font-playfair-display: var(--font-tenor-sans);
-
 }
 
 /* Dashboard Dark Mode - Optional high contrast dark theme */
@@ -208,7 +207,7 @@
 }
 
 @utility bg-opple-banner {
-    @apply bg-cover bg-center bg-[url('/brands/opple-distribution-banner.png')] max-sm:bg-[url('/brands/opple-distribution-banner-mobile.png')];
+  @apply bg-cover bg-center bg-[url('/brands/opple-distribution-banner.png')] max-sm:bg-[url('/brands/opple-distribution-banner-mobile.png')];
 }
 
 @layer base {
@@ -226,7 +225,7 @@
 
   h2,
   h3 {
-    @apply text-primary-foreground ;
+    @apply text-primary-foreground;
     font-size: clamp(30px, 4vw, 40px);
   }
 
@@ -236,7 +235,7 @@
   }
 
   h2 {
-      @apply font-bold;
+    @apply font-bold;
   }
 
   p {

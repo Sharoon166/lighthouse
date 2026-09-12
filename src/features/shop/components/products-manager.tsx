@@ -65,7 +65,10 @@ function ProductTable({
 }: {
   products: ProductListItem[];
   onDelete?: (product: ProductListItem) => void;
-  onStatusChange?: (product: ProductListItem, status: "draft" | "active" | "archived") => void;
+  onStatusChange?: (
+    product: ProductListItem,
+    status: "draft" | "active" | "archived",
+  ) => void;
 }) {
   const columns = useMemo(
     () => [
@@ -158,7 +161,11 @@ function ProductTable({
                   >
                     <StatusBadge status={s} />
                     {s === currentStatus && (
-                      <HugeiconsIcon icon={Tick02Icon} size={14} className="ml-auto text-foreground" />
+                      <HugeiconsIcon
+                        icon={Tick02Icon}
+                        size={14}
+                        className="ml-auto text-foreground"
+                      />
                     )}
                   </DropdownMenuItem>
                 ))}

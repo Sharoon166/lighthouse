@@ -234,7 +234,7 @@ export function GalleryManager({
               key={image.publicId}
               className="group relative space-y-2 rounded-lg border border-border p-2"
             >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-md bg-muted">
+              <div className="relative aspect-4/3 overflow-hidden rounded-md bg-muted">
                 <Image
                   src={image.url}
                   alt={image.caption || `Gallery image ${index + 1}`}

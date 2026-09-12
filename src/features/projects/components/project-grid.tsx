@@ -49,14 +49,16 @@ export function ProjectGrid({ projects }: { projects: ProjectItem[] }) {
           </div>
         ) : (
           <Empty className="rounded-2xl border border-border bg-card py-16">
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <HugeiconsIcon icon={FolderOpenIcon} size={24} />
-          </EmptyMedia>
-          <EmptyTitle>No projects found</EmptyTitle>
-          <EmptyDescription>Try a different search or category.</EmptyDescription>
-        </EmptyHeader>
-      </Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <HugeiconsIcon icon={FolderOpenIcon} size={24} />
+              </EmptyMedia>
+              <EmptyTitle>No projects found</EmptyTitle>
+              <EmptyDescription>
+                Try a different search or category.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         )}
       </div>
     </>

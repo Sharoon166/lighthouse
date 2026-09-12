@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Delete02Icon,
-  Edit02Icon,
-  StarIcon,
-} from "@hugeicons/core-free-icons";
+import { Delete02Icon, Edit02Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";

@@ -266,7 +266,7 @@ export const ceoMessage = {
   name: "Raja Abdul Ghaffar",
   role: "CEO @ lighthouse",
   image: "/ceo.webp",
-  message:[
+  message: [
     "Raja Abdul Ghaffar is the CEO and founder of the newly emerging Lighthouse that was established in 2018. Mr Ghaffar is a highly qualified and learned person with 26 years of experience in the lighting business. As the leader of Lighthouse, he leads all the design, engineering, and manufacturing of the lighting products. Since the inception of Lighthouse after 26 years of his untiring service in the lighting sector, he has finally pooled in all his previous knowledge and experience to bring a new wave of innovative high-potential products.",
     "Mr Ghaffar is a visionary and a person with highly noticeable 26 years of experience in this industry offering excellent services.Now he has embarked on this mission to offer cost- effective, international- standard and efficient lighting products.Lighthouse has the privilege to produce world - class lighting products while following all international standards.",
     "Mr Ghaffar has proved his worth in all his previous 26 years of experience and now as the CEO of Lighthouse that he and his company has all the potential to bring much-needed change and lighting products to the market. Mr Ghaffar has personally focused his energies on establishing a state-of-the-art company while offering a chance to the consumer to experience the real future of lighting products.",

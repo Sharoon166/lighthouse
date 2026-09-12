@@ -234,7 +234,7 @@ export function ImageCropDialog({
   const isBusy = isProcessingCrop || isProcessing;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
       {/* Backdrop */}
       <button
         type="button"
@@ -264,10 +264,7 @@ export function ImageCropDialog({
         <div className="flex items-center justify-between gap-3 border-b border-border/60 px-5 py-3.5">
           <div className="flex items-center gap-2.5">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary-foreground/6">
-              <HugeiconsIcon
-                icon={CropIcon}
-                size={16}
-              />
+              <HugeiconsIcon icon={CropIcon} size={16} />
             </div>
             <div>
               <h2
@@ -295,7 +292,7 @@ export function ImageCropDialog({
         </div>
 
         {/* Cropper Area */}
-        <div className="relative h-[500px] bg-black/[0.02]">
+        <div className="relative h-125 bg-black/5">
           {/* Processing overlay */}
           {isBusy && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-background/80 backdrop-blur-sm">

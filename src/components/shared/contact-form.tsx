@@ -147,7 +147,12 @@ export function ContactForm() {
             />
           </div>
 
-          <Button type="submit" variant="secondary" size="lg" className="max-sm:w-full">
+          <Button
+            type="submit"
+            variant="secondary"
+            size="lg"
+            className="max-sm:w-full"
+          >
             Send a Message
           </Button>
         </form>

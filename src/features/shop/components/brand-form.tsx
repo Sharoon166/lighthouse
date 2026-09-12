@@ -332,7 +332,7 @@ export function BrandForm({
 
               <div className="space-y-2" data-field="description">
                 <Label htmlFor="description">Description</Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="description"
                     value={description}
@@ -465,7 +465,7 @@ export function BrandForm({
 
               <div className="space-y-2" data-field="seo.metaDescription">
                 <Label htmlFor="seo-meta-description">Meta Description</Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="seo-meta-description"
                     value={seoMetaDescription}

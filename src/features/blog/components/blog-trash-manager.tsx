@@ -70,9 +70,7 @@ export function BlogTrashManager({
             </div>
           )}
           <div className="min-w-0">
-            <p className="truncate font-medium text-foreground">
-              {post.title}
-            </p>
+            <p className="truncate font-medium text-foreground">{post.title}</p>
             <p className="truncate text-xs text-muted-foreground">
               /{post.slug}
             </p>

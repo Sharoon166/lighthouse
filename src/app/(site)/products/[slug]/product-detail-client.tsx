@@ -10,14 +10,15 @@ interface ProductDetailClientProps {
 }
 
 export function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const [selectedVariant, setSelectedVariant] = useState<ShopProductVariant | undefined>(
-    () => product.variants.find((v) => v.isDefault) || product.variants[0]
-  );
+  const [selectedVariant, setSelectedVariant] = useState<
+    ShopProductVariant | undefined
+  >(() => product.variants.find((v) => v.isDefault) || product.variants[0]);
 
   // Determine which image should be highlighted/selected
-  const highlightedImage = selectedVariant?.images && selectedVariant.images.length > 0
-    ? selectedVariant.images[0]
-    : product.images[0];
+  const highlightedImage =
+    selectedVariant?.images && selectedVariant.images.length > 0
+      ? selectedVariant.images[0]
+      : product.images[0];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -29,8 +30,8 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
       />
 
       {/* Right: Purchase & Info Panel */}
-      <ProductPurchasePanel 
-        product={product} 
+      <ProductPurchasePanel
+        product={product}
         onVariantChange={setSelectedVariant}
       />
     </div>

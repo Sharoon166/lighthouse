@@ -75,7 +75,13 @@ function Tooltip({ label, className }: { label: string; className?: string }) {
   );
 }
 
-export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMobile?: boolean }) {
+export function SidebarNav({
+  navigate,
+  isMobile,
+}: {
+  navigate?: () => void;
+  isMobile?: boolean;
+}) {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
   const user = session?.user;
@@ -85,7 +91,7 @@ export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMo
     "lighthouse:sidebar-collapsed",
     true,
   );
-  
+
   // On mobile, always show expanded sidebar
   const collapsed = isMobile ? false : collapsedStorage;
 
@@ -128,7 +134,7 @@ export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMo
             className="flex size-8 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <HugeiconsIcon
-              icon={collapsed ? PanelLeftOpenIcon : PanelLeftCloseIcon}
+              icon={collapsed ? PanelLeftCloseIcon : PanelLeftOpenIcon}
               size={18}
             />
           </button>
@@ -172,9 +178,16 @@ export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMo
             href="/admin/settings/staff"
             onClick={navigate}
             aria-label={collapsed ? "Staff" : undefined}
-            className={itemClasses(collapsed, pathname === "/admin/settings/staff")}
+            className={itemClasses(
+              collapsed,
+              pathname === "/admin/settings/staff",
+            )}
           >
-            <HugeiconsIcon icon={UserShield01Icon} size={18} className="shrink-0" />
+            <HugeiconsIcon
+              icon={UserShield01Icon}
+              size={18}
+              className="shrink-0"
+            />
             <span className={cn(collapsed && "hidden")}>Staff</span>
             {collapsed && <Tooltip label="Staff" />}
           </Link>
@@ -198,7 +211,9 @@ export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMo
                 <p className="truncate text-sm font-medium text-foreground">
                   {name}
                 </p>
-                <p className="truncate text-xs text-muted-foreground">{email}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {email}
+                </p>
               </div>
             )}
             {collapsed && (
@@ -228,14 +243,20 @@ export function SidebarNav({ navigate, isMobile }: { navigate?: () => void; isMo
                 Profile
               </DropdownMenuItem>
               <DropdownMenuItem onClick={navigate}>
-                <Link href="/admin/settings" className="flex items-center gap-2">
+                <Link
+                  href="/admin/settings"
+                  className="flex items-center gap-2"
+                >
                   <HugeiconsIcon icon={Settings01Icon} size={16} />
                   Settings
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+            <DropdownMenuItem
+              onClick={handleSignOut}
+              className="text-destructive"
+            >
               <HugeiconsIcon icon={LogoutIcon} size={16} />
               Sign out
             </DropdownMenuItem>

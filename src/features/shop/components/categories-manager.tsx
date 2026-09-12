@@ -10,6 +10,7 @@ import {
   ImageIcon,
   PlusSignIcon,
   Search01Icon,
+  Star,
   StarIcon,
   TagsIcon,
 } from "@hugeicons/core-free-icons";
@@ -64,14 +65,14 @@ function TreeNode({
     <div>
       <div
         className={cn(
-          "group flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-muted/50",
+          "group flex items-center gap-1.5 sm:gap-2 rounded-lg px-2 sm:px-3 py-2 sm:py-2.5 text-sm transition-colors hover:bg-muted/50",
         )}
-        style={{ paddingLeft: `${depth * 1.5 + 0.75}rem` }}
+        style={{ paddingLeft: `${depth * 1.25 + 0.5}rem` }}
       >
         <button
           type="button"
           className={cn(
-            "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted",
+            "flex shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted",
             !hasChildren && "invisible",
           )}
           onClick={() => setExpanded((prev) => !prev)}
@@ -79,7 +80,7 @@ function TreeNode({
         >
           <HugeiconsIcon
             icon={expanded ? ChevronDownIcon : ChevronRightIcon}
-            size={14}
+            size={18}
           />
         </button>
 
@@ -98,31 +99,35 @@ function TreeNode({
         )}
 
         <div className="min-w-0 flex-1">
-          <span className="font-medium text-foreground">{node.name}</span>
-          <span className="ml-2 text-xs text-muted-foreground">
+          <span className="font-heading text-base sm:text-lg font-semibold text-foreground">
+            {node.name}
+          </span>
+          <span className="ml-1.5 text-xs text-muted-foreground max-sm:hidden">
             /{node.slug}
           </span>
         </div>
 
+        {/* Badges — hidden on mobile to reduce clutter */}
         {node.productCount > 0 && (
-          <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+          <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground max-sm:hidden">
             {node.productCount} products
           </span>
         )}
 
         {!node.isActive && (
-          <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+          <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground max-sm:hidden">
             Inactive
           </span>
         )}
 
         {node.featured && (
-          <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 border border-amber-200">
-            ★ Featured
+          <span className="hidden sm:inline-flex shrink-0 items-center gap-1 rounded-full bg-gold/15 px-2 py-1 text-xs font-medium text-gold border border-gold">
+            <HugeiconsIcon icon={Star} size={16} /> Featured
           </span>
         )}
 
-        <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+        {/* Actions — always visible on mobile (no hover), hidden until hover on desktop */}
+        <div className="flex shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100">
           {onToggleFeatured && (
             <button
               type="button"
@@ -346,82 +351,87 @@ export function CategoriesManager({
 
       {/* Featured Section */}
       {!isLoading && featuredCategories.length > 0 && (
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg bg-muted/40 px-4 py-3">
-          <HugeiconsIcon
-            icon={StarIcon}
-            size={14}
-            className="shrink-0 text-muted-foreground"
-          />
-          <span className="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Featured
-          </span>
-          <div className="hidden h-4 w-px bg-border sm:block" />
-          {featuredCategories.map((cat) => (
-            <div key={cat.id} className="group flex items-center gap-2.5">
-              {cat.image ? (
-                <img
-                  src={cat.image}
-                  alt=""
-                  className="size-8 shrink-0 rounded object-cover"
-                />
-              ) : (
-                <div className="size-8 shrink-0 rounded bg-border" />
-              )}
-              <span className="max-w-50 truncate text-sm text-foreground">
-                {cat.name}
-              </span>
-              <button
-                type="button"
-                onClick={() => handleToggleFeatured(cat)}
-                className="shrink-0 rounded p-0.5 text-muted-foreground opacity-0 transition-all hover:text-destructive group-hover:opacity-100"
-                title="Unfeature"
-              >
-                <HugeiconsIcon icon={Delete02Icon} size={12} />
-              </button>
-            </div>
-          ))}
+        <div className="rounded-lg bg-muted/40 px-3 py-2.5 sm:px-4 sm:py-3">
+          <div className="flex items-center gap-2 mb-2 sm:mb-0 sm:flex-row sm:items-center sm:gap-x-3 sm:gap-y-2">
+            <HugeiconsIcon
+              icon={StarIcon}
+              size={14}
+              className="shrink-0 text-muted-foreground"
+            />
+            <span className="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Featured
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:mt-0 mt-2">
+            {featuredCategories.map((cat) => (
+              <div key={cat.id} className="group flex items-center gap-2.5 p-2">
+                {cat.image ? (
+                  <img
+                    src={cat.image}
+                    alt=""
+                    className="size-7 sm:size-8 shrink-0 rounded object-cover"
+                  />
+                ) : (
+                  <div className="size-7 sm:size-8 shrink-0 rounded bg-border" />
+                )}
+                <span className="max-w-36 sm:max-w-50 truncate text-sm text-foreground">
+                  {cat.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleToggleFeatured(cat)}
+                  className="shrink-0 rounded p-0.5 text-muted-foreground sm:opacity-0 sm:transition-all sm:hover:text-destructive sm:group-hover:opacity-100"
+                  title="Unfeature"
+                >
+                  <HugeiconsIcon icon={Delete02Icon} size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <InputGroup className="h-10 w-full rounded-full bg-card md:w-72">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <InputGroup className="h-10 w-full rounded-full bg-card sm:w-72">
           <InputGroupAddon>
             <HugeiconsIcon icon={Search01Icon} size={16} />
           </InputGroupAddon>
           <InputGroupInput
-            placeholder="Search categories…"
+            placeholder="Search categories..."
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             className="h-10"
           />
         </InputGroup>
-        {!isLoading && tree.length > 0 && (
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              onClick={handleExpandAll}
-              aria-label="Expand all categories"
-            >
-              <HugeiconsIcon icon={Expand} size={16} />
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              onClick={handleCollapseAll}
-              aria-label="Collapse all categories"
-            >
-              <HugeiconsIcon icon={Collapse} size={16} />
-            </Button>
-          </div>
-        )}
-        {!isLoading && (
-          <span className="text-sm text-muted-foreground">
-            {countAll(tree)} total categories
-          </span>
-        )}
+        <div className="flex items-center justify-between gap-2">
+          {!isLoading && tree.length > 0 && (
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                onClick={handleExpandAll}
+                aria-label="Expand all categories"
+              >
+                <HugeiconsIcon icon={Expand} size={16} />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                onClick={handleCollapseAll}
+                aria-label="Collapse all categories"
+              >
+                <HugeiconsIcon icon={Collapse} size={16} />
+              </Button>
+            </div>
+          )}
+          {!isLoading && (
+            <span className="text-sm text-muted-foreground">
+              {countAll(tree)} total
+            </span>
+          )}
+        </div>
       </div>
 
       {error && (
@@ -478,7 +488,7 @@ export function CategoriesManager({
         </Empty>
       ) : (
         <div className="rounded-2xl border border-border bg-card">
-          <div className="p-2">
+          <div className="p-1 sm:p-2">
             {filteredTree.map((node) => (
               <TreeNode
                 key={`${node.id}-${treeVersion}`}
@@ -487,9 +497,7 @@ export function CategoriesManager({
                 onDelete={isAdmin ? handleDelete : undefined}
                 onToggleFeatured={isAdmin ? handleToggleFeatured : undefined}
                 canFeatureMore={canFeatureMore}
-                defaultExpanded={
-                  forceExpand !== null ? forceExpand : undefined
-                }
+                defaultExpanded={forceExpand !== null ? forceExpand : undefined}
               />
             ))}
           </div>

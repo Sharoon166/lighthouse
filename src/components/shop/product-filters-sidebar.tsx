@@ -2,7 +2,10 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
-import { FilterHorizontalIcon, CancelCircleIcon } from "@hugeicons/core-free-icons";
+import {
+  FilterHorizontalIcon,
+  CancelCircleIcon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
 import type { ShopProductItem } from "@/lib/shop-data";
@@ -43,7 +46,8 @@ export function ProductFiltersSidebar({
   );
 
   const [category, setCategory] = useState(initialCategory);
-  const [selectedBrands, setSelectedBrands] = useState<Set<string>>(initialBrands);
+  const [selectedBrands, setSelectedBrands] =
+    useState<Set<string>>(initialBrands);
   const [selectedPrice, setSelectedPrice] = useState<Set<string>>(initialPrice);
 
   const toggleSet = (
@@ -84,9 +88,7 @@ export function ProductFiltersSidebar({
     [...selectedPrice].some((v) => !initialPrice.has(v));
 
   const activeFilterCount =
-    (category !== "all" ? 1 : 0) +
-    selectedBrands.size +
-    selectedPrice.size;
+    (category !== "all" ? 1 : 0) + selectedBrands.size + selectedPrice.size;
 
   const filterContent = (
     <div className="space-y-8">

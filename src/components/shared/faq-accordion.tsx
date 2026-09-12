@@ -43,7 +43,7 @@ export function FAQAccordion({ items }: FAQAccordionProps) {
                 onClick={() => toggleItem(index)}
                 className={cn(
                   "flex w-full items-center justify-between gap-4 px-6 py-5 text-left transition-colors",
-                  "hover:bg-muted/50 focus:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                  "hover:bg-muted/50 focus:bg-muted/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2",
                 )}
               >
                 <span className="font-medium text-base md:text-lg pr-4">
@@ -54,12 +54,12 @@ export function FAQAccordion({ items }: FAQAccordionProps) {
                   size={20}
                   className={cn(
                     "shrink-0 text-muted-foreground transition-transform duration-300",
-                    isOpen && "rotate-180 text-gold"
+                    isOpen && "rotate-180 text-gold",
                   )}
                 />
               </button>
             </h3>
-            
+
             <div
               id={panelId}
               role="region"

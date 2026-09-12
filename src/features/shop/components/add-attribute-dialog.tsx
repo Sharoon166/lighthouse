@@ -128,16 +128,16 @@ export function AddAttributeDialog({
           </div>
         ) : (
           <Empty className="p-4">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <HugeiconsIcon icon={VariableIcon} size={24} />
-            </EmptyMedia>
-            <EmptyTitle>No attributes found</EmptyTitle>
-            <EmptyDescription>
-              Create a new attribute below or search with a different term.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <HugeiconsIcon icon={VariableIcon} size={24} />
+              </EmptyMedia>
+              <EmptyTitle>No attributes found</EmptyTitle>
+              <EmptyDescription>
+                Create a new attribute below or search with a different term.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         )}
 
         <div className="border-t border-border pt-3">

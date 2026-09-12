@@ -1,18 +1,20 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import {
-  Cancel01Icon,
-} from "@hugeicons/core-free-icons";
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ProductImageGallery } from "./product-image-gallery";
 import { ProductPurchasePanel } from "./product-purchase-panel";
 import type { ShopProductItem } from "@/lib/shop-data";
-
-
 
 interface QuickViewContextType {
   open: (product: ShopProductItem) => void;
@@ -100,10 +102,7 @@ function QuickViewPanel({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-h-[90vh]">
           {/* Left: Image gallery using ProductImageGallery component */}
           <div className="p-4 md:p-6 md:sticky md:top-0 md:self-start md:max-h-[90vh] md:overflow-y-auto">
-            <ProductImageGallery
-              images={product.images}
-              name={product.name}
-            />
+            <ProductImageGallery images={product.images} name={product.name} />
           </div>
 
           {/* Right: Collapsed ProductPurchasePanel */}

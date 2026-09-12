@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Delete02Icon,
-  Edit02Icon,
-  StarIcon,
-} from "@hugeicons/core-free-icons";
+import { Delete02Icon, Edit02Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   createColumnHelper,
@@ -127,9 +123,7 @@ export function ProjectTable({
                       ? "Add to featured"
                       : "Featured limit reached"
                 }
-                disabled={
-                  !info.row.original.featured && !canFeatureMore
-                }
+                disabled={!info.row.original.featured && !canFeatureMore}
                 onClick={() => onToggleFeatured(info.row.original)}
                 className={cn(
                   "flex size-8 items-center justify-center rounded-md transition-colors",

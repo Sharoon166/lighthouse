@@ -40,9 +40,11 @@ export interface DeleteConfirmConfig {
 }
 
 export interface TrashManagerProps<TItem> {
-  fetchItems: (
-    input: { page: number; pageSize: number; search: string },
-  ) => Promise<NormalizedTrashResult<TItem>>;
+  fetchItems: (input: {
+    page: number;
+    pageSize: number;
+    search: string;
+  }) => Promise<NormalizedTrashResult<TItem>>;
   restoreItem: (item: TItem) => Promise<{ ok: boolean; message?: string }>;
   deleteItem: (item: TItem) => Promise<{ ok: boolean; message?: string }>;
   renderItemContent: (item: TItem) => React.ReactNode;
@@ -231,7 +233,9 @@ export function TrashManager<TItem>({
             <EmptyMedia variant="icon">
               <HugeiconsIcon icon={DeleteThrowIcon} size={24} />
             </EmptyMedia>
-            <EmptyTitle>{debouncedSearch ? "No results" : "Nothing here"}</EmptyTitle>
+            <EmptyTitle>
+              {debouncedSearch ? "No results" : "Nothing here"}
+            </EmptyTitle>
             <EmptyDescription>
               {debouncedSearch ? emptySearchMsg : emptyMsg}
             </EmptyDescription>

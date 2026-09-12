@@ -24,7 +24,11 @@ import {
   useState,
   useTransition,
 } from "react";
-import { ColorPicker, ColorSwatch, PRESET_COLORS } from "@/components/shared/color-picker";
+import {
+  ColorPicker,
+  ColorSwatch,
+  PRESET_COLORS,
+} from "@/components/shared/color-picker";
 import { ImageDropzone } from "@/components/shared/image-dropzone";
 import { RichTextEditor } from "@/components/shared/rich-text-editor";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -405,13 +409,12 @@ export function ProductForm({
         initialData.baseAttributes,
         String(attrName),
       );
-      const rawValues = baseVal
-        ? baseVal.split(",").map((v) => v.trim())
-        : [];
+      const rawValues = baseVal ? baseVal.split(",").map((v) => v.trim()) : [];
       // Detect color options: name matches known keywords OR all values are hex codes
       const isColor =
         COLOR_OPTION_NAMES.includes(attrName.toLowerCase()) ||
-        (rawValues.length > 0 && rawValues.every((v) => /^#[0-9A-Fa-f]{6}$/i.test(v)));
+        (rawValues.length > 0 &&
+          rawValues.every((v) => /^#[0-9A-Fa-f]{6}$/i.test(v)));
       // If color option with hex values, convert to preset names
       const values = isColor
         ? rawValues.map((hex) => {
@@ -616,7 +619,11 @@ export function ProductForm({
         }
 
         if (existing) {
-          return { ...existing, name: buildVariantName(attrs), colorHex: colorHex || existing.colorHex };
+          return {
+            ...existing,
+            name: buildVariantName(attrs),
+            colorHex: colorHex || existing.colorHex,
+          };
         }
         return {
           sku: "",
@@ -1092,7 +1099,7 @@ export function ProductForm({
                     </p>
                   )}
                 </div>
-  
+
                 <div className="space-y-2" data-field="slug">
                   <Label htmlFor="slug">Slug</Label>
                   <div className="flex gap-2">
@@ -1135,7 +1142,7 @@ export function ProductForm({
                       URL-friendly identifier. Auto-generated from name.
                     </p>
                   )}
-                  </div>
+                </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2" data-field="description">
@@ -1158,7 +1165,7 @@ export function ProductForm({
                     </p>
                   )}
                 </div>
-  
+
                 <div className="space-y-2" data-field="shortDescription">
                   <Label htmlFor="short-description">Short description</Label>
                   <InputGroup>
@@ -1175,7 +1182,8 @@ export function ProductForm({
                     />
                     <InputGroupAddon align="inline-end">
                       <InputGroupText>
-                        {shortDescription.length}/{FIELD_LIMITS.description.short}
+                        {shortDescription.length}/
+                        {FIELD_LIMITS.description.short}
                       </InputGroupText>
                     </InputGroupAddon>
                   </InputGroup>
@@ -1373,10 +1381,7 @@ export function ProductForm({
                       <div className="space-y-3">
                         {pendingColor?.optionIndex === index ? (
                           <div className="flex items-center gap-2">
-                            <ColorSwatch
-                              color={pendingColor.hex}
-                              size="sm"
-                            />
+                            <ColorSwatch color={pendingColor.hex} size="sm" />
                             <input
                               type="text"
                               value={pendingColor.name}
@@ -1474,7 +1479,10 @@ export function ProductForm({
                                 key={value}
                                 className="inline-flex items-center gap-1.5 rounded-full border bg-muted pl-1 pr-2.5 py-0.5 text-xs"
                               >
-                                <ColorSwatch color={colorHexMap[value] || value} size="xs" />
+                                <ColorSwatch
+                                  color={colorHexMap[value] || value}
+                                  size="xs"
+                                />
                                 {value}
                                 <button
                                   type="button"

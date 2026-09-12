@@ -26,9 +26,37 @@ type Tab = (typeof TABS)[number]["id"];
 
 function EyeIcons({ show }: { show: boolean }) {
   return show ? (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
   ) : (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
   );
 }
 
@@ -72,7 +100,12 @@ function PasswordField({
           required={required}
         />
         <InputGroupAddon align="inline-end">
-          <InputGroupButton size="icon-xs" onClick={onToggle} tabIndex={-1} aria-label={show ? "Hide" : "Show"}>
+          <InputGroupButton
+            size="icon-xs"
+            onClick={onToggle}
+            tabIndex={-1}
+            aria-label={show ? "Hide" : "Show"}
+          >
             <EyeIcons show={show} />
           </InputGroupButton>
         </InputGroupAddon>
@@ -89,35 +122,47 @@ export default function AdminSettingsPage() {
   // Profile state
   const [name, setName] = useState("");
   const [profileLoading, setProfileLoading] = useState(false);
-  const [profileMsg, setProfileMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [profileMsg, setProfileMsg] = useState<{
+    type: "ok" | "err";
+    text: string;
+  } | null>(null);
 
   // Password state
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordLoading, setPasswordLoading] = useState(false);
-  const [passwordMsg, setPasswordMsg] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [passwordMsg, setPasswordMsg] = useState<{
+    type: "ok" | "err";
+    text: string;
+  } | null>(null);
 
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
   const user = session?.user;
-  const initials = user?.name
-    ?.split(" ")
-    .map((p) => p[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase() || "AD";
+  const initials =
+    user?.name
+      ?.split(" ")
+      .map((p) => p[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "AD";
 
   async function handleUpdateProfile(e: React.FormEvent) {
     e.preventDefault();
     setProfileMsg(null);
     setProfileLoading(true);
     try {
-      const { error } = await authClient.updateUser({ name: name || undefined });
+      const { error } = await authClient.updateUser({
+        name: name || undefined,
+      });
       if (error) {
-        setProfileMsg({ type: "err", text: error.message || "Failed to update." });
+        setProfileMsg({
+          type: "err",
+          text: error.message || "Failed to update.",
+        });
       } else {
         setProfileMsg({ type: "ok", text: "Saved." });
         refetch();
@@ -174,7 +219,11 @@ export default function AdminSettingsPage() {
     });
     if (!ok) return;
     authClient.signOut({
-      fetchOptions: { onSuccess: () => { window.location.href = "/admin/login"; } },
+      fetchOptions: {
+        onSuccess: () => {
+          window.location.href = "/admin/login";
+        },
+      },
     });
   }
 
@@ -205,7 +254,9 @@ export default function AdminSettingsPage() {
           <div className="space-y-10">
             {/* Profile */}
             <section>
-              <h2 className="text-base font-semibold text-foreground">Profile</h2>
+              <h2 className="text-base font-semibold text-foreground">
+                Profile
+              </h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 Your display name and account info.
               </p>
@@ -220,10 +271,13 @@ export default function AdminSettingsPage() {
                   <p className="truncate font-medium text-foreground">
                     {user?.name || "Admin"}
                   </p>
-                  <p className="truncate text-sm text-muted-foreground">{user?.email}</p>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {user?.email}
+                  </p>
                 </div>
                 <span className="ml-auto rounded-full bg-[#2a1b45]/8 px-3 py-1 text-xs font-semibold text-[#2a1b45]">
-                  {(user as Record<string, unknown>)?.role as string || "user"}
+                  {((user as Record<string, unknown>)?.role as string) ||
+                    "user"}
                 </span>
               </div>
 
@@ -242,11 +296,19 @@ export default function AdminSettingsPage() {
                 </div>
 
                 <div className="grid gap-2 sm:grid-cols-[140px_1fr] sm:items-center">
-                  <Label htmlFor="email" className="text-muted-foreground sm:text-right">
+                  <Label
+                    htmlFor="email"
+                    className="text-muted-foreground sm:text-right"
+                  >
                     Email
                   </Label>
                   <div>
-                    <Input id="email" value={user?.email || ""} disabled className="bg-muted/40" />
+                    <Input
+                      id="email"
+                      value={user?.email || ""}
+                      disabled
+                      className="bg-muted/40"
+                    />
                     <p className="mt-1 text-xs text-muted-foreground">
                       Contact your team lead to change your email.
                     </p>
@@ -254,7 +316,9 @@ export default function AdminSettingsPage() {
                 </div>
 
                 {profileMsg && (
-                  <p className={`text-sm ${profileMsg.type === "ok" ? "text-chart-2" : "text-destructive"}`}>
+                  <p
+                    className={`text-sm ${profileMsg.type === "ok" ? "text-chart-2" : "text-destructive"}`}
+                  >
                     {profileMsg.text}
                   </p>
                 )}
@@ -271,7 +335,9 @@ export default function AdminSettingsPage() {
                       {profileLoading ? "Saving..." : "Save changes"}
                     </Button>
                     {profileMsg?.type === "ok" && (
-                      <span className="text-xs text-muted-foreground">Changes saved</span>
+                      <span className="text-xs text-muted-foreground">
+                        Changes saved
+                      </span>
                     )}
                   </div>
                 </div>
@@ -281,7 +347,9 @@ export default function AdminSettingsPage() {
             {/* Team & staff */}
             {(user as Record<string, unknown>)?.role === "admin" && (
               <section>
-                <h2 className="text-base font-semibold text-foreground">Team &amp; staff</h2>
+                <h2 className="text-base font-semibold text-foreground">
+                  Team &amp; staff
+                </h2>
                 <p className="mt-0.5 text-sm text-muted-foreground">
                   Manage staff accounts, passwords, and sessions.
                 </p>
@@ -312,14 +380,20 @@ export default function AdminSettingsPage() {
 
             {/* Sign out */}
             <section>
-              <h2 className="text-base font-semibold text-foreground">Sign out</h2>
+              <h2 className="text-base font-semibold text-foreground">
+                Sign out
+              </h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 Sign out of your account on this device.
               </p>
 
               <div className="my-4 h-px bg-border" />
 
-              <Button variant="destructive" size="sm" onClick={() => void handleSignOut()}>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => void handleSignOut()}
+              >
                 Sign out
               </Button>
             </section>
@@ -329,7 +403,9 @@ export default function AdminSettingsPage() {
         <Activity mode={activeTab === "security" ? "visible" : "hidden"}>
           <div className="space-y-10">
             <section>
-              <h2 className="text-base font-semibold text-foreground">Password</h2>
+              <h2 className="text-base font-semibold text-foreground">
+                Password
+              </h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 Keep your account secure with a strong password.
               </p>
@@ -375,7 +451,9 @@ export default function AdminSettingsPage() {
                 />
 
                 {passwordMsg && (
-                  <p className={`text-sm ${passwordMsg.type === "ok" ? "text-chart-2" : "text-destructive"}`}>
+                  <p
+                    className={`text-sm ${passwordMsg.type === "ok" ? "text-chart-2" : "text-destructive"}`}
+                  >
                     {passwordMsg.text}
                   </p>
                 )}
@@ -384,7 +462,12 @@ export default function AdminSettingsPage() {
                   <div />
                   <Button
                     type="submit"
-                    disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
+                    disabled={
+                      passwordLoading ||
+                      !currentPassword ||
+                      !newPassword ||
+                      !confirmPassword
+                    }
                     size="sm"
                     variant="outline"
                   >

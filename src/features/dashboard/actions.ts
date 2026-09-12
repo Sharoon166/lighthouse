@@ -65,11 +65,26 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     ProductModel.aggregate([
       {
         $facet: {
-          total: [{ $match: { deletedAt: { $eq: null } } }, { $count: "count" }],
-          drafts: [{ $match: { status: "draft", deletedAt: { $eq: null } } }, { $count: "count" }],
-          active: [{ $match: { status: "active", deletedAt: { $eq: null } } }, { $count: "count" }],
+          total: [
+            { $match: { deletedAt: { $eq: null } } },
+            { $count: "count" },
+          ],
+          drafts: [
+            { $match: { status: "draft", deletedAt: { $eq: null } } },
+            { $count: "count" },
+          ],
+          active: [
+            { $match: { status: "active", deletedAt: { $eq: null } } },
+            { $count: "count" },
+          ],
           outOfStock: [
-            { $match: { inStock: false, status: { $ne: "archived" }, deletedAt: { $eq: null } } },
+            {
+              $match: {
+                inStock: false,
+                status: { $ne: "archived" },
+                deletedAt: { $eq: null },
+              },
+            },
             { $count: "count" },
           ],
         },
@@ -81,10 +96,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         $facet: {
           total: [{ $count: "count" }],
           drafts: [{ $match: { status: "draft" } }, { $count: "count" }],
-          published: [
-            { $match: { status: "published" } },
-            { $count: "count" },
-          ],
+          published: [{ $match: { status: "published" } }, { $count: "count" }],
           ongoing: [
             { $match: { projectStatus: "ongoing", status: "published" } },
             { $count: "count" },
@@ -106,14 +118,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         $facet: {
           total: [{ $count: "count" }],
           drafts: [{ $match: { status: "draft" } }, { $count: "count" }],
-          published: [
-            { $match: { status: "published" } },
-            { $count: "count" },
-          ],
-          featured: [
-            { $match: { featured: true } },
-            { $count: "count" },
-          ],
+          published: [{ $match: { status: "published" } }, { $count: "count" }],
+          featured: [{ $match: { featured: true } }, { $count: "count" }],
         },
       },
     ]),
@@ -241,4 +247,41 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       })),
     },
   };
+}
+
+export type OutOfStockProduct = {
+  _id: string;
+  name: string;
+  slug: string;
+  image: string | null;
+  category: string;
+};
+
+export async function getOutOfStockProducts(): Promise<OutOfStockProduct[]> {
+  await connectToDatabase();
+
+  const products = await ProductModel.find({
+    inStock: false,
+    status: { $ne: "archived" },
+    deletedAt: null,
+  })
+    .select({ name: 1, slug: 1, images: 1, "category.name": 1 })
+    .limit(20)
+    .lean();
+
+  return products.map(
+    (p: {
+      _id: { toString(): string };
+      name: string;
+      slug: string;
+      images?: string[];
+      category?: { name?: string };
+    }) => ({
+      _id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      image: p.images?.[0] ?? null,
+      category: p.category?.name ?? "Uncategorized",
+    }),
+  );
 }

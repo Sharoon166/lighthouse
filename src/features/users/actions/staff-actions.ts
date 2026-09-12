@@ -40,7 +40,9 @@ async function getDb() {
 
 async function findStaffAccount(userId: string) {
   const db = await getDb();
-  const doc = await db.collection("user").findOne({ _id: new ObjectId(userId) });
+  const doc = await db
+    .collection("user")
+    .findOne({ _id: new ObjectId(userId) });
   if (!doc || doc.role !== "staff") return null;
 
   const activeSession = await db.collection("session").findOne({
@@ -62,10 +64,12 @@ async function findStaffAccount(userId: string) {
 
 async function setPlainPassword(userId: string, password: string) {
   const db = await getDb();
-  await db.collection("user").updateOne(
-    { _id: new ObjectId(userId) },
-    { $set: { plainPassword: password } },
-  );
+  await db
+    .collection("user")
+    .updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { plainPassword: password } },
+    );
 }
 
 function apiErrorMessage(err: unknown, fallback: string) {
@@ -129,7 +133,11 @@ export async function listStaffAccounts(): Promise<StaffAccount[]> {
 }
 
 const staffCreateSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120, "Name is too long"),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required")
+    .max(120, "Name is too long"),
   email: z.email("Enter a valid email address"),
   password: z
     .string()
@@ -153,7 +161,9 @@ export async function createStaffAccount(
   const { name, email, password } = parsed.data;
 
   const db = await getDb();
-  const staffCount = await db.collection("user").countDocuments({ role: "staff" });
+  const staffCount = await db
+    .collection("user")
+    .countDocuments({ role: "staff" });
   if (staffCount >= STAFF_LIMIT) {
     return {
       ok: false,
@@ -192,7 +202,11 @@ export async function createStaffAccount(
 
 const staffUpdateSchema = z.object({
   userId: z.string().min(1),
-  name: z.string().trim().min(1, "Name is required").max(120, "Name is too long"),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required")
+    .max(120, "Name is too long"),
   email: z.email("Enter a valid email address"),
 });
 
@@ -286,7 +300,8 @@ export async function setStaffPassword(
 
     return {
       ok: true,
-      message: "Password updated. The staff member was signed out on all devices.",
+      message:
+        "Password updated. The staff member was signed out on all devices.",
     };
   } catch (err) {
     return {
@@ -343,7 +358,10 @@ export async function revokeStaffSessions(
       headers: await headers(),
       body: { userId },
     });
-    return { ok: true, message: "Logged out this staff member on all devices." };
+    return {
+      ok: true,
+      message: "Logged out this staff member on all devices.",
+    };
   } catch (err) {
     return {
       ok: false,
@@ -406,10 +424,9 @@ export async function blockStaffAccount(
 
   try {
     const db = await getDb();
-    await db.collection("user").updateOne(
-      { _id: new ObjectId(userId) },
-      { $set: { blocked: true } },
-    );
+    await db
+      .collection("user")
+      .updateOne({ _id: new ObjectId(userId) }, { $set: { blocked: true } });
 
     await auth.api.revokeUserSessions({
       headers: await headers(),
@@ -437,10 +454,9 @@ export async function unblockStaffAccount(
 
   try {
     const db = await getDb();
-    await db.collection("user").updateOne(
-      { _id: new ObjectId(userId) },
-      { $set: { blocked: false } },
-    );
+    await db
+      .collection("user")
+      .updateOne({ _id: new ObjectId(userId) }, { $set: { blocked: false } });
 
     return { ok: true, message: "Staff member unblocked." };
   } catch (err) {

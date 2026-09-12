@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
 import {
@@ -29,7 +35,11 @@ const CommandPaletteContext = createContext<{
   setOpen: (v: boolean) => void;
 }>({ open: false, setOpen: () => {} });
 
-export function CommandPaletteProvider({ children }: { children: React.ReactNode }) {
+export function CommandPaletteProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -113,7 +123,11 @@ function CommandPaletteDialog() {
       loop
     >
       <div className="flex items-center border-b border-border px-4">
-        <HugeiconsIcon icon={Search01Icon} size={18} className="shrink-0 text-muted-foreground" />
+        <HugeiconsIcon
+          icon={Search01Icon}
+          size={18}
+          className="shrink-0 text-muted-foreground"
+        />
         <Command.Input
           placeholder="Search products, projects, blog posts..."
           className="h-12 w-full bg-transparent pl-3 text-sm outline-none placeholder:text-muted-foreground"
@@ -131,7 +145,10 @@ function CommandPaletteDialog() {
 
         {/* Live search results */}
         {query && results.length > 0 && (
-          <Command.Group heading="Results" className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5">
+          <Command.Group
+            heading="Results"
+            className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5"
+          >
             {results.map((r) => (
               <Command.Item
                 key={`${r.type}-${r.slug}`}
@@ -149,37 +166,70 @@ function CommandPaletteDialog() {
         {/* Static pages — only show when input is empty */}
         {!query && (
           <>
-            <Command.Group heading="Pages" className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5">
-              <CommandItem icon={DashboardSquare03Icon} onSelect={() => run(() => router.push("/admin"))}>
+            <Command.Group
+              heading="Pages"
+              className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5"
+            >
+              <CommandItem
+                icon={DashboardSquare03Icon}
+                onSelect={() => run(() => router.push("/admin"))}
+              >
                 Dashboard
               </CommandItem>
-              <CommandItem icon={PackageIcon} onSelect={() => run(() => router.push("/admin/products"))}>
+              <CommandItem
+                icon={PackageIcon}
+                onSelect={() => run(() => router.push("/admin/products"))}
+              >
                 Products
               </CommandItem>
-              <CommandItem icon={Folder02Icon} onSelect={() => run(() => router.push("/admin/projects"))}>
+              <CommandItem
+                icon={Folder02Icon}
+                onSelect={() => run(() => router.push("/admin/projects"))}
+              >
                 Projects
               </CommandItem>
-              <CommandItem icon={NewsIcon} onSelect={() => run(() => router.push("/admin/blog"))}>
+              <CommandItem
+                icon={NewsIcon}
+                onSelect={() => run(() => router.push("/admin/blog"))}
+              >
                 Blog
               </CommandItem>
-              <CommandItem icon={TagsIcon} onSelect={() => run(() => router.push("/admin/categories"))}>
+              <CommandItem
+                icon={TagsIcon}
+                onSelect={() => run(() => router.push("/admin/categories"))}
+              >
                 Categories
               </CommandItem>
-              <CommandItem icon={Settings01Icon} onSelect={() => run(() => router.push("/admin/settings"))}>
+              <CommandItem
+                icon={Settings01Icon}
+                onSelect={() => run(() => router.push("/admin/settings"))}
+              >
                 Settings
               </CommandItem>
             </Command.Group>
 
             <Command.Separator className="my-1 h-px bg-border" />
 
-            <Command.Group heading="Quick actions" className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5">
-              <CommandItem icon={PlusSignIcon} onSelect={() => run(() => router.push("/admin/products/new"))}>
+            <Command.Group
+              heading="Quick actions"
+              className="text-xs font-medium text-muted-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5"
+            >
+              <CommandItem
+                icon={PlusSignIcon}
+                onSelect={() => run(() => router.push("/admin/products/new"))}
+              >
                 New product
               </CommandItem>
-              <CommandItem icon={PlusSignIcon} onSelect={() => run(() => router.push("/admin/projects/new"))}>
+              <CommandItem
+                icon={PlusSignIcon}
+                onSelect={() => run(() => router.push("/admin/projects/new"))}
+              >
                 New project
               </CommandItem>
-              <CommandItem icon={PlusSignIcon} onSelect={() => run(() => router.push("/admin/blog/new"))}>
+              <CommandItem
+                icon={PlusSignIcon}
+                onSelect={() => run(() => router.push("/admin/blog/new"))}
+              >
                 New blog post
               </CommandItem>
             </Command.Group>
@@ -189,9 +239,18 @@ function CommandPaletteDialog() {
 
       <div className="border-t border-border px-4 py-2">
         <p className="text-xs text-muted-foreground">
-          <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">↑↓</kbd> to navigate{" "}
-          <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">↵</kbd> to select{" "}
-          <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">esc</kbd> to close
+          <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">
+            ↑↓
+          </kbd>{" "}
+          to navigate{" "}
+          <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">
+            ↵
+          </kbd>{" "}
+          to select{" "}
+          <kbd className="rounded border border-border bg-muted px-1 py-0.5 text-[10px] font-medium">
+            esc
+          </kbd>{" "}
+          to close
         </p>
       </div>
     </Command.Dialog>

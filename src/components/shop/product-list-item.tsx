@@ -57,7 +57,7 @@ export function ProductListItem({
                 {product.name}
               </h3>
             </Link>
-            
+
             {product.shortDescription && (
               <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                 {product.shortDescription}
@@ -84,7 +84,7 @@ export function ProductListItem({
             <p className="text-muted-foreground font-semibold uppercase font-heading">
               {priceDisplay}
             </p>
-            
+
             <div className="flex items-center gap-2">
               {showQuickView && (
                 <Button
@@ -98,13 +98,9 @@ export function ProductListItem({
                   Quick View
                 </Button>
               )}
-              
-              <Button
-                className="rounded-full"
-              >
-                <Link href={`/products/${product.slug}`}>
-                  View Details
-                </Link>
+
+              <Button className="rounded-full">
+                <Link href={`/products/${product.slug}`}>View Details</Link>
               </Button>
             </div>
           </div>

@@ -43,7 +43,6 @@ export function ProjectCard({
           {project.title}
         </h3>
         <div className="flex gap-1 items-center text-gold ">
-          
           <p className="mt-1 text-xs truncate">{project.subtitle}</p>
           <HugeiconsIcon icon={ArrowRight02Icon} />
         </div>

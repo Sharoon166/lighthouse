@@ -158,7 +158,7 @@ export function ImageDropzone({
             type="button"
             onClick={() => setZoomOpen(true)}
             title="View fullscreen"
-            className="group relative aspect-[16/9] w-48 shrink-0 overflow-hidden rounded-lg border border-border outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="group relative aspect-video w-48 shrink-0 overflow-hidden rounded-lg border border-border outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             <Image
               src={value.url}

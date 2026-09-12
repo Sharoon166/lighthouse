@@ -129,7 +129,9 @@ export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
               {allCategories.map((cat) => (
                 <Button
                   key={cat.value}
-                  variant={activeCategory === cat.value ? "secondary" : "outline"}
+                  variant={
+                    activeCategory === cat.value ? "secondary" : "outline"
+                  }
                   size="sm"
                   className="rounded-full"
                   onClick={() => handleCategoryChange(cat.value)}

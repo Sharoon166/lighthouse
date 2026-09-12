@@ -1,6 +1,10 @@
 "use client";
 
-import { ListViewIcon, Search01Icon, Grid3X3Icon } from "@hugeicons/core-free-icons";
+import {
+  ListViewIcon,
+  Search01Icon,
+  Grid3X3Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -33,7 +37,10 @@ export function ProductGridToolbar({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const [searchVal, setSearchVal] = useState(searchParams.get("search") || "");
-  const [view, setView] = useLocalStorage<ViewMode>("lighthouse:products-view", "grid");
+  const [view, setView] = useLocalStorage<ViewMode>(
+    "lighthouse:products-view",
+    "grid",
+  );
   const isSmallScreen = !useMediaQuery("(min-width: 640px)");
   const effectiveView = isSmallScreen ? "grid" : view;
 
@@ -86,10 +93,7 @@ export function ProductGridToolbar({
 
         {/* View Toggle, Counter and Sort */}
         <div className="flex items-center justify-between md:justify-end gap-4 text-sm text-muted-foreground">
-
-          <span>
-            {total} products
-          </span>
+          <span>{total} products</span>
           <select
             onChange={handleSortChange}
             defaultValue={searchParams.get("sort") || "featured"}
@@ -101,7 +105,12 @@ export function ProductGridToolbar({
             <option value="newest">Newest Arrivals</option>
           </select>
           {/* View Toggle */}
-          <div className={cn("flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-1", isSmallScreen && "hidden")}>
+          <div
+            className={cn(
+              "flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-1",
+              isSmallScreen && "hidden",
+            )}
+          >
             <button
               type="button"
               onClick={() => setView("grid")}
@@ -110,7 +119,7 @@ export function ProductGridToolbar({
                 "flex size-7 items-center justify-center rounded-sm transition-colors",
                 view === "grid"
                   ? "bg-secondary text-secondary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               <HugeiconsIcon icon={Grid3X3Icon} size={16} />
@@ -123,7 +132,7 @@ export function ProductGridToolbar({
                 "flex size-7 items-center justify-center rounded-md transition-colors",
                 view === "list"
                   ? "bg-secondary text-secondary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               <HugeiconsIcon icon={ListViewIcon} size={16} />

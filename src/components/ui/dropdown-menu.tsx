@@ -50,10 +50,7 @@ function DropdownMenuGroup({ ...props }: MenuPrimitive.Group.Props) {
   return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />;
 }
 
-function DropdownMenuItem({
-  className,
-  ...props
-}: MenuPrimitive.Item.Props) {
+function DropdownMenuItem({ className, ...props }: MenuPrimitive.Item.Props) {
   return (
     <MenuPrimitive.Item
       data-slot="dropdown-menu-item"
@@ -66,7 +63,10 @@ function DropdownMenuItem({
   );
 }
 
-function DropdownMenuSeparator({ className, ...props }: MenuPrimitive.Separator.Props) {
+function DropdownMenuSeparator({
+  className,
+  ...props
+}: MenuPrimitive.Separator.Props) {
   return (
     <MenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
@@ -83,7 +83,10 @@ function DropdownMenuLabel({
   return (
     <div
       data-slot="dropdown-menu-label"
-      className={cn("px-2.5 py-1.5 text-xs font-medium text-muted-foreground", className)}
+      className={cn(
+        "px-2.5 py-1.5 text-xs font-medium text-muted-foreground",
+        className,
+      )}
       {...props}
     />
   );

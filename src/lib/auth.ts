@@ -5,9 +5,7 @@ import { admin } from "better-auth/plugins";
 import clientPromise from "./mongodb";
 
 export const auth = betterAuth({
-  database: mongodbAdapter(
-    await clientPromise.then((c) => c.db()),
-  ),
+  database: mongodbAdapter(await clientPromise.then((c) => c.db())),
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,

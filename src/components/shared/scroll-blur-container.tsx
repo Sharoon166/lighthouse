@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from "react";
 
 interface ScrollBlurContainerProps {
   children: React.ReactNode;
@@ -12,9 +12,9 @@ interface ScrollBlurContainerProps {
 
 export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
   children,
-  blurWidth = '3rem', // 48px
-  className = '',
-  backgroundClass = 'from-background via-background/70 to-transparent',
+  blurWidth = "3rem", // 48px
+  className = "",
+  backgroundClass = "from-background via-background/70 to-transparent",
 }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
@@ -25,7 +25,7 @@ export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
     if (!container) return;
 
     const { scrollLeft, scrollWidth, clientWidth } = container;
-    
+
     // Use a small 2px buffer to absorb browser rounding discrepancies
     setShowLeft(scrollLeft > 2);
     setShowRight(scrollWidth - scrollLeft - clientWidth > 2);
@@ -40,7 +40,7 @@ export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
     // Re-calculate if items scale inside, window resizes, or content updates dynamically
     const observer = new ResizeObserver(() => checkScroll());
     observer.observe(container);
-    
+
     // Also monitor deeply nested child changes if content loads asynchronously
     const mutationObserver = new MutationObserver(() => checkScroll());
     mutationObserver.observe(container, { childList: true, subtree: true });
@@ -56,7 +56,7 @@ export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
       {/* Left Progressive Blur Indicator */}
       <div
         className={`absolute left-0 top-0 bottom-0 z-20 pointer-events-none transition-opacity duration-300 bg-linear-to-r ${backgroundClass} backdrop-blur-[2px] [mask-image:linear-gradient(to_right,rgba(0,0,0,1),transparent)] ${
-          showLeft ? 'opacity-100' : 'opacity-0'
+          showLeft ? "opacity-100" : "opacity-0"
         }`}
         style={{ width: blurWidth }}
       />
@@ -67,8 +67,8 @@ export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
         onScroll={checkScroll}
         className="w-full overflow-x-auto scroll-smooth py-1"
         style={{
-          scrollbarWidth: 'none', // Firefox
-          msOverflowStyle: 'none', // IE/Edge
+          scrollbarWidth: "none", // Firefox
+          msOverflowStyle: "none", // IE/Edge
         }}
       >
         {/* Universal layout helper to enforce horizontal behavior */}
@@ -80,7 +80,7 @@ export const ScrollBlurContainer: React.FC<ScrollBlurContainerProps> = ({
       {/* Right Progressive Blur Indicator */}
       <div
         className={`absolute right-0 top-0 bottom-0 z-20 pointer-events-none transition-opacity duration-300 bg-linear-to-l ${backgroundClass} backdrop-blur-[2px] [mask-image:linear-gradient(to_left,rgba(0,0,0,1),transparent)] ${
-          showRight ? 'opacity-100' : 'opacity-0'
+          showRight ? "opacity-100" : "opacity-0"
         }`}
         style={{ width: blurWidth }}
       />

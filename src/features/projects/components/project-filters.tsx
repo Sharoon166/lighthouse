@@ -31,22 +31,22 @@ export function ProjectFilters({
       <div className="w-full min-w-0 lg:flex-1">
         <ScrollBlurContainer>
           <nav
-              aria-label="Blog categories"
-              className="grow flex flex-wrap items-center gap-2"
-            >
-              {allCategories.map((cat) => (
-                <Button
-                  key={cat.value}
-                  variant={activeCategory === cat.value ? "secondary" : "outline"}
-                  size="sm"
-                  className="rounded-full"
-                  onClick={() => onCategoryChange(cat.value)}
-                >
-                  {cat.label}
-                </Button>
-              ))}
+            aria-label="Blog categories"
+            className="grow flex flex-wrap items-center gap-2"
+          >
+            {allCategories.map((cat) => (
+              <Button
+                key={cat.value}
+                variant={activeCategory === cat.value ? "secondary" : "outline"}
+                size="sm"
+                className="rounded-full"
+                onClick={() => onCategoryChange(cat.value)}
+              >
+                {cat.label}
+              </Button>
+            ))}
           </nav>
-         </ScrollBlurContainer>
+        </ScrollBlurContainer>
       </div>
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium text-muted-foreground">

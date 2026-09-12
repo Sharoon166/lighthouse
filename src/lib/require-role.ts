@@ -22,7 +22,10 @@ export async function requireRole(roles: readonly string[]) {
   const db = (await clientPromise).db();
   const user = await db
     .collection("user")
-    .findOne({ _id: new ObjectId(session.user.id) }, { projection: { blocked: 1 } });
+    .findOne(
+      { _id: new ObjectId(session.user.id) },
+      { projection: { blocked: 1 } },
+    );
 
   if (user?.blocked) {
     // Revoke all sessions for blocked user

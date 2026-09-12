@@ -28,7 +28,11 @@ interface ProductPurchasePanelProps {
   compact?: boolean;
 }
 
-export function ProductPurchasePanel({ product, onVariantChange, compact = false }: ProductPurchasePanelProps) {
+export function ProductPurchasePanel({
+  product,
+  onVariantChange,
+  compact = false,
+}: ProductPurchasePanelProps) {
   const [selectedAttributes, setSelectedAttributes] = useState<
     Record<string, string>
   >(() => {
@@ -54,8 +58,8 @@ export function ProductPurchasePanel({ product, onVariantChange, compact = false
     if (product.variants.length === 0) return undefined;
     return (
       product.variants.find((v) =>
-        product.variantAttributes.every((key) =>
-          selectedAttributes[key] === v.attributes[key],
+        product.variantAttributes.every(
+          (key) => selectedAttributes[key] === v.attributes[key],
         ),
       ) ||
       product.variants.find((v) => v.isDefault) ||
@@ -94,8 +98,8 @@ export function ProductPurchasePanel({ product, onVariantChange, compact = false
       const next = { ...prev, [key]: value };
       // Find the variant that matches the new attribute combination
       const nextVariant = product.variants.find((v) =>
-        product.variantAttributes.every((attrKey) =>
-          next[attrKey] === v.attributes[attrKey],
+        product.variantAttributes.every(
+          (attrKey) => next[attrKey] === v.attributes[attrKey],
         ),
       );
       // Clamp quantity: if new stock is lower, drop down; otherwise keep current
@@ -175,7 +179,7 @@ export function ProductPurchasePanel({ product, onVariantChange, compact = false
         </p>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-8 mt-4">
         {/* Variant Attributes */}
         {product.variantAttributes.map((attrKey) => {
           const options = attributeOptions[attrKey];

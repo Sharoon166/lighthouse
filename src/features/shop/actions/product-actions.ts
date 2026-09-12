@@ -229,16 +229,19 @@ export async function updateProduct(
     return { ok: true, slug: nextSlug };
   } catch (error) {
     console.error("Failed to update product:", error);
-    
+
     // Handle duplicate variant slug within product
-    if (error instanceof Error && error.message.includes("Duplicate variant slug")) {
+    if (
+      error instanceof Error &&
+      error.message.includes("Duplicate variant slug")
+    ) {
       return {
         ok: false,
         fieldErrors: {},
         formErrors: [error.message],
       };
     }
-    
+
     // Handle MongoDB duplicate key errors
     const message =
       (error as { code?: number }).code === 11000
@@ -345,7 +348,10 @@ export async function permanentlyDeleteProduct(
       const publicId = extractPublicId(imageUrl);
       if (publicId) {
         await deleteImage(publicId).catch((error) => {
-          console.error("Failed to delete variant image from Cloudinary:", error);
+          console.error(
+            "Failed to delete variant image from Cloudinary:",
+            error,
+          );
         });
       }
     }
@@ -589,7 +595,10 @@ export async function listTrashedProducts(
     brandName: doc.brand?.name ?? "",
     status: doc.status,
     images: doc.images ?? [],
-    deletedAt: doc.deletedAt instanceof Date ? doc.deletedAt.toISOString() : doc.deletedAt ?? null,
+    deletedAt:
+      doc.deletedAt instanceof Date
+        ? doc.deletedAt.toISOString()
+        : (doc.deletedAt ?? null),
   }));
 
   return {

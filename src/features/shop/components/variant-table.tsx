@@ -453,7 +453,10 @@ function VariantRow({
                     <SelectItem key={val} value={val}>
                       <span className="flex items-center gap-1.5">
                         {colorOptions.has(key) && (
-                          <ColorSwatch color={colorHexMap[val] || val} size="xs" />
+                          <ColorSwatch
+                            color={colorHexMap[val] || val}
+                            size="xs"
+                          />
                         )}
                         {val}
                       </span>
@@ -464,7 +467,13 @@ function VariantRow({
             ) : (
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 {colorOptions.has(key) && variant.attributes[key] && (
-                  <ColorSwatch color={colorHexMap[variant.attributes[key]] || variant.attributes[key]} size="xs" />
+                  <ColorSwatch
+                    color={
+                      colorHexMap[variant.attributes[key]] ||
+                      variant.attributes[key]
+                    }
+                    size="xs"
+                  />
                 )}
                 {variant.attributes[key] ?? "\u2014"}
               </span>

@@ -9,7 +9,7 @@ export async function SiteFooter() {
   const nav = [
     {
       heading: "Products",
-      links: categories.slice(0,6).map((c) => ({
+      links: categories.slice(0, 6).map((c) => ({
         label: c.name,
         href: `/categories/${c.slug}`,
       })),

@@ -221,7 +221,7 @@ export function CategoryForm({
   const selectedParentName =
     parent === null
       ? ""
-      : parentOptions.find((c) => c.id === parent)?.name ?? "";
+      : (parentOptions.find((c) => c.id === parent)?.name ?? "");
 
   const [addAttrDialogOpen, setAddAttrDialogOpen] = useState(false);
 
@@ -483,7 +483,7 @@ export function CategoryForm({
 
               <div className="space-y-2" data-field="description">
                 <Label htmlFor="description">Description</Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="description"
                     value={description}
@@ -665,17 +665,17 @@ export function CategoryForm({
               <CardContent>
                 {categoryAttributes.length === 0 ? (
                   <Empty className="border border-border">
-                  <EmptyHeader>
-                    <EmptyMedia variant="icon">
-                      <HugeiconsIcon icon={VariableIcon} size={24} />
-                    </EmptyMedia>
-                    <EmptyTitle>No attributes assigned</EmptyTitle>
-                    <EmptyDescription>
-                      Click &ldquo;Add&rdquo; to assign product attributes to
-                      this category.
-                    </EmptyDescription>
-                  </EmptyHeader>
-                </Empty>
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon">
+                        <HugeiconsIcon icon={VariableIcon} size={24} />
+                      </EmptyMedia>
+                      <EmptyTitle>No attributes assigned</EmptyTitle>
+                      <EmptyDescription>
+                        Click &ldquo;Add&rdquo; to assign product attributes to
+                        this category.
+                      </EmptyDescription>
+                    </EmptyHeader>
+                  </Empty>
                 ) : (
                   <div className="space-y-3">
                     {categoryAttributes.map((catAttr, index) => {
@@ -853,7 +853,7 @@ export function CategoryForm({
 
               <div className="space-y-2" data-field="seo.metaDescription">
                 <Label htmlFor="seo-meta-description">Meta Description</Label>
-                <InputGroup className="min-h-[5rem]">
+                <InputGroup className="min-h-20">
                   <InputGroupTextarea
                     id="seo-meta-description"
                     value={seoMetaDescription}

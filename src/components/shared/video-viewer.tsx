@@ -53,11 +53,7 @@ export function VideoViewerProvider({ children }: { children: ReactNode }) {
     <VideoViewerContext.Provider value={{ open, close }}>
       {children}
       {video && (
-        <VideoViewerPanel
-          url={video.url}
-          title={video.title}
-          onClose={close}
-        />
+        <VideoViewerPanel url={video.url} title={video.title} onClose={close} />
       )}
     </VideoViewerContext.Provider>
   );

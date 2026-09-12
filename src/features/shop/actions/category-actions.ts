@@ -531,7 +531,14 @@ export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
 }
 
 export async function getAllCategories(): Promise<
-  { id: string; name: string; slug: string; level: number; featured: boolean; featuredImage: string }[]
+  {
+    id: string;
+    name: string;
+    slug: string;
+    level: number;
+    featured: boolean;
+    featuredImage: string;
+  }[]
 > {
   await connectToDatabase();
 
@@ -577,7 +584,16 @@ export async function getCategoryBySlug(
 export async function getSubcategories(
   parentId: string,
 ): Promise<
-  { id: string; name: string; slug: string; description: string; image: string; productCount: number; featured: boolean; featuredImage: string }[]
+  {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    image: string;
+    productCount: number;
+    featured: boolean;
+    featuredImage: string;
+  }[]
 > {
   await connectToDatabase();
   const children = await CategoryModel.find({
@@ -621,7 +637,9 @@ export async function getAllCategoriesAdmin(): Promise<
 
   const categories = await CategoryModel.find()
     .sort({ level: 1, sortOrder: 1, name: 1 })
-    .select("name slug level parent ancestors attributes featured featuredImage")
+    .select(
+      "name slug level parent ancestors attributes featured featuredImage",
+    )
     .lean();
 
   return categories.map((c) => ({
@@ -779,7 +797,9 @@ export type PublicFeaturedCategory = {
   productCount: number;
 };
 
-export async function getFeaturedCategories(): Promise<PublicFeaturedCategory[]> {
+export async function getFeaturedCategories(): Promise<
+  PublicFeaturedCategory[]
+> {
   await connectToDatabase();
 
   const categories = await CategoryModel.find({

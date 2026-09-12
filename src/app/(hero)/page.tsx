@@ -61,7 +61,7 @@ export default function Home() {
           className="absolute inset-0 -z-10 block h-full w-full object-cover object-[center_30%] sm:hidden"
         />
         <div className="container space-y-6 sm:space-y-8">
-          <div className="space-y-4 lg:w-[65%]">
+          <div className="space-y-6 lg:w-[60%]">
             <h1 className="text-pretty max-sm:text-4xl">
               A house is only as warm as its{" "}
               <span className="text-gold">light</span>
@@ -113,7 +113,7 @@ export default function Home() {
                   {
                     "col-span-12 row-span-1 md:col-span-6 lg:col-span-8":
                       index === 0,
-                    "col-span-6 row-span-1 h-66 md:col-span-6 lg:col-span-4 lg:row-span-2":
+                    "col-span-6 row-span-1 min-h-66 md:col-span-6 lg:col-span-4 lg:row-span-2":
                       index === 1,
                     "col-span-6 row-span-1 h-66 md:col-span-6 lg:col-span-4":
                       index === 2,
@@ -123,7 +123,7 @@ export default function Home() {
                 )}
               >
                 <h3 className="text-xl font-normal tracking-tight text-primary">
-                  {category.title}
+                  {category.title} {index}
                 </h3>
                 <p className="uppercase tracking-widest text-gold">
                   {category.items} Designs

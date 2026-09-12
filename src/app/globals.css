@@ -199,7 +199,7 @@
   margin-inline: auto;
   /*padding-inline: 1rem;*/
 
-  @apply px-4 md:px-16;
+  @apply px-4 md:px-8;
 }
 
 @utility bg-noise {

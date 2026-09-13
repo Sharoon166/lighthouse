@@ -24,6 +24,7 @@ export interface ShopCategoryItem {
   description: string;
   image: string;
   designsCount: number;
+  featured: boolean;
 }
 
 export interface ShopProductVariant {
@@ -95,6 +96,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Suspended statement fixtures designed to elevate dining tables and kitchen islands.",
     image: "/1.png",
     designsCount: 42,
+    featured: false,
   },
   {
     id: "wall-lights",
@@ -103,6 +105,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     description: "Elegant sconces providing warm ambient up and down lighting.",
     image: "/3.png",
     designsCount: 29,
+    featured: false,
   },
   {
     id: "chandeliers",
@@ -112,6 +115,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Intricate multi-light centerpiece lighting for grand rooms and foyers.",
     image: "/4.png",
     designsCount: 19,
+    featured: false,
   },
   {
     id: "floor-lamp",
@@ -121,6 +125,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Versatile standing lamps for cozy reading corners and living rooms.",
     image: "/2.png",
     designsCount: 41,
+    featured: false,
   },
   {
     id: "desk-lamp",
@@ -129,6 +134,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     description: "Precision task lighting with warm LED illumination.",
     image: "/products/1.png",
     designsCount: 18,
+    featured: false,
   },
   {
     id: "ceiling-lights",
@@ -138,6 +144,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Flush and semi-flush mounted architectural overhead fixtures.",
     image: "/products/2.png",
     designsCount: 32,
+    featured: false,
   },
   {
     id: "table-lamps",
@@ -147,6 +154,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Accent lighting designed for nightstands, consoles, and desks.",
     image: "/products/3.png",
     designsCount: 24,
+    featured: false,
   },
   {
     id: "outdoor-lights",
@@ -156,6 +164,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Weather-resistant fixtures for gardens, gates, and patio spaces.",
     image: "/projects/oak-residence.png",
     designsCount: 16,
+    featured: false,
   },
   {
     id: "commercial-lights",
@@ -165,6 +174,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "High-performance illumination tailored for offices, retail, and hospitality.",
     image: "/projects/aurora-penthouse.png",
     designsCount: 35,
+    featured: false,
   },
   {
     id: "spot-lights",
@@ -174,6 +184,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Directional accent lights to highlight art and architectural details.",
     image: "/projects/skyline-bedroom.png",
     designsCount: 22,
+    featured: false,
   },
   {
     id: "track-lights",
@@ -182,6 +193,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     description: "Flexible track systems for customizable spotlighting.",
     image: "/blogs/1.png",
     designsCount: 15,
+    featured: false,
   },
   {
     id: "architectural-lighting",
@@ -190,6 +202,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
     description: "Seamlessly integrated linear and cove lighting solutions.",
     image: "/blogs/2.png",
     designsCount: 12,
+    featured: false,
   },
   {
     id: "linear-lights",
@@ -199,6 +212,7 @@ export const FALLBACK_CATEGORIES: ShopCategoryItem[] = [
       "Minimalist continuous light bars ideal for offices and kitchen spaces.",
     image: "/blogs/3.png",
     designsCount: 10,
+    featured: false,
   },
 ];
 
@@ -682,6 +696,7 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
         description: c.description || "Curated decorative lighting collection.",
         image: c.image || "/1.png",
         designsCount: c.productCount || Math.floor(Math.random() * 30) + 10,
+        featured: Boolean(c.featured),
       }));
     }
   } catch (error) {

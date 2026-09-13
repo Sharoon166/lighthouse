@@ -65,7 +65,7 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
           <div className="flex flex-col lg:flex-row gap-8">
             <ProductFiltersSidebar
               categories={filterMeta.categories}
-              brands={filterMeta.brands}
+              brands={[]}
               priceRange={filterMeta.priceRange}
               products={products}
             />

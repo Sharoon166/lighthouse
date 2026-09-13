@@ -1,6 +1,6 @@
 "use client";
 
-import { Search01Icon } from "@hugeicons/core-free-icons";
+import { Search01Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Empty,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/empty";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ShopCategoryItem } from "@/lib/shop-data";
 
 interface CategorySearchFilterProps {
@@ -22,16 +22,28 @@ export function CategorySearchFilter({
   categories,
 }: CategorySearchFilterProps) {
   const [query, setQuery] = useState("");
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
 
-  const filtered = categories.filter(
-    (c) =>
-      c.name.toLowerCase().includes(query.toLowerCase()) ||
-      c.description.toLowerCase().includes(query.toLowerCase()),
-  );
+  const filtered = useMemo(() => {
+    const result = categories.filter(
+      (c) =>
+        c.name.toLowerCase().includes(query.toLowerCase()) ||
+        c.description.toLowerCase().includes(query.toLowerCase()),
+    );
+
+    if (showFeaturedOnly) {
+      return result.filter((c) => c.featured);
+    }
+
+    // Sort featured first
+    return [...result].sort((a, b) => Number(b.featured) - Number(a.featured));
+  }, [categories, query, showFeaturedOnly]);
+
+  const featuredCount = categories.filter((c) => c.featured).length;
 
   return (
     <div className="space-y-6 container">
-      {/* Header bar: Count & Search bar */}
+      {/* Header bar: Count, Search bar & Filter */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
         <div className="relative w-full sm:w-80">
           <input
@@ -48,9 +60,25 @@ export function CategorySearchFilter({
           />
         </div>
 
-        <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
-          {filtered.length} {filtered.length === 1 ? "category" : "categories"}
-        </span>
+        <div className="flex items-center gap-3">
+          {featuredCount > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                showFeaturedOnly
+                  ? "border-gold bg-gold/10 text-gold"
+                  : "border-border text-muted-foreground hover:border-gold/50 hover:text-foreground"
+              }`}
+            >
+              <HugeiconsIcon icon={StarIcon} size={12} />
+              Featured
+            </button>
+          )}
+          <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+            {filtered.length} {filtered.length === 1 ? "category" : "categories"}
+          </span>
+        </div>
       </div>
 
       {/* Grid of Categories matching Image 0 */}
@@ -67,8 +95,16 @@ export function CategorySearchFilter({
               alt={category.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="object-cover object-top transition-transform duration-500 group-hover:scale-105 brightness-170"
+              className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
             />
+
+            {/* Featured badge */}
+            {category.featured && (
+              <span className="absolute top-3 right-3 z-10 inline-flex items-center gap-1 rounded-full bg-gold/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-black backdrop-blur-sm">
+                <HugeiconsIcon icon={StarIcon} size={10} />
+                Featured
+              </span>
+            )}
 
             {/* Content overlay */}
             <div className="relative z-10 space-y-1 mb-auto">

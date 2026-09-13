@@ -98,7 +98,7 @@ export default async function CategoryPage({
 
   return (
     <main className="min-h-screen bg-background">
-      <section className="bg-noise grid overflow-hidden pb-0 lg:grid-cols-5 lg:pt-0 place-items-center">
+      <section className="bg-noise grid overflow-hidden pb-0 lg:grid-cols-5 lg:pt-0 place-items-center min-h-96">
         <div className="container space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10 max-lg:pt-10 lg:ml-28">
           <Breadcrumb
             items={[
@@ -113,14 +113,16 @@ export default async function CategoryPage({
           )}
         </div>
 
-        <Image
-          src={category.featuredImage || category.image || "/about-image.webp"}
-          width={1024}
-          height={1024}
-          priority
-          alt={category.name}
-          className="max-h-96 w-full object-contain brightness-125 transition-all duration-500 lg:col-start-3 lg:col-span-5 lg:row-start-1"
-        />
+        {category.featuredImage && (
+          <Image
+            src={category.featuredImage}
+            width={1024}
+            height={1024}
+            priority
+            alt={category.name}
+            className="max-h-96 w-full object-contain brightness-125 transition-all duration-500 lg:col-start-3 lg:col-span-5 lg:row-start-1"
+          />
+        )}
       </section>
 
       {subcategories.length > 0 && (

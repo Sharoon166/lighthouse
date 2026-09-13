@@ -527,6 +527,27 @@ export function CategoryForm({
                   optimizationPreset="product"
                 />
               </div>
+
+              <div className="space-y-2" data-field="featuredImage">
+                <Label>Featured image</Label>
+                <ImageDropzone
+                  value={featuredImage}
+                  onChange={(img) => {
+                    setFeaturedImage(img);
+                    clearFieldError("featuredImage");
+                  }}
+                  upload={uploadShopImage}
+                  deleteImage={deleteShopImage}
+                  emptyLabel="Featured image (optional)"
+                  aspectRatio={1}
+                  lockAspect
+                  optimizationPreset="product"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Used on the category detail hero. Prefer images with transparent
+                  backgrounds for best effect.
+                </p>
+              </div>
             </CardContent>
           </Card>
 
@@ -790,29 +811,6 @@ export function CategoryForm({
                   </p>
                 </div>
               </div>
-
-              {featured && (
-                <div className="space-y-2" data-field="featuredImage">
-                  <Label>Featured image</Label>
-                  <ImageDropzone
-                    value={featuredImage}
-                    onChange={(img) => {
-                      setFeaturedImage(img);
-                      clearFieldError("featuredImage");
-                    }}
-                    upload={uploadShopImage}
-                    deleteImage={deleteShopImage}
-                    emptyLabel="Featured image (optional)"
-                    aspectRatio={1}
-                    lockAspect
-                    optimizationPreset="product"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Optional. Overrides the category image on the homepage
-                    featured section.
-                  </p>
-                </div>
-              )}
             </CardContent>
           </Card>
 

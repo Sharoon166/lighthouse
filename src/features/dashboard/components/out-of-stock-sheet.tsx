@@ -24,13 +24,14 @@ export function OutOfStockSheet({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open && products.length === 0) {
+    if (open) {
       setLoading(true);
+      setProducts([]);
       getOutOfStockProducts()
         .then(setProducts)
         .finally(() => setLoading(false));
     }
-  }, [open, products.length]);
+  }, [open]);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

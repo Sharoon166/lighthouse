@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import type { DashboardStats } from "../actions";
 
 export function DashboardFeatured({
@@ -26,9 +27,11 @@ export function DashboardFeatured({
             <div className="absolute -bottom-8 -right-8 size-24 rounded-full bg-chart-4/4 blur-xl" />
             <div className="relative flex items-start gap-4">
               {featured.blog.image ? (
-                <img
+                <Image
                   src={featured.blog.image}
-                  alt=""
+                  alt={featured.blog.title}
+                  width={56}
+                  height={56}
                   className="size-14 shrink-0 rounded-xl object-cover"
                 />
               ) : (
@@ -55,9 +58,11 @@ export function DashboardFeatured({
             <div className="absolute -bottom-8 -right-8 size-24 rounded-full bg-chart-3/4 blur-xl" />
             <div className="relative flex items-start gap-4">
               {project.image ? (
-                <img
+                <Image
                   src={project.image}
-                  alt=""
+                  alt={project.title}
+                  width={56}
+                  height={56}
                   className="size-14 shrink-0 rounded-xl object-cover"
                 />
               ) : (

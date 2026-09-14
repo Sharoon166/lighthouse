@@ -18,12 +18,12 @@ import { Partners } from "@/components/shared/partners";
 import { SectionHeader } from "@/components/shared/section-header";
 import { Button } from "@/components/ui/button";
 import {
-  dummyCategories,
   dummyProducts,
   dummyProjects,
   featuredBlogs,
   marqueeText,
 } from "@/lib/constants";
+import { fetchHomepageCategories } from "@/lib/shop-data";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -44,10 +44,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+// <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto items-end sm:items-center justify-center overflow-hidden px-6 pb-38 sm:pb-0">
+export default async function Home() {
+  const categories = await fetchHomepageCategories();
   return (
     <main>
-      <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto items-end sm:items-center justify-center overflow-hidden px-6 pb-38 sm:pb-0">
+      <section className="relative min-h-125 sm:h-[95dvh] aspect-9/16 sm:aspect-auto max-sm:pt-[70%] sm:flex items-center overflow-hidden px-6 pb-38 sm:pb-0">
         <Image
           src={HeroImage}
           alt="Modern lighting fixtures illuminating a living space"
@@ -76,13 +78,20 @@ export default function Home() {
             </p>
           </div>
 
-          <Button size="lg" className="group gap-4 font-bold">
-            Shop Collection
-            <HugeiconsIcon
-              icon={ArrowUpRight01FreeIcons}
-              className="size-8 rounded-full bg-primary-foreground p-1 text-primary transition-transform group-hover:rotate-45"
+          <Button
+            size="lg"
+            className="group gap-4 font-bold"
+            nativeButton={false}
+            render={
+              <Link href="/products" className="contents">
+                Shop Collection
+                <HugeiconsIcon
+                  icon={ArrowUpRight01FreeIcons}
+                  className="size-8 rounded-full bg-primary-foreground p-1 text-primary transition-transform group-hover:rotate-45"
+                />
+              </Link>
+            }
             />
-          </Button>
         </div>
         <HeroLinks />
       </section>
@@ -101,13 +110,15 @@ export default function Home() {
           <SectionHeader
             title="Lighting Collections for Every Space"
             description="Explore our curated range of premium lighting solutions for homes, offices and commercial environments. Find the perfect fixture for every style and every space."
+            ctaText="View All Categories"
+            ctaHref="/categories"
           />
 
           <div className="grid grid-cols-12 gap-4">
-            {dummyCategories.map((category, index) => (
+            {categories.map((category, index) => (
               <Link
                 key={category.id}
-                href="#"
+                href={category.href}
                 className={cn(
                   "relative overflow-hidden bg-contain p-6 min-h-66 h-full",
                   {
@@ -123,7 +134,7 @@ export default function Home() {
                 )}
               >
                 <h3 className="text-xl font-normal tracking-tight text-primary">
-                  {category.title} {index}
+                  {category.title}
                 </h3>
                 <p className="uppercase tracking-widest text-gold">
                   {category.items} Designs
@@ -146,6 +157,7 @@ export default function Home() {
             title="Customer Favorites"
             description="Explore our most popular lighting designs, chosen by homeowners, architects and interior designers for their exceptional quality and timeless style."
             ctaText="View all Products"
+            ctaHref="/products"
           />
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
@@ -210,15 +222,16 @@ export default function Home() {
             title="Lighting That Transforms Every Space"
             description="Explore a selection of residential and commercial projects featuring our premium lighting solutions, designed to enhance ambience, functionality and style."
             ctaText="View all Projects"
+            ctaHref="/projects"
           />
-          <div className="grid h-136 grid-cols-5 gap-4">
+          <div className="grid md:h-136 grid-cols-5 gap-4">
             {dummyProjects.map((project, index) => (
               <Link
                 key={project.id}
                 href={project.link}
                 style={{ backgroundImage: `url(${project.image})` }}
                 className={cn(
-                  `border bg-cover p-4 place-content-end col-span-2 max-md:col-span-5`,
+                  `border bg-cover p-4 place-content-end col-span-2 max-md:col-span-5 max-md:aspect-3/2`,
                   {
                     "md:col-span-3 md:row-span-2": index === 0,
                   },
@@ -247,7 +260,8 @@ export default function Home() {
           <SectionHeader
             title="Lighting Ideas & Design Inspiration"
             description="Explore expert tips, interior design trends, and practical lighting guides to help you create beautiful, functional spaces with confidence."
-            ctaText="View All Articles"
+            ctaText="View All Blogs"
+            ctaHref="/blogs"
           />
           <div className="grid gap-4 md:grid-cols-3">
             {featuredBlogs.map((blog) => (

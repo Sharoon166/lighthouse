@@ -2,7 +2,7 @@
 
 import type { QueryFilter } from "mongoose";
 import { Types } from "mongoose";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAdminForAction } from "@/lib/admin-guard";
 import { connectToDatabase } from "@/lib/db";
@@ -173,6 +173,7 @@ export async function createCategory(
     });
 
     revalidatePath("/admin/categories");
+    revalidateTag("homepage", "max");
 
     return { ok: true, slug };
   } catch (error) {
@@ -323,6 +324,7 @@ export async function updateCategory(
 
     revalidatePath("/admin/categories");
     revalidatePath("/admin/products");
+    revalidateTag("homepage", "max");
 
     return { ok: true, slug: nextSlug };
   } catch (error) {
@@ -374,6 +376,7 @@ export async function deleteCategory(
   await existing.deleteOne();
 
   revalidatePath("/admin/categories");
+  revalidateTag("homepage", "max");
 
   return { ok: true, message: "Category deleted." };
 }
@@ -783,6 +786,7 @@ export async function toggleFeaturedCategory(
   await existing.save();
 
   revalidatePath("/admin/categories");
+  revalidateTag("homepage", "max");
 
   return { ok: true, featured: existing.featured };
 }

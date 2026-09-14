@@ -98,8 +98,8 @@ export default async function CategoryPage({
 
   return (
     <main className="min-h-screen bg-background">
-      <section className="bg-noise grid overflow-hidden pb-0 lg:grid-cols-5 lg:pt-0 place-items-center min-h-96">
-        <div className="container space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10 max-lg:pt-10 lg:ml-28">
+      <section className="bg-noise grid overflow-hidden pb-0 lg:grid-cols-5 lg:pt-0 place-items-top min-h-96">
+        <div className="container space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10 max-lg:pt-10 lg:ml-28 py-10">
           <Breadcrumb
             items={[
               { label: "Home", href: "/" },
@@ -107,10 +107,12 @@ export default async function CategoryPage({
               { label: category.name },
             ]}
           />
-          <h1 className="lg:text-5xl">{category.name}</h1>
-          {category.description && (
-            <p className="max-w-2xl">{category.description}</p>
-          )}
+          <div className="max-w-2xl space-y-4">
+            <h1 className="lg:text-5xl">{category.name}</h1>
+            {category.description && (
+              <p className="max-w-2xl">{category.description}</p>
+            )}
+          </div>
         </div>
 
         {category.featuredImage && (

@@ -9,6 +9,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
+import { Breadcrumb } from "@/components/shared/breadcrumb";
 import type { ProjectDraftData, ProjectListItem } from "../actions";
 import { ProjectVideoPlayer } from "./project-video-player";
 
@@ -29,29 +30,14 @@ export function ProjectDetail({
     <article>
       {/* Hero */}
       <section className="relative overflow-hidden py-10">
-        <nav className="container">
-          <ol className="flex items-center gap-2 text-sm text-muted-foreground">
-            <li>
-              <Link
-                href="/"
-                className="transition-colors hover:text-foreground"
-              >
-                Home
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link
-                href="/projects"
-                className="transition-colors hover:text-foreground"
-              >
-                Projects
-              </Link>
-            </li>
-            <li>/</li>
-            <li className="text-foreground">{project.title}</li>
-          </ol>
-        </nav>
+        <Breadcrumb
+          className="container"
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Projects", href: "/projects" },
+            { label: project.title },
+          ]}
+        />
         <div className="container mt-12">
           <div className="max-w-4xl space-y-4">
             <h1 className="text-secondary text-balance">{project.title}</h1>

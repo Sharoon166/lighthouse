@@ -1,6 +1,7 @@
 import { connectToDatabase } from "@/lib/db";
 import { CategoryModel } from "@/models/category";
 import { ProductModel } from "@/models/product";
+import { unstable_cache } from "next/cache";
 
 const COLOR_NAME_TO_HEX: Record<string, string> = {
   Black: "#000000",
@@ -688,14 +689,36 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
     const categoriesFromDb = await CategoryModel.find({
       isActive: true,
     }).lean();
+
     if (categoriesFromDb && categoriesFromDb.length > 0) {
+      // Single aggregation to count active products per category slug
+      const counts = await ProductModel.aggregate([
+        {
+          $match: {
+            status: "active",
+            deletedAt: null,
+          },
+        },
+        {
+          $group: {
+            _id: "$category.slug",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const countMap = new Map<string, number>();
+      for (const entry of counts) {
+        countMap.set(entry._id, entry.count);
+      }
+
       return categoriesFromDb.map((c) => ({
         id: String(c._id),
         name: c.name,
         slug: c.slug,
         description: c.description || "Curated decorative lighting collection.",
         image: c.image || "/1.png",
-        designsCount: c.productCount || Math.floor(Math.random() * 30) + 10,
+        designsCount: countMap.get(c.slug) ?? 0,
         featured: Boolean(c.featured),
       }));
     }
@@ -707,6 +730,75 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
   }
   return FALLBACK_CATEGORIES;
 }
+
+export interface HomepageCategory {
+  id: string;
+  title: string;
+  slug: string;
+  href: string;
+  items: number;
+}
+
+const HOMEPAGE_CATEGORY_SLUGS = [
+  "pendant-lights",
+  "floor-lamps",
+  "wall-lights",
+  "chandeliers",
+];
+
+const HOMEPAGE_FALLBACK_CATEGORIES: HomepageCategory[] = [
+  { id: "pendant-lights", title: "Pendant Lights", slug: "pendant-lights", href: "/categories/pendant-lights", items: 69 },
+  { id: "floor-lamps", title: "Floor Lamps", slug: "floor-lamps", href: "/categories/floor-lamps", items: 41 },
+  { id: "wall-lights", title: "Wall lights", slug: "wall-lights", href: "/categories/wall-lights", items: 29 },
+  { id: "chandeliers", title: "Chandeliers", slug: "chandeliers", href: "/categories/chandeliers", items: 19 },
+];
+
+async function fetchHomepageCategoriesUncached(): Promise<HomepageCategory[]> {
+  try {
+    await connectToDatabase();
+
+    const categories = await CategoryModel.find({
+      slug: { $in: HOMEPAGE_CATEGORY_SLUGS },
+      isActive: true,
+    }).lean();
+
+    if (categories.length !== HOMEPAGE_CATEGORY_SLUGS.length) {
+      return HOMEPAGE_FALLBACK_CATEGORIES;
+    }
+
+    const counts = await ProductModel.aggregate([
+      { $match: { status: "active", deletedAt: null } },
+      { $group: { _id: "$category.slug", count: { $sum: 1 } } },
+    ]);
+
+    const countMap = new Map<string, number>();
+    for (const entry of counts) {
+      countMap.set(entry._id, entry.count);
+    }
+
+    const categoryMap = new Map(categories.map((c) => [c.slug, c]));
+
+    return HOMEPAGE_CATEGORY_SLUGS.map((slug) => {
+      const c = categoryMap.get(slug)!;
+      return {
+        id: c.slug,
+        title: c.name,
+        slug: c.slug,
+        href: `/categories/${c.slug}`,
+        items: countMap.get(c.slug) ?? 0,
+      };
+    });
+  } catch (error) {
+    console.warn("Failed to fetch homepage categories, using fallback:", error);
+    return HOMEPAGE_FALLBACK_CATEGORIES;
+  }
+}
+
+export const fetchHomepageCategories = unstable_cache(
+  fetchHomepageCategoriesUncached,
+  ["homepage-categories"],
+  { tags: ["homepage"], revalidate: 1800 },
+);
 
 export interface FilterMetadata {
   categories: { name: string; slug: string; count: number }[];

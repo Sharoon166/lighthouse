@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 
 export function OppelDistributorBanner() {
   return (
-    <section className="bg-opple-banner relative h-[155dvh] sm:h-155">
+    <section className="bg-opple-banner relative aspect-1/2.5 sm:h-155">
       {/*<picture className="absolute inset-0 -z-10">
           <source
             media="(max-width: 639px)"
@@ -22,7 +22,7 @@ export function OppelDistributorBanner() {
       <div className="container flex max-lg:flex-col items-center gap-y-10 justify-between py-10">
         <header className="flex flex-col gap-6">
           {/* Logo section */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-centern max-sm:justify-center gap-4">
             <LogoImage />
             <div className="w-0.5 bg-gold h-14" aria-hidden />
             <Image
@@ -30,6 +30,7 @@ export function OppelDistributorBanner() {
               alt="OPPLE brand logo"
               height={60}
               width={120}
+              className="object-contain"
             />
           </div>
 
@@ -40,15 +41,15 @@ export function OppelDistributorBanner() {
               alt="OPPLE brand logo"
               height={50}
               width={180}
-              className="-rotate-6 sm:hidden"
+              className="-rotate-6 hidden"
             />
-            <h2 className="heading-underline text-primary uppercase max-w-3xl leading-snug">
+            <h2 className="heading-underline text-primary uppercase max-w-3xl max-sm:text-center leading-snug">
               We are now the official distributor of{" "}
               <span className="text-gold">Opple</span>
             </h2>
 
             <address className="not-italic">
-              <div className="flex items-center gap-4 uppercase text-xl">
+              <div className="flex items-center max-sm:justify-center gap-4 uppercase text-xl">
                 <HugeiconsIcon icon={MapPin} className="text-gold w-6 h-6" />
                 <p>
                   In{" "}

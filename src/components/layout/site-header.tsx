@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  ArrowDownIcon,
   ArrowRight02Icon,
   Bulb,
   Cancel01Icon,
@@ -254,11 +253,15 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                       {displayedCategories.length > 0 ? (
                         <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                           {displayedCategories.map((category) => (
-                            <NavigationMenuLink key={category.id}>
-                              <Link
-                                href={`/categories/${category.slug}`}
-                                className="group flex items-center gap-3 rounded-xl transition-all duration-200 hover:bg-muted/70 w-full"
-                              >
+                            <NavigationMenuLink
+                              key={category.id}
+                              render={
+                                <Link
+                                  href={`/categories/${category.slug}`}
+                                  className="group flex items-center gap-3 rounded-xl transition-all duration-200 hover:bg-muted/70 w-full"
+                                />
+                              }
+                            >
                                 {/* Image */}
 
                                 <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
@@ -302,7 +305,6 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                                   size={14}
                                   className="mr-1 shrink-0 -translate-x-1 text-muted-foreground opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:text-gold group-hover:opacity-100"
                                 />
-                              </Link>
                             </NavigationMenuLink>
                           ))}
                         </div>
@@ -577,20 +579,26 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           </form>
 
           {/* --------------------------------------------------------------
-              MOBILE NAV
+              MOBILE NAV — slide between main menu & categories
           --------------------------------------------------------------- */}
 
-          <nav className="flex flex-col gap-1.5 overflow-auto">
-            {/* Products */}
-
-            <div>
+          <div className="relative flex-1 overflow-hidden">
+            {/* Main nav panel */}
+            <nav
+              className={cn(
+                "absolute inset-0 flex flex-col gap-1.5 overflow-auto transition-transform duration-300 ease-in-out",
+                mobileCategoriesOpen
+                  ? "-translate-x-full opacity-0"
+                  : "translate-x-0 opacity-100",
+              )}
+            >
+              {/* Products → opens categories sub-panel */}
               <button
                 type="button"
-                onClick={() => setMobileCategoriesOpen((prev) => !prev)}
+                onClick={() => setMobileCategoriesOpen(true)}
                 className={cn(
                   "flex w-full items-center justify-between rounded-2xl px-5 py-3 text-xl font-medium transition-all",
-
-                  isActive("/products") || mobileCategoriesOpen
+                  isActive("/products")
                     ? "text-3xl font-bold text-secondary"
                     : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
                 )}
@@ -598,98 +606,107 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 <span>Products</span>
 
                 <HugeiconsIcon
-                  icon={ArrowDownIcon}
+                  icon={ArrowRight02Icon}
                   size={20}
-                  className={cn(
-                    "transition-transform duration-200",
-                    mobileCategoriesOpen && "rotate-180",
-                  )}
+                  className="text-muted-foreground"
                 />
               </button>
 
-              {/* Category accordion */}
+              {NAV_LINKS.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={closeMobileMenu}
+                  className={cn(
+                    "flex items-center gap-2 rounded-2xl px-5 py-3 text-xl font-medium transition-all",
+                    isActive(href)
+                      ? "text-3xl font-bold text-secondary"
+                      : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+                  )}
+                >
+                  <span>{label}</span>
+                </Link>
+              ))}
+            </nav>
 
-              <div
-                className={cn(
-                  "overflow-hidden transition-all duration-300",
-                  mobileCategoriesOpen
-                    ? "max-h-150 opacity-100"
-                    : "max-h-0 opacity-0",
-                )}
+            {/* Categories sub-panel */}
+            <nav
+              className={cn(
+                "absolute inset-0 flex flex-col overflow-auto transition-transform duration-300 ease-in-out",
+                mobileCategoriesOpen
+                  ? "translate-x-0 opacity-100"
+                  : "translate-x-full opacity-0",
+              )}
+            >
+              {/* Back button */}
+              <button
+                type="button"
+                onClick={() => setMobileCategoriesOpen(false)}
+                className="flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-xl font-medium text-foreground/80 transition-all hover:bg-muted/60 hover:text-foreground"
               >
-                <div className="max-h-80 overflow-y-auto scrollbar-hide pl-5 pt-1">
-                  <div className="space-y-1 pb-2">
-                    {categories.length > 0 ? (
-                      <>
-                        {categories.map((category) => (
-                          <Link
-                            key={category.id}
-                            href={`/categories/${category.slug}`}
-                            onClick={closeMobileMenu}
-                            className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
-                          >
-                            <div className="relative size-8 shrink-0 overflow-hidden rounded-md bg-muted">
-                              {category.image ? (
-                                <Image
-                                  src={category.image}
-                                  alt={category.name}
-                                  fill
-                                  sizes="32px"
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <div className="flex size-full items-center justify-center">
-                                  <HugeiconsIcon icon={Bulb} size={14} />
-                                </div>
-                              )}
-                            </div>
+                <HugeiconsIcon icon={ArrowRight02Icon} size={20} className="rotate-180" />
+                <span>Back</span>
+              </button>
 
-                            <span>{category.name}</span>
-                          </Link>
-                        ))}
+              {/* Categories list */}
+              <div className="flex flex-col gap-1.5 overflow-y-auto scrollbar-hide pb-4">
+                <Link
+                  href="/products"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-3 rounded-2xl px-5 py-3 text-xl font-semibold text-gold transition-all hover:bg-muted/60"
+                >
+                  View all products
+                  <HugeiconsIcon icon={ArrowRight02Icon} size={16} />
+                </Link>
 
-                        <Link
-                          href="/categories"
-                          onClick={closeMobileMenu}
-                          className="flex items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-medium text-gold hover:underline"
-                        >
-                          View all categories
-                          <HugeiconsIcon icon={ArrowRight02Icon} size={12} />
-                        </Link>
-                      </>
-                    ) : (
-                      <Link
-                        href="/categories"
-                        onClick={closeMobileMenu}
-                        className="block rounded-xl px-4 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
-                      >
-                        View All Categories
-                      </Link>
-                    )}
-                  </div>
-                </div>
+                {categories.length > 0 ? (
+                  categories.map((category) => (
+                    <Link
+                      key={category.id}
+                      href={`/categories/${category.slug}`}
+                      onClick={closeMobileMenu}
+                      className="flex items-center gap-3 rounded-xl px-5 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
+                    >
+                      <div className="relative size-8 shrink-0 overflow-hidden rounded-md bg-muted">
+                        {category.image ? (
+                          <Image
+                            src={category.image}
+                            alt={category.name}
+                            fill
+                            sizes="32px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="flex size-full items-center justify-center">
+                            <HugeiconsIcon icon={Bulb} size={14} />
+                          </div>
+                        )}
+                      </div>
+
+                      <span>{category.name}</span>
+                    </Link>
+                  ))
+                ) : (
+                  <Link
+                    href="/categories"
+                    onClick={closeMobileMenu}
+                    className="block rounded-xl px-5 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
+                  >
+                    View All Categories
+                  </Link>
+                )}
+
+                <Link
+                  href="/categories"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-1 rounded-xl px-5 py-2.5 text-sm font-medium text-gold hover:underline"
+                >
+                  View all categories
+                  <HugeiconsIcon icon={ArrowRight02Icon} size={12} />
+                </Link>
               </div>
-            </div>
-
-            {/* Normal links */}
-
-            {NAV_LINKS.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeMobileMenu}
-                className={cn(
-                  "flex items-center gap-2 rounded-2xl px-5 py-3 text-xl font-medium transition-all",
-
-                  isActive(href)
-                    ? "text-3xl font-bold text-secondary"
-                    : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
-                )}
-              >
-                <span>{label}</span>
-              </Link>
-            ))}
-          </nav>
+            </nav>
+          </div>
 
           {/* ==============================================================
               MOBILE CTA

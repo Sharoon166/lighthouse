@@ -1,7 +1,7 @@
 "use server";
 
 import type { QueryFilter } from "mongoose";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAdminForAction } from "@/lib/admin-guard";
 import { deleteImage, extractPublicId } from "@/lib/cloudinary";
@@ -11,8 +11,18 @@ import { BrandModel } from "@/models/brand";
 import { CategoryModel } from "@/models/category";
 import { type Product, ProductModel } from "@/models/product";
 import { productInputSchema } from "../validation/product";
+import { Types } from "mongoose";
 
 export type { Product };
+
+function revalidateProductCaches(categorySlug?: string) {
+  revalidateTag("homepage", "max");
+  revalidatePath("/categories");
+  revalidatePath("/products");
+  if (categorySlug) {
+    revalidatePath(`/categories/${categorySlug}`);
+  }
+}
 
 export type ProductActionResult =
   | { ok: true; slug: string }
@@ -43,6 +53,16 @@ async function uniqueSlug(name: string, excludeId?: string) {
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function adjustCategoryProductCount(
+  categoryId: string,
+  delta: 1 | -1,
+): Promise<void> {
+  await CategoryModel.collection.updateOne(
+    { _id: new Types.ObjectId(categoryId) },
+    [{ $set: { productCount: { $max: [0, { $add: ["$productCount", delta] }] } } }],
+  );
 }
 
 async function buildProductData(data: z.infer<typeof productInputSchema>) {
@@ -169,7 +189,12 @@ export async function createProduct(
       slug,
     });
 
+    if (productData.status === "active" && productData.category?._id) {
+      await adjustCategoryProductCount(String(productData.category._id), 1);
+    }
+
     revalidatePath("/admin/products");
+    revalidateProductCaches(productData.category?.slug);
 
     return { ok: true, slug };
   } catch (error) {
@@ -215,6 +240,11 @@ export async function updateProduct(
       String(existing._id),
     );
 
+    const oldCategoryId = existing.category?._id
+      ? String(existing.category._id)
+      : null;
+    const oldStatus = existing.status;
+
     const productData = await buildProductData(data);
 
     existing.set({
@@ -224,7 +254,31 @@ export async function updateProduct(
 
     await existing.save();
 
+    const newCategoryId = productData.category?._id
+      ? String(productData.category._id)
+      : null;
+    const newStatus = productData.status;
+
+    if (oldStatus === "active" && newStatus !== "active" && oldCategoryId) {
+      await adjustCategoryProductCount(oldCategoryId, -1);
+    } else if (oldStatus !== "active" && newStatus === "active" && newCategoryId) {
+      await adjustCategoryProductCount(newCategoryId, 1);
+    }
+
+    if (oldCategoryId && newCategoryId && oldCategoryId !== newCategoryId) {
+      if (oldStatus === "active") {
+        await adjustCategoryProductCount(oldCategoryId, -1);
+      }
+      if (newStatus === "active") {
+        await adjustCategoryProductCount(newCategoryId, 1);
+      }
+    }
+
     revalidatePath("/admin/products");
+    revalidateProductCaches(existing.category?.slug);
+    if (productData.category?.slug && productData.category.slug !== existing.category?.slug) {
+      revalidatePath(`/categories/${productData.category.slug}`);
+    }
 
     return { ok: true, slug: nextSlug };
   } catch (error) {
@@ -266,10 +320,21 @@ export async function updateProductStatus(
     return { ok: false, message: "Product not found." };
   }
 
+  const oldStatus = product.status;
   product.status = status;
   await product.save();
 
+  const categoryId = product.category?._id ? String(product.category._id) : null;
+  if (categoryId) {
+    if (oldStatus === "active" && status !== "active") {
+      await adjustCategoryProductCount(categoryId, -1);
+    } else if (oldStatus !== "active" && status === "active") {
+      await adjustCategoryProductCount(categoryId, 1);
+    }
+  }
+
   revalidatePath("/admin/products");
+  revalidateProductCaches(product.category?.slug);
 
   return { ok: true, message: "Status updated." };
 }
@@ -294,7 +359,12 @@ export async function deleteProduct(
   existing.deletedAt = new Date();
   await existing.save();
 
+  if (existing.status === "active" && existing.category?._id) {
+    await adjustCategoryProductCount(String(existing.category._id), -1);
+  }
+
   revalidatePath("/admin/products");
+  revalidateProductCaches(existing.category?.slug);
 
   return { ok: true, message: "Product moved to trash." };
 }
@@ -315,8 +385,13 @@ export async function restoreProduct(
   existing.deletedAt = null;
   await existing.save();
 
+  if (existing.status === "active" && existing.category?._id) {
+    await adjustCategoryProductCount(String(existing.category._id), 1);
+  }
+
   revalidatePath("/admin/products");
   revalidatePath("/admin/products/trash");
+  revalidateProductCaches(existing.category?.slug);
 
   return { ok: true, message: "Product restored." };
 }
@@ -357,10 +432,15 @@ export async function permanentlyDeleteProduct(
     }
   }
 
+  if (existing.status === "active" && existing.category?._id) {
+    await adjustCategoryProductCount(String(existing.category._id), -1);
+  }
+
   await existing.deleteOne();
 
   revalidatePath("/admin/products");
   revalidatePath("/admin/products/trash");
+  revalidateProductCaches(existing.category?.slug);
 
   return { ok: true, message: "Product permanently deleted." };
 }
@@ -388,6 +468,7 @@ export async function updateVariantStock(
   await product.save();
 
   revalidatePath("/admin/products");
+  revalidateProductCaches(product.category?.slug);
 
   return { ok: true, message: "Stock updated." };
 }

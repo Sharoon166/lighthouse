@@ -9,7 +9,7 @@ import {
 export const IS_PHASE_2 = false;
 
 export const heroLinks = [
-  { label: "Facebook", href: "https://facebook.com", icon: FacebookIcon },
+  { label: "Facebook", href: "https://www.facebook.com/lighthouseisb", icon: FacebookIcon },
   { label: "Twitter", href: "https://x.com", icon: TwitterIcon },
   { label: "LinkedIn", href: "https://linkedin.com", icon: LinkedinIcon },
   { label: "Vimeo", href: "https://vimeo.com", icon: VimeoIcon },
@@ -31,21 +31,25 @@ export const dummyCategories = [
     id: "pendant-lights",
     title: "Pendant Lights",
     items: 69,
+    href: "/categories/pendant-lights"
   },
   {
     id: "floor-lamps",
     title: "Floor Lamps",
     items: 41,
+    href: "/categories/floor-lamps"
   },
   {
     id: "wall-lights",
     title: "Wall lights",
     items: 29,
+    href: "/categories/wall-lights"
   },
   {
     id: "chandeliers",
     title: "Chandeliers",
     items: 19,
+    href: "/categories/chandeliers"
   },
 ];
 
@@ -303,8 +307,8 @@ export const contactInfo = {
 };
 
 export const socialLinks = [
-  { name: "Facebook", url: "#" },
-  { name: "Instagram", url: "#" },
+  { name: "Facebook", url: "https://www.facebook.com/lighthouseisb" },
+  { name: "Instagram", url: "https://www.instagram.com/lighthouse.isb" },
   { name: "Twitter", url: "#" },
   { name: "Linkedin", url: "#" },
   { name: "Tiktok", url: "#" },

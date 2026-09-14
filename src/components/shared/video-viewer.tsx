@@ -95,7 +95,7 @@ function VideoViewerPanel({
         className="absolute inset-0 z-0 cursor-default"
         onClick={onClose}
       />
-      <div className="absolute top-0 w-full z-10 flex items-start justify-between gap-4 p-4 sm:p-5">
+      <div className="absolute top-0 w-full z-100 flex items-start justify-between gap-4 p-4 sm:p-5">
         <div className="min-w-0 pt-1">
           <p className="truncate text-sm font-medium text-white/90">
             {title || "Video"}

@@ -207,7 +207,7 @@
 }
 
 @utility bg-opple-banner {
-  @apply bg-cover bg-center bg-[url('/brands/opple-distribution-banner.png')] max-sm:bg-[url('/brands/opple-distribution-banner-mobile.png')];
+  @apply bg-cover bg-center bg-[url('/brands/opple-distribution-banner.png')] max-sm:bg-[url('/brands/opple-distribution-banner-mobile.jpeg')];
 }
 
 @layer base {
@@ -305,6 +305,8 @@
     height: 4px;
     width: 70%;
     background: var(--gold);
+
+    @apply max-sm:left-1/2 max-sm:-translate-x-1/2;
   }
 
   .blog-prose {

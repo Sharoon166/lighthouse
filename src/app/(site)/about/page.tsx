@@ -29,22 +29,19 @@ export default function AboutPage() {
   return (
     <main>
       {/* Hero Section */}
-      <section className="bg-noise pb-0 lg:pt-0 grid lg:grid-cols-5 place-items-center overflow-hidden">
-        <div className="container max-lg:pt-10 lg:ml-28 space-y-6 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10">
+      <section className="bg-noise pb-0 pt-0 grid lg:grid-cols-5 overflow-hidden">
+        <div className="container max-lg:pt-10 lg:ml-28 space-y-8 lg:space-y-18 lg:col-start-1 lg:col-span-2 lg:row-start-1 z-10 lg:py-10">
           <Breadcrumb
             items={[{ label: "Home", href: "/" }, { label: "About" }]}
           />
-          <h1 className="lg:text-5xl">About Lighthouse</h1>
-          <p className="max-w-2xl">
-            Premium lighting, carefully chosen for quality, style, and
-            performance. Beautiful fixtures that make every space feel warm and
-            inviting.
-          </p>
-          <Link href="#ceo-message">
-            <Button size="lg" className="mt-2">
-              Learn More <HugeiconsIcon icon={ArrowRight02Icon} />
-            </Button>
-          </Link>
+          <div className="space-y-4">
+            <h1 className="lg:text-5x">About Lighthouse</h1>
+            <p className="max-w-2xl">
+              Premium lighting, carefully chosen for quality, style, and
+              performance. Beautiful fixtures that make every space feel warm
+              and inviting.
+            </p>
+          </div>
         </div>
 
         <Image

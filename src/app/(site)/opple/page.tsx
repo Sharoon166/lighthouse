@@ -57,7 +57,7 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
   return (
     <main className="min-h-screen bg-background">
       {/* Opple Distributor Banner */}
-      <OppelDistributorBanner />
+      <OppelDistributorBanner hideButton />
 
       {/* Main Collection Container */}
       <section className="py-12 md:py-16 px-4 sm:px-6 lg:px-8">

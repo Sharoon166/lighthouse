@@ -30,7 +30,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
@@ -139,7 +138,6 @@ export function CategoryForm({
   const [parent, setParent] = useState<string | null>(
     initialData?.parent ? String(initialData.parent) : null,
   );
-  const [sortOrder, setSortOrder] = useState(initialData?.sortOrder ?? 0);
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
 
   const [categoryAttributes, setCategoryAttributes] = useState<
@@ -284,7 +282,7 @@ export function CategoryForm({
     description,
     image: image?.url ?? "",
     parent: parent || null,
-    sortOrder,
+    sortOrder: initialData?.sortOrder ?? 0,
     isActive,
     attributes: categoryAttributes.map((a) => ({
       attributeId: a.attributeId,
@@ -619,23 +617,6 @@ export function CategoryForm({
                   )}
                   <p className="text-xs text-muted-foreground">
                     Leave empty for a top-level category.
-                  </p>
-                </div>
-
-                <div className="space-y-2" data-field="sortOrder">
-                  <Label htmlFor="sort-order">Sort order</Label>
-                  <Input
-                    id="sort-order"
-                    type="number"
-                    min={0}
-                    value={sortOrder}
-                    onChange={(event) =>
-                      setSortOrder(Number(event.target.value))
-                    }
-                    placeholder="0"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Lower numbers appear first.
                   </p>
                 </div>
               </div>

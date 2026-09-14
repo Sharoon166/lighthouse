@@ -5,6 +5,7 @@ import {
   ChevronRightIcon,
   Collapse,
   Delete02Icon,
+  DragDropIcon,
   Edit02Icon,
   Expand,
   ImageIcon,
@@ -15,8 +16,26 @@ import {
   TagsIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  closestCenter,
+  DndContext,
+  DragOverlay,
+  type DragEndEvent,
+  type DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { authClient } from "@/lib/auth-client";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -38,23 +57,75 @@ import {
   type CategoryTreeNode,
   deleteCategory,
   getCategoryTree,
+  reorderCategories,
   toggleFeaturedCategory,
 } from "../actions/category-actions";
 
-function TreeNode({
-  node,
-  depth,
-  onDelete,
-  onToggleFeatured,
-  canFeatureMore,
-  defaultExpanded,
-}: {
+interface SortableTreeNodeProps {
   node: CategoryTreeNode;
   depth: number;
+  index: number;
   onDelete?: (node: CategoryTreeNode) => void;
   onToggleFeatured?: (node: CategoryTreeNode) => void;
+  onReorder?: (parentId: string | null, reordered: CategoryTreeNode[]) => void;
   canFeatureMore?: boolean;
   defaultExpanded?: boolean;
+}
+
+function SortableTreeNode({
+  node,
+  depth,
+  index,
+  onDelete,
+  onToggleFeatured,
+  onReorder,
+  canFeatureMore,
+  defaultExpanded,
+}: SortableTreeNodeProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: node.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : undefined,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <TreeNodeContent
+        node={node}
+        depth={depth}
+        index={index}
+        onDelete={onDelete}
+        onToggleFeatured={onToggleFeatured}
+        onReorder={onReorder}
+        canFeatureMore={canFeatureMore}
+        defaultExpanded={defaultExpanded}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
+    </div>
+  );
+}
+
+function TreeNodeContent({
+  node,
+  depth,
+  index,
+  onDelete,
+  onToggleFeatured,
+  onReorder,
+  canFeatureMore,
+  defaultExpanded,
+  dragHandleProps,
+}: SortableTreeNodeProps & {
+  dragHandleProps?: Record<string, unknown>;
 }) {
   const [expanded, setExpanded] = useState(
     defaultExpanded !== undefined ? defaultExpanded : depth < 1,
@@ -69,6 +140,20 @@ function TreeNode({
         )}
         style={{ paddingLeft: `${depth * 1.25 + 0.5}rem` }}
       >
+        {/* Drag handle */}
+        {dragHandleProps && (
+          <button
+            type="button"
+            className="flex shrink-0 items-center justify-center rounded text-muted-foreground/50 transition-colors hover:bg-muted hover:text-muted-foreground cursor-grab active:cursor-grabbing"
+            aria-label={`Drag to reorder ${node.name}`}
+            {...dragHandleProps}
+          >
+            <HugeiconsIcon icon={DragDropIcon} size={14} />
+          </button>
+        )}
+
+        <div className="font-heading font-semibold">#{index + 1}.</div>
+
         <button
           type="button"
           className={cn(
@@ -178,19 +263,89 @@ function TreeNode({
         </div>
       </div>
 
-      {expanded &&
-        node.children.map((child) => (
-          <TreeNode
-            key={child.id}
-            node={child}
-            depth={depth + 1}
+      {expanded && node.children.length > 0 && (
+        <SortableTreeLevel
+          nodes={node.children}
+          depth={depth + 1}
+          onDelete={onDelete}
+          onToggleFeatured={onToggleFeatured}
+          onReorder={onReorder}
+          canFeatureMore={canFeatureMore}
+          defaultExpanded={defaultExpanded}
+        />
+      )}
+    </div>
+  );
+}
+
+function SortableTreeLevel({
+  nodes,
+  depth,
+  onDelete,
+  onToggleFeatured,
+  onReorder,
+  canFeatureMore,
+  defaultExpanded,
+}: {
+  nodes: CategoryTreeNode[];
+  depth: number;
+  onDelete?: (node: CategoryTreeNode) => void;
+  onToggleFeatured?: (node: CategoryTreeNode) => void;
+  onReorder?: (parentId: string | null, reordered: CategoryTreeNode[]) => void;
+  canFeatureMore?: boolean;
+  defaultExpanded?: boolean;
+}) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 },
+    }),
+    useSensor(KeyboardSensor),
+  );
+
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+
+      const oldIndex = nodes.findIndex((n) => n.id === active.id);
+      const newIndex = nodes.findIndex((n) => n.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return;
+
+      const reordered = arrayMove(nodes, oldIndex, newIndex);
+      const orderedIds = reordered.map((n) => n.id);
+
+      const parentId = nodes[0]?.parentId ?? null;
+
+      onReorder?.(parentId, reordered);
+      await reorderCategories(orderedIds);
+    },
+    [nodes, onReorder],
+  );
+
+  const nodeIds = nodes.map((n) => n.id);
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={nodeIds} strategy={verticalListSortingStrategy}>
+        {nodes.map((node, index) => (
+          <SortableTreeNode
+            key={node.id}
+            node={node}
+            depth={depth}
+            index={index}
             onDelete={onDelete}
             onToggleFeatured={onToggleFeatured}
+            onReorder={onReorder}
             canFeatureMore={canFeatureMore}
             defaultExpanded={defaultExpanded}
           />
         ))}
-    </div>
+      </SortableContext>
+    </DndContext>
   );
 }
 
@@ -271,8 +426,8 @@ export function CategoriesManager({
       title: "Delete this category?",
       description: (
         <>
-          "{node.name}" will be permanently deleted. This action cannot be
-          undone.
+          &ldquo;{node.name}&rdquo; will be permanently deleted. This action
+          cannot be undone.
         </>
       ),
       confirmLabel: "Delete",
@@ -302,6 +457,26 @@ export function CategoriesManager({
     setForceExpand(false);
     setTreeVersion((v) => v + 1);
   };
+
+  const handleReorder = useCallback(
+    (parentId: string | null, reordered: CategoryTreeNode[]) => {
+      if (parentId === null) {
+        setTree(reordered);
+        return;
+      }
+
+      const replaceChildren = (nodes: CategoryTreeNode[]): CategoryTreeNode[] =>
+        nodes.map((n) => {
+          if (n.id === parentId) {
+            return { ...n, children: reordered };
+          }
+          return { ...n, children: replaceChildren(n.children) };
+        });
+
+      setTree((prev) => replaceChildren(prev));
+    },
+    [],
+  );
 
   const filterTree = (
     nodes: CategoryTreeNode[],
@@ -489,17 +664,16 @@ export function CategoriesManager({
       ) : (
         <div className="rounded-2xl border border-border bg-card">
           <div className="p-1 sm:p-2">
-            {filteredTree.map((node) => (
-              <TreeNode
-                key={`${node.id}-${treeVersion}`}
-                node={node}
-                depth={0}
-                onDelete={isAdmin ? handleDelete : undefined}
-                onToggleFeatured={isAdmin ? handleToggleFeatured : undefined}
-                canFeatureMore={canFeatureMore}
-                defaultExpanded={forceExpand !== null ? forceExpand : undefined}
-              />
-            ))}
+            <SortableTreeLevel
+              key={treeVersion}
+              nodes={filteredTree}
+              depth={0}
+              onDelete={isAdmin ? handleDelete : undefined}
+              onToggleFeatured={isAdmin ? handleToggleFeatured : undefined}
+              onReorder={handleReorder}
+              canFeatureMore={canFeatureMore}
+              defaultExpanded={forceExpand !== null ? forceExpand : undefined}
+            />
           </div>
         </div>
       )}

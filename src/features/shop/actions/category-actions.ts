@@ -824,3 +824,32 @@ export async function getFeaturedCategories(): Promise<
     productCount: c.productCount || 0,
   }));
 }
+
+export async function reorderCategories(
+  orderedIds: string[],
+): Promise<{ ok: boolean; message?: string }> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) return adminCheck;
+
+  await connectToDatabase();
+
+  try {
+    const bulkOps = orderedIds.map((id, index) => ({
+      updateOne: {
+        filter: { _id: new Types.ObjectId(id) },
+        update: { $set: { sortOrder: index } },
+      },
+    }));
+
+    await CategoryModel.bulkWrite(bulkOps);
+
+    revalidatePath("/admin/categories");
+    revalidatePath("/categories");
+    revalidateTag("homepage", "max");
+
+    return { ok: true, message: "Order updated." };
+  } catch (error) {
+    console.error("Failed to reorder categories:", error);
+    return { ok: false, message: "Failed to update order." };
+  }
+}

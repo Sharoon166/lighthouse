@@ -64,6 +64,7 @@ function QuickViewPanel({
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
+
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
@@ -84,30 +85,42 @@ function QuickViewPanel({
         aria-modal="true"
         aria-label={product.name}
         className={cn(
-          "relative z-10 w-full max-w-5xl max-h-[90vh] rounded-2xl border border-border bg-background shadow-2xl overflow-hidden",
+          "relative z-10 w-full max-w-5xl max-h-[90vh]",
+          "overflow-y-auto scrollbar-hide rounded-2xl border border-border",
+          "bg-background shadow-2xl",
           "animate-in fade-in-0 zoom-in-95 duration-200",
         )}
       >
-        {/* Close button */}
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-1.5 text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground border border-border"
-        >
-          <HugeiconsIcon icon={Cancel01Icon} size={18} />
-        </button>
+        <div className="flex items-center justify-between gap-2 sticky right-0 top-0 w-full bg-background/20 backdrop-blur-md z-100 py-3 px-6 ">
+          <div className="font-heading font-semibold text-xl text-secondary">
+            Overview of {product.name}
+          </div>
+          {/* Close button */}
+          <button
+            type="button"
+            aria-label="Close"
+            onClick={onClose}
+            className="z-20 mr-4 mt-4 rounded-full border border-border bg-background/80 p-1.5 text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground"
+          >
+            <HugeiconsIcon icon={Cancel01Icon} size={18} />
+          </button>
+        </div>
 
-        {/* Top section: Image gallery + Product info (matches detail page layout) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 max-h-[90vh]">
-          {/* Left: Image gallery using ProductImageGallery component */}
-          <div className="p-4 md:p-6 md:sticky md:top-0 md:self-start md:max-h-[90vh] md:overflow-y-auto">
-            <ProductImageGallery images={product.images} name={product.name} />
+        {/* Content */}
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          {/* Gallery */}
+          <div className="p-4 pt-14 md:p-6 md:pt-6">
+            <div className="md:sticky md:top-6">
+              <ProductImageGallery
+                images={product.images}
+                name={product.name}
+              />
+            </div>
           </div>
 
-          {/* Right: Collapsed ProductPurchasePanel */}
-          <div className="p-4 md:p-6 md:overflow-y-auto md:max-h-[90vh]">
-            <ProductPurchasePanel product={product} compact={true} />
+          {/* Product info */}
+          <div className="border-border p-4 md:border-l md:p-6">
+            <ProductPurchasePanel product={product} compact />
           </div>
         </div>
       </div>

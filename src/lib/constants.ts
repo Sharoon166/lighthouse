@@ -1,8 +1,8 @@
 import {
   FacebookIcon,
-  TwitterIcon,
+  InstagramIcon,
   LinkedinIcon,
-  VimeoIcon,
+  TikTokIcon,
   LocationIcon,
 } from "@/components/hero/social-icons";
 
@@ -10,10 +10,10 @@ export const IS_PHASE_2 = false;
 
 export const heroLinks = [
   { label: "Facebook", href: "https://www.facebook.com/lighthouseisb", icon: FacebookIcon },
-  { label: "Twitter", href: "https://x.com", icon: TwitterIcon },
-  { label: "LinkedIn", href: "https://linkedin.com", icon: LinkedinIcon },
-  { label: "Vimeo", href: "https://vimeo.com", icon: VimeoIcon },
-  { label: "Location", href: "https://google.maps.com", icon: LocationIcon },
+  { label: "Instagram", href: "https://www.instagram.com/lighthouse.isb", icon: InstagramIcon },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/light-house-islamabad", icon: LinkedinIcon },
+  { label: "TikTok", href: "https://www.tiktok.com/@light.house.isb", icon: TikTokIcon },
+  { label: "Location", href: "/contact#showrooms", icon: LocationIcon },
 ];
 
 export const marqueeText = [
@@ -309,32 +309,17 @@ export const contactInfo = {
 export const socialLinks = [
   { name: "Facebook", url: "https://www.facebook.com/lighthouseisb" },
   { name: "Instagram", url: "https://www.instagram.com/lighthouse.isb" },
-  { name: "Twitter", url: "#" },
-  { name: "Linkedin", url: "#" },
-  { name: "Tiktok", url: "#" },
+  { name: "LinkedIn", url: "https://www.linkedin.com/company/light-house-islamabad" },
+  { name: "TikTok", url: "https://www.tiktok.com/@light.house.isb" },
 ];
 
 export const showrooms = [
   {
-    id: "iqbal-town",
-    label: "Iqbal Town, Islamabad",
-    address: "Block 5, Iqbal Town, Islamabad",
+    id: "blue-area",
+    label: "Blue Area, Islamabad",
+    address: "Shop 1, Bilal Plaza, Blue, Area G 7/3 Blue Area, Islamabad, 44000, Pakistan",
     embedUrl:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3401.487359564895!2d73.00718397574598!3d31.48286207429519!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3918ff7876e3d12d%3A0x56fa8c6de3b38cb8!2sBlock%205%2C%20Iqbal%20Town%2C%20Islamabad!5e0!3m2!1sen!2s!4v1724000000000!5m2!1sen!2s",
-  },
-  {
-    id: "gulberg",
-    label: "Gulberg III, Lahore",
-    address: "Block C, Gulberg III, Lahore",
-    embedUrl:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3401.487359564895!2d74.3!3d31.52!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sGulberg%20III%2C%20Lahore!5e0!3m2!1sen!2s!4v1724000000000!5m2!1sen!2s",
-  },
-  {
-    id: "clifton",
-    label: "Clifton Block 5, Karachi",
-    address: "Block 5, Clifton, Karachi, 75600",
-    embedUrl:
-      "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3402.7!2d67.02!3d24.81!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sClifton%20Block%205%2C%20Karachi!5e0!3m2!1sen!2s!4v1724000000000!5m2!1sen!2s",
+      "https://maps.google.com/maps?q=33.716574,73.0698142&t=&z=17&ie=UTF8&iwloc=&output=embed",
   },
 ];
 

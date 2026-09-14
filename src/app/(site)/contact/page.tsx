@@ -34,7 +34,7 @@ export default function ContactPage() {
       </section>
 
       {/* Visit Our Showroom */}
-      <section className="container">
+      <section id="showrooms" className="container">
         <div className="space-y-3 mb-8">
           <h2>Visit Our Showroom</h2>
         </div>

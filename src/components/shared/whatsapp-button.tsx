@@ -50,8 +50,8 @@ export function WhatsAppButton() {
         transform: visible ? "scale(1)" : "scale(0.5)",
       }}
     >
-      <span className="flex size-14 items-center justify-center rounded-full bg-white/0 transition-transform duration-300 group-hover:rotate-12 sm:size-16">
-        <WhatsAppIcon className="size-7 drop-shadow-sm sm:size-8" />
+      <span className="flex size-18 items-center justify-center rounded-full bg-white/0 transition-transform duration-300 group-hover:rotate-12 sm:size-16">
+        <WhatsAppIcon className="size-9 drop-shadow-sm sm:size-8" />
       </span>
 
       <span className="max-w-0 overflow-hidden whitespace-nowrap pr-0 text-sm font-semibold opacity-0 transition-all duration-300 group-hover:max-w-36 group-hover:pr-5 group-hover:opacity-100">

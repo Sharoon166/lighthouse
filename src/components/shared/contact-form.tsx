@@ -21,9 +21,8 @@ import { contactInfo, socialLinks } from "@/lib/constants";
 const socialIconMap: Record<string, typeof Facebook02Icon> = {
   Facebook: Facebook02Icon,
   Instagram: InstagramIcon,
-  Twitter: NewTwitterIcon,
-  Linkedin: Linkedin01Icon,
-  Tiktok: TiktokIcon,
+  LinkedIn: Linkedin01Icon,
+  TikTok: TiktokIcon,
 };
 
 export function ContactForm() {
@@ -227,6 +226,7 @@ export function ContactForm() {
                 <a
                   key={link.name}
                   href={link.url}
+                  target="_blank"
                   aria-label={link.name}
                   className="flex size-9 items-center justify-center rounded-full bg-secondary-foreground/10 text-muted transition-colors hover:bg-secondary-foreground/20"
                 >

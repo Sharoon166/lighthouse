@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  ArrowDownIcon,
   ArrowRight02Icon,
   Bulb,
   Cancel01Icon,
+  ChevronRightIcon,
   Menu11Icon,
   Search01Icon,
   ShoppingBag02Icon,
@@ -13,7 +15,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import LogoImage from "@/components/shared/logo-img";
 import { cn } from "@/lib/utils";
@@ -56,6 +58,9 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const [categories, setCategories] = useState<MegaCategory[]>([]);
+  const [productsOpen, setProductsOpen] = useState(false);
+  const productsHoverTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const productsMenuRef = useRef<HTMLDivElement>(null);
 
   const isHero = variant === "hero";
 
@@ -154,11 +159,20 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
     }
   };
 
+  const handleProductsMouseEnter = () => {
+    if (productsHoverTimeoutRef.current) clearTimeout(productsHoverTimeoutRef.current);
+    setProductsOpen(true);
+  };
+
+  const handleProductsMouseLeave = () => {
+    productsHoverTimeoutRef.current = setTimeout(() => setProductsOpen(false), 150);
+  };
+
   return (
     <header
       className={cn(
         "z-50 w-full",
-        isHero ? "absolute top-0 py-4" : "static bg-background py-3",
+        isHero ? "absolute top-0 py-4" : "relative bg-background py-3",
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
@@ -185,216 +199,34 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
         >
           <NavigationMenuList className="gap-1">
             {/* ------------------------------------------------------------
-                PRODUCTS MEGA MENU
+                PRODUCTS MEGA MENU (hover-based, click navigates)
             ------------------------------------------------------------- */}
 
-            <NavigationMenuItem>
-              <NavigationMenuTrigger
+            <NavigationMenuItem
+              onPointerEnter={handleProductsMouseEnter}
+              onPointerLeave={handleProductsMouseLeave}
+            >
+              <Link
+                href="/products"
                 className={cn(
-                  "h-auto rounded-full bg-transparent px-4 py-1.5",
-                  "font-medium",
-                  "transition-colors",
-                  "hover:bg-transparent",
-                  "focus:bg-transparent",
-                  "data-[state=open]:bg-transparent",
-                  "data-[state=open]:hover:bg-transparent",
-
+                  "flex items-center gap-1 rounded-full px-4 py-1.5 font-medium transition-colors",
                   isActive("/products")
                     ? "text-gold"
                     : isHero
-                      ? "text-background hover:text-gold data-[state=open]:text-gold"
-                      : "text-foreground hover:bg-muted data-[state=open]:text-gold",
+                      ? "text-background hover:text-gold"
+                      : "text-foreground hover:bg-muted",
                 )}
               >
                 Products
-              </NavigationMenuTrigger>
-
-              <NavigationMenuContent
-                className={cn(
-                  "rounded-3xl shadow-lg",
-                  "backdrop-blur-xl",
-                  "data-[motion=from-start]:animate-none",
-                  "data-[motion=from-end]:animate-none",
-                  "data-[motion=to-start]:animate-none",
-                  "data-[motion=to-end]:animate-none",
-                )}
-              >
-                <div className="overflow-hidden rounded-[16px]">
-                  {/* ================================================================
-                      MAIN MEGA MENU
-                  ================================================================= */}
-
-                  <div className="grid grid-cols-[1.15fr_0.85fr] max-w-5xl">
-                    {/* ==============================================================
-                        LEFT - CATEGORIES
-                    ============================================================== */}
-
-                    <div className="p-7">
-                      {/* Header */}
-
-                      <div className="mb-6 flex items-end justify-between">
-                        <div>
-                          <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
-                            Collections
-                          </p>
-
-                          <h3 className="font-heading text-xl font-semibold tracking-tight text-secondary">
-                            Shop by category
-                          </h3>
-                        </div>
-
-                        <span className="text-xs text-muted-foreground">
-                          {categories.length} categories
-                        </span>
-                      </div>
-
-                      {/* Category grid */}
-
-                      {displayedCategories.length > 0 ? (
-                        <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-                          {displayedCategories.map((category) => (
-                            <NavigationMenuLink
-                              key={category.id}
-                              render={
-                                <Link
-                                  href={`/categories/${category.slug}`}
-                                  className="group flex items-center gap-3 rounded-xl transition-all duration-200 hover:bg-muted/70 w-full"
-                                />
-                              }
-                            >
-                                {/* Image */}
-
-                                <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
-                                  {category.image ? (
-                                    <Image
-                                      src={category.image}
-                                      alt={category.name}
-                                      fill
-                                      sizes="44px"
-                                      className="object-cover  transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                  ) : (
-                                    <div className="flex size-full items-center justify-center">
-                                      <HugeiconsIcon
-                                        icon={Bulb}
-                                        size={18}
-                                        className="text-muted-foreground"
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Text */}
-
-                                <div className="min-w-0 flex-1">
-                                  <p className="truncate text-sm font-medium text-foreground transition-colors group-hover:text-gold">
-                                    {category.name}
-                                  </p>
-
-                                  {category.productCount > 0 && (
-                                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                                      {category.productCount} products
-                                    </p>
-                                  )}
-                                </div>
-
-                                {/* Arrow */}
-
-                                <HugeiconsIcon
-                                  icon={ArrowRight02Icon}
-                                  size={14}
-                                  className="mr-1 shrink-0 -translate-x-1 text-muted-foreground opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:text-gold group-hover:opacity-100"
-                                />
-                            </NavigationMenuLink>
-                          ))}
-                        </div>
-                      ) : (
-                        <Link
-                          href="/categories"
-                          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                        >
-                          View all categories
-                        </Link>
-                      )}
-                    </div>
-
-                    {/* ==============================================================
-                        RIGHT - FEATURED
-                    ============================================================== */}
-
-                    <div className="relative m-1.5 min-h-87.5 overflow-hidden rounded-4xl bg-muted">
-                      {featuredCategory && (
-                        <>
-                          {/* Image */}
-
-                          <Image
-                            src={featuredCategory.image}
-                            alt={featuredCategory.name}
-                            fill
-                            sizes="400px"
-                            className="object-cover transition-transform duration-700 hover:scale-[1.04]"
-                          />
-
-                          {/* Content */}
-                          <div className="absolute inset-x-0 bottom-0 p-6">
-                            <div className="text-xs text-gold font-semibold uppercase">
-                              Featured collection
-                            </div>
-
-                            <h3 className="font-heading text-2xl font-semibold tracking-tight text-white">
-                              {featuredCategory.name}
-                            </h3>
-
-                            {featuredCategory.description && (
-                              <p className="mt-1.5 line-clamp-2 max-w-70 text-xs leading-relaxed text-white/70">
-                                {featuredCategory.description}
-                              </p>
-                            )}
-
-                            <Link
-                              href={`/categories/${featuredCategory.slug}`}
-                              className="group mt-3 inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-medium text-background transition-all hover:bg-gold/90 hover:text-background"
-                            >
-                              Explore collection
-                              <HugeiconsIcon
-                                icon={ArrowRight02Icon}
-                                size={13}
-                                className="transition-transform duration-200 group-hover:translate-x-0.5"
-                              />
-                            </Link>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* ================================================================
-                      FOOTER
-                  ================================================================= */}
-
-                  <div className="mx-3 flex items-center justify-between border-t border-border/60 py-3.5">
-                    <Link
-                      href="/categories"
-                      className="group flex items-center gap-2 px-3 text-xs font-medium text-foreground transition-colors hover:text-gold"
-                    >
-                      <span>View all categories</span>
-
-                      <HugeiconsIcon
-                        icon={ArrowRight02Icon}
-                        size={13}
-                        className="transition-transform duration-200 group-hover:translate-x-0.5"
-                      />
-                    </Link>
-
-                    <Link
-                      href="/products"
-                      className="px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      Browse all products
-                    </Link>
-                  </div>
-                </div>
-              </NavigationMenuContent>
+                <HugeiconsIcon
+                  icon={ArrowDownIcon}
+                  size={14}
+                  className={cn(
+                    "transition-transform duration-200",
+                    productsOpen && "rotate-180",
+                  )}
+                />
+              </Link>
             </NavigationMenuItem>
 
             {/* ------------------------------------------------------------
@@ -425,6 +257,165 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
             ))}
           </NavigationMenuList>
         </NavigationMenu>
+
+        {/* ================================================================
+            PRODUCTS MEGA DROPDOWN (centered on page)
+        ================================================================= */}
+
+        <div
+          className={cn(
+            "absolute left-1/2 -translate-x-1/2 top-full pt-3 z-50 hidden md:block",
+            "w-[min(90vw,920px)]",
+            "transition-all duration-200 origin-top",
+            productsOpen
+              ? "opacity-100 scale-100 pointer-events-auto"
+              : "opacity-0 scale-95 pointer-events-none",
+          )}
+          onPointerEnter={handleProductsMouseEnter}
+          onPointerLeave={handleProductsMouseLeave}
+        >
+          <div className="overflow-hidden rounded-2xl border border-border bg-background shadow-2xl p-2">
+            <div className="grid grid-cols-[1.15fr_0.85fr]">
+              {/* LEFT - CATEGORIES */}
+              <div className="p-5 sm:p-7">
+                <div className="mb-4 sm:mb-6 flex items-end justify-between">
+                  <div>
+                    <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
+                      Collections
+                    </p>
+                    <h3 className="font-heading text-lg sm:text-xl font-semibold tracking-tight text-secondary">
+                      Shop by category
+                    </h3>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {categories.length} categories
+                  </span>
+                </div>
+
+                {displayedCategories.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-2 gap-y-1">
+                    {displayedCategories.map((category) => (
+                      <Link
+                        key={category.id}
+                        href={`/categories/${category.slug}`}
+                        onClick={() => setProductsOpen(false)}
+                        className="group flex items-center gap-3 rounded-xl transition-all duration-200 hover:bg-muted/70 w-full p-2.5"
+                      >
+                        <div className="relative size-10 sm:size-12 shrink-0 overflow-hidden rounded-lg bg-muted">
+                          {category.image ? (
+                            <Image
+                              src={category.image}
+                              alt={category.name}
+                              fill
+                              sizes="44px"
+                              className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="flex size-full items-center justify-center">
+                              <HugeiconsIcon
+                                icon={Bulb}
+                                size={18}
+                                className="text-muted-foreground"
+                              />
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-foreground transition-colors group-hover:text-gold">
+                            {category.name}
+                          </p>
+                          {category.productCount > 0 && (
+                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                              {category.productCount} products
+                            </p>
+                          )}
+                        </div>
+
+                        <HugeiconsIcon
+                          icon={ArrowRight02Icon}
+                          size={14}
+                          className="mr-1 shrink-0 -translate-x-1 text-muted-foreground opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:text-gold group-hover:opacity-100 max-sm:hidden"
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                ) : (
+                  <Link
+                    href="/categories"
+                    className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    View all categories
+                  </Link>
+                )}
+              </div>
+
+              {/* RIGHT - FEATURED */}
+              <div className="relative m-1.5 hidden sm:block min-h-72 sm:min-h-87.5 overflow-hidden rounded-4xl bg-muted">
+                {featuredCategory && (
+                  <>
+                    <Image
+                      src={featuredCategory.image}
+                      alt={featuredCategory.name}
+                      fill
+                      sizes="400px"
+                      className="object-cover transition-transform duration-700 hover:scale-[1.04]"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+                      <div className="text-xs text-gold font-semibold uppercase">
+                        Featured collection
+                      </div>
+                      <h3 className="font-heading text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                        {featuredCategory.name}
+                      </h3>
+                      {featuredCategory.description && (
+                        <p className="mt-1.5 line-clamp-2 max-w-70 text-xs leading-relaxed text-white/70">
+                          {featuredCategory.description}
+                        </p>
+                      )}
+                      <Link
+                        href={`/categories/${featuredCategory.slug}`}
+                        onClick={() => setProductsOpen(false)}
+                        className="group mt-3 inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-xs font-medium text-background transition-all hover:bg-gold/90 hover:text-background"
+                      >
+                        Explore collection
+                        <HugeiconsIcon
+                          icon={ArrowRight02Icon}
+                          size={13}
+                          className="transition-transform duration-200 group-hover:translate-x-0.5"
+                        />
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="mx-3 flex items-center justify-between border-t border-border/60 py-3.5">
+              <Link
+                href="/categories"
+                onClick={() => setProductsOpen(false)}
+                className="group flex items-center gap-2 px-3 text-xs font-medium text-foreground transition-colors hover:text-gold"
+              >
+                <span>View all categories</span>
+                <HugeiconsIcon
+                  icon={ArrowRight02Icon}
+                  size={13}
+                  className="transition-transform duration-200 group-hover:translate-x-0.5"
+                />
+              </Link>
+
+              <Link
+                href="/products"
+                onClick={() => setProductsOpen(false)}
+                className="px-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Browse all products
+              </Link>
+            </div>
+          </div>
+        </div>
 
         {/* ================================================================
             DESKTOP ACTIONS
@@ -586,7 +577,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
             {/* Main nav panel */}
             <nav
               className={cn(
-                "absolute inset-0 flex flex-col gap-1.5 overflow-auto transition-transform duration-300 ease-in-out",
+                "absolute inset-0 flex flex-col gap-1 overflow-auto transition-transform duration-300 ease-in-out",
                 mobileCategoriesOpen
                   ? "-translate-x-full opacity-0"
                   : "translate-x-0 opacity-100",
@@ -597,7 +588,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 type="button"
                 onClick={() => setMobileCategoriesOpen(true)}
                 className={cn(
-                  "flex w-full items-center justify-between rounded-2xl px-5 py-3 text-xl font-medium transition-all",
+                  "flex w-full items-center justify-between rounded-2xl px-5 py-3.5 text-xl font-medium transition-all",
                   isActive("/products")
                     ? "text-3xl font-bold text-secondary"
                     : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
@@ -606,9 +597,9 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 <span>Products</span>
 
                 <HugeiconsIcon
-                  icon={ArrowRight02Icon}
+                  icon={ChevronRightIcon}
                   size={20}
-                  className="text-muted-foreground"
+                  className="text-muted-foreground transition-transform duration-200"
                 />
               </button>
 
@@ -618,7 +609,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                   href={href}
                   onClick={closeMobileMenu}
                   className={cn(
-                    "flex items-center gap-2 rounded-2xl px-5 py-3 text-xl font-medium transition-all",
+                    "flex items-center rounded-2xl px-5 py-3.5 text-xl font-medium transition-all",
                     isActive(href)
                       ? "text-3xl font-bold text-secondary"
                       : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
@@ -627,6 +618,18 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                   <span>{label}</span>
                 </Link>
               ))}
+
+              {/* Quick links */}
+              <div className="mt-auto border-t border-border pt-4">
+                <Link
+                  href="/products"
+                  onClick={closeMobileMenu}
+                  className="flex items-center gap-2 rounded-2xl px-5 py-3 text-base font-medium text-gold transition-all hover:bg-muted/60"
+                >
+                  View all products
+                  <HugeiconsIcon icon={ChevronRightIcon} size={16} />
+                </Link>
+              </div>
             </nav>
 
             {/* Categories sub-panel */}
@@ -642,22 +645,24 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               <button
                 type="button"
                 onClick={() => setMobileCategoriesOpen(false)}
-                className="flex w-full items-center gap-3 rounded-2xl px-5 py-3 text-xl font-medium text-foreground/80 transition-all hover:bg-muted/60 hover:text-foreground"
+                className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-xl font-medium text-foreground/80 transition-all hover:bg-muted/60 hover:text-foreground"
               >
-                <HugeiconsIcon icon={ArrowRight02Icon} size={20} className="rotate-180" />
+                <HugeiconsIcon icon={ChevronRightIcon} size={20} className="rotate-180" />
                 <span>Back</span>
               </button>
 
               {/* Categories list */}
-              <div className="flex flex-col gap-1.5 overflow-y-auto scrollbar-hide pb-4">
+              <div className="flex flex-col gap-1 overflow-y-auto scrollbar-hide pb-4">
                 <Link
                   href="/products"
                   onClick={closeMobileMenu}
-                  className="flex items-center gap-3 rounded-2xl px-5 py-3 text-xl font-semibold text-gold transition-all hover:bg-muted/60"
+                  className="flex items-center justify-between rounded-2xl px-5 py-3.5 text-xl font-semibold text-gold transition-all hover:bg-muted/60"
                 >
-                  View all products
-                  <HugeiconsIcon icon={ArrowRight02Icon} size={16} />
+                  <span>View all products</span>
+                  <HugeiconsIcon icon={ChevronRightIcon} size={18} />
                 </Link>
+
+                <div className="my-2 h-px bg-border" />
 
                 {categories.length > 0 ? (
                   categories.map((category) => (
@@ -665,15 +670,15 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                       key={category.id}
                       href={`/categories/${category.slug}`}
                       onClick={closeMobileMenu}
-                      className="flex items-center gap-3 rounded-xl px-5 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
+                      className="flex items-center gap-3 rounded-xl px-5 py-3 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
                     >
-                      <div className="relative size-8 shrink-0 overflow-hidden rounded-md bg-muted">
+                      <div className="relative size-9 shrink-0 overflow-hidden rounded-lg bg-muted">
                         {category.image ? (
                           <Image
                             src={category.image}
                             alt={category.name}
                             fill
-                            sizes="32px"
+                            sizes="36px"
                             className="object-cover"
                           />
                         ) : (
@@ -683,27 +688,34 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                         )}
                       </div>
 
-                      <span>{category.name}</span>
+                      <span className="flex-1">{category.name}</span>
+                      <HugeiconsIcon
+                        icon={ChevronRightIcon}
+                        size={16}
+                        className="text-muted-foreground"
+                      />
                     </Link>
                   ))
                 ) : (
                   <Link
                     href="/categories"
                     onClick={closeMobileMenu}
-                    className="block rounded-xl px-5 py-2.5 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
+                    className="block rounded-xl px-5 py-3 text-base text-foreground/70 transition-all hover:bg-muted/60 hover:text-foreground"
                   >
                     View All Categories
                   </Link>
                 )}
 
-                <Link
-                  href="/categories"
-                  onClick={closeMobileMenu}
-                  className="flex items-center gap-1 rounded-xl px-5 py-2.5 text-sm font-medium text-gold hover:underline"
-                >
-                  View all categories
-                  <HugeiconsIcon icon={ArrowRight02Icon} size={12} />
-                </Link>
+                <div className="mt-2 border-t border-border pt-4">
+                  <Link
+                    href="/categories"
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-2 rounded-2xl px-5 py-3 text-base font-medium text-gold transition-all hover:bg-muted/60"
+                  >
+                    View all categories
+                    <HugeiconsIcon icon={ChevronRightIcon} size={16} />
+                  </Link>
+                </div>
               </div>
             </nav>
           </div>

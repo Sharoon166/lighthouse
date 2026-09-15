@@ -227,6 +227,7 @@ export function ContactForm() {
                   key={link.name}
                   href={link.url}
                   target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={link.name}
                   className="flex size-9 items-center justify-center rounded-full bg-secondary-foreground/10 text-muted transition-colors hover:bg-secondary-foreground/20"
                 >

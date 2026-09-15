@@ -20,7 +20,7 @@ export function OppelDistributorBanner({ hideButton = false }: { hideButton?: bo
           />
       </picture>*/}
 
-      <div className="container flex max-lg:flex-col items-center gap-y-10 justify-between py-10 sm:pt-[27%]">
+      <div className="container flex max-lg:flex-col lg:items-center gap-y-10 justify-between py-10 max-sm:pt-[27%]">
         <header className="flex flex-col gap-4 sm:gap-6">
           {/* Logo section */}
           <div className="flex items-centern gap-4 h-12 ">

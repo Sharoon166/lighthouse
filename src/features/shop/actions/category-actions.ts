@@ -110,6 +110,11 @@ function escapeRegExp(value: string) {
 export async function createCategory(
   input: unknown,
 ): Promise<CategoryActionResult> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) {
+    return { ok: false, fieldErrors: {}, formErrors: [adminCheck.message] };
+  }
+
   const parsed = categoryInputSchema.safeParse(input);
 
   if (!parsed.success) {
@@ -194,6 +199,11 @@ export async function updateCategory(
   id: string,
   input: unknown,
 ): Promise<CategoryActionResult> {
+  const adminCheck = await requireAdminForAction();
+  if (adminCheck) {
+    return { ok: false, fieldErrors: {}, formErrors: [adminCheck.message] };
+  }
+
   const parsed = categoryInputSchema.safeParse(input);
 
   if (!parsed.success) {

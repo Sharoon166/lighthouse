@@ -393,7 +393,7 @@ export function ProductPurchasePanel({
             size={18}
             className="text-gold"
           />
-          <span>3–5 business days delivery within Karachi & nationwide</span>
+          <span>3–5 business days delivery within Islamabad & nationwide</span>
         </div>
         <div className="flex items-center gap-2.5">
           <HugeiconsIcon

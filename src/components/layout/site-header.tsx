@@ -354,13 +354,15 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               <div className="relative m-1.5 hidden sm:block min-h-72 sm:min-h-87.5 overflow-hidden rounded-4xl bg-muted">
                 {featuredCategory && (
                   <>
-                    <Image
-                      src={featuredCategory.image}
-                      alt={featuredCategory.name}
-                      fill
-                      sizes="400px"
-                      className="object-cover transition-transform duration-700 hover:scale-[1.04]"
-                    />
+                    {featuredCategory.image && (
+                      <Image
+                        src={featuredCategory.image}
+                        alt={featuredCategory.name}
+                        fill
+                        sizes="400px"
+                        className="object-cover transition-transform duration-700 hover:scale-[1.04]"
+                      />
+                    )}
                     <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
                       <div className="text-xs text-gold font-semibold uppercase">
                         Featured collection
@@ -444,7 +446,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               <input
                 type="text"
                 name="search"
-                placeholder="Search...."
+                placeholder="Search..."
                 className={cn(
                   "w-40 bg-transparent px-4 py-4 pl-2 text-sm outline-none",
                   "placeholder:text-current/50",
@@ -563,7 +565,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
               <input
                 type="text"
                 name="search"
-                placeholder="Search...."
+                placeholder="Search..."
                 className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
               />
             </div>

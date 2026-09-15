@@ -157,10 +157,10 @@ export function ProjectForm({
   });
 
   const [seoMetaTitle, setSeoMetaTitle] = useState(
-    initialData?.seo?.metaTitle ?? "",
+    initialData?.seo?.metaTitle ?? initialData?.title ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? "",
+    initialData?.seo?.metaDescription ?? initialData?.description?.slice(0, 160) ?? "",
   );
   const [seoFocusKeyword, setSeoFocusKeyword] = useState(
     initialData?.seo?.focusKeyword ?? "",
@@ -168,6 +168,9 @@ export function ProjectForm({
   const [seoNoIndex, setSeoNoIndex] = useState(
     initialData?.seo?.noIndex ?? false,
   );
+
+  const seoMetaTitleTouched = useRef(isEdit);
+  const seoMetaDescriptionTouched = useRef(isEdit);
 
   const [featured, setFeatured] = useState(initialData?.featured ?? false);
   const [publishedAt, setPublishedAt] = useState<string>(() => {
@@ -212,8 +215,10 @@ export function ProjectForm({
       const d = new Date(initialData.publishedAt);
       setPublishedAt(d.toISOString().slice(0, 16));
     }
-    setSeoMetaTitle(initialData.seo?.metaTitle ?? "");
-    setSeoMetaDescription(initialData.seo?.metaDescription ?? "");
+    setSeoMetaTitle(initialData.seo?.metaTitle ?? initialData.title ?? "");
+    setSeoMetaDescription(initialData.seo?.metaDescription ?? initialData.description?.slice(0, 160) ?? "");
+    seoMetaTitleTouched.current = isEdit;
+    seoMetaDescriptionTouched.current = isEdit;
     setSeoFocusKeyword(initialData.seo?.focusKeyword ?? "");
     setSeoNoIndex(initialData.seo?.noIndex ?? false);
   }, [initialData]);
@@ -223,6 +228,19 @@ export function ProjectForm({
       if (savedNoticeTimer.current) clearTimeout(savedNoticeTimer.current);
     };
   }, []);
+
+  // Auto-sync SEO fields from source fields (unless user has edited them)
+  useEffect(() => {
+    if (!seoMetaTitleTouched.current) {
+      setSeoMetaTitle(title);
+    }
+  }, [title]);
+
+  useEffect(() => {
+    if (!seoMetaDescriptionTouched.current) {
+      setSeoMetaDescription(description.slice(0, 160));
+    }
+  }, [description]);
 
   const clearFieldError = (field: string) => {
     setFieldErrors((previous) => {
@@ -1017,6 +1035,7 @@ export function ProjectForm({
                         id="seo-meta-title"
                         value={seoMetaTitle}
                         onChange={(event) => {
+                          seoMetaTitleTouched.current = true;
                           setSeoMetaTitle(event.target.value);
                           clearFieldError("seo.metaTitle");
                         }}
@@ -1046,6 +1065,7 @@ export function ProjectForm({
                         id="seo-meta-description"
                         value={seoMetaDescription}
                         onChange={(event) => {
+                          seoMetaDescriptionTouched.current = true;
                           setSeoMetaDescription(event.target.value);
                           clearFieldError("seo.metaDescription");
                         }}

@@ -47,7 +47,6 @@ import {
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { TaggedInput } from "@/components/ui/tagged-input";
-import { Textarea } from "@/components/ui/textarea";
 import { useSlugValidation } from "@/hooks/use-slug-validation";
 import { BLOG_CATEGORIES } from "@/lib/constants";
 import { FIELD_LIMITS } from "@/lib/field-limits";
@@ -227,10 +226,10 @@ export function BlogPostForm({
 
   // SEO fields (optional overrides)
   const [seoMetaTitle, setSeoMetaTitle] = useState(
-    initialData?.seo?.metaTitle ?? "",
+    initialData?.seo?.metaTitle ?? initialData?.title ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? "",
+    initialData?.seo?.metaDescription ?? initialData?.summary?.slice(0, 160) ?? "",
   );
   const [seoFocusKeyword, setSeoFocusKeyword] = useState(
     initialData?.seo?.focusKeyword ?? "",
@@ -238,6 +237,10 @@ export function BlogPostForm({
   const [seoNoIndex, setSeoNoIndex] = useState(
     initialData?.seo?.noIndex ?? false,
   );
+
+  const seoMetaTitleTouched = useRef(false);
+  const seoMetaDescriptionTouched = useRef(false);
+  const skipAutoSync = useRef(false);
 
   const {
     slug,
@@ -287,10 +290,13 @@ export function BlogPostForm({
       const d = new Date(initialData.publishedAt);
       setPublishedAt(d.toISOString().slice(0, 16));
     }
-    setSeoMetaTitle(initialData.seo?.metaTitle ?? "");
-    setSeoMetaDescription(initialData.seo?.metaDescription ?? "");
+    setSeoMetaTitle(initialData.seo?.metaTitle ?? initialData.title ?? "");
+    setSeoMetaDescription(initialData.seo?.metaDescription ?? initialData.summary?.slice(0, 160) ?? "");
+    seoMetaTitleTouched.current = false;
+    seoMetaDescriptionTouched.current = false;
     setSeoFocusKeyword(initialData.seo?.focusKeyword ?? "");
     setSeoNoIndex(initialData.seo?.noIndex ?? false);
+    skipAutoSync.current = true;
   }, [initialData]);
 
   useEffect(() => {
@@ -357,6 +363,24 @@ export function BlogPostForm({
       if (savedNoticeTimer.current) clearTimeout(savedNoticeTimer.current);
     };
   }, []);
+
+  // Auto-sync SEO fields from source fields (unless user has edited them)
+  useEffect(() => {
+    if (skipAutoSync.current || isEdit) {
+      skipAutoSync.current = false;
+      return;
+    }
+    if (!seoMetaTitleTouched.current) {
+      setSeoMetaTitle(title);
+    }
+  }, [title]);
+
+  useEffect(() => {
+    if (skipAutoSync.current) return;
+    if (!seoMetaDescriptionTouched.current) {
+      setSeoMetaDescription(summary.slice(0, 160));
+    }
+  }, [summary]);
 
   const clearFieldError = (field: string) => {
     setFieldErrors((previous) => {
@@ -658,7 +682,7 @@ export function BlogPostForm({
           </div>
 
           {view === "edit" ? (
-            <div className="min-w-0 space-y-8 *:border-none *:p-0">
+            <div className="min-w-0 space-y-8 *:ring-0 *:p-0">
               <Card>
                 <CardHeader>
                   <CardTitle>Content</CardTitle>
@@ -997,6 +1021,7 @@ export function BlogPostForm({
                         id="seo-meta-title"
                         value={seoMetaTitle}
                         onChange={(event) => {
+                          seoMetaTitleTouched.current = true;
                           setSeoMetaTitle(event.target.value);
                           clearFieldError("seo.metaTitle");
                         }}
@@ -1026,6 +1051,7 @@ export function BlogPostForm({
                         id="seo-meta-description"
                         value={seoMetaDescription}
                         onChange={(event) => {
+                          seoMetaDescriptionTouched.current = true;
                           setSeoMetaDescription(event.target.value);
                           clearFieldError("seo.metaDescription");
                         }}

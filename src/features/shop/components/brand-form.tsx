@@ -87,11 +87,13 @@ export function BrandForm({
   const [isActive, setIsActive] = useState(initialData?.isActive ?? true);
 
   const [seoMetaTitle, setSeoMetaTitle] = useState(
-    initialData?.seo?.metaTitle ?? "",
+    initialData?.seo?.metaTitle ?? initialData?.name ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? "",
+    initialData?.seo?.metaDescription ?? initialData?.description?.slice(0, 160) ?? "",
   );
+  const seoMetaTitleTouched = useRef(isEdit);
+  const seoMetaDescriptionTouched = useRef(isEdit);
 
   const [fieldErrors, setFieldErrors] = useState<{
     [key: string]: string[] | undefined;
@@ -117,6 +119,19 @@ export function BrandForm({
       if (savedNoticeTimer.current) clearTimeout(savedNoticeTimer.current);
     };
   }, []);
+
+  // Auto-sync SEO fields from source fields (unless user has edited them)
+  useEffect(() => {
+    if (!seoMetaTitleTouched.current) {
+      setSeoMetaTitle(name);
+    }
+  }, [name]);
+
+  useEffect(() => {
+    if (!seoMetaDescriptionTouched.current) {
+      setSeoMetaDescription(description.slice(0, 160));
+    }
+  }, [description]);
 
   const clearFieldError = (field: string) => {
     setFieldErrors((previous) => {
@@ -443,6 +458,7 @@ export function BrandForm({
                     id="seo-meta-title"
                     value={seoMetaTitle}
                     onChange={(event) => {
+                      seoMetaTitleTouched.current = true;
                       setSeoMetaTitle(event.target.value);
                       clearFieldError("seo.metaTitle");
                     }}
@@ -470,6 +486,7 @@ export function BrandForm({
                     id="seo-meta-description"
                     value={seoMetaDescription}
                     onChange={(event) => {
+                      seoMetaDescriptionTouched.current = true;
                       setSeoMetaDescription(event.target.value);
                       clearFieldError("seo.metaDescription");
                     }}

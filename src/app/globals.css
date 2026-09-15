@@ -315,12 +315,67 @@
     margin-top: 1.5rem;
   }
 
-  .blog-prose .tiptap > * + :where(h2, h3, h4, h5) {
+  /* Shared heading behavior */
+  .blog-prose .tiptap :where(h2, h3, h4, h5) {
+    color: var(--foreground);
+    position: relative;
+  }
+
+  /* H2 — Major section */
+  .blog-prose .tiptap h2 {
+    counter-increment: section;
+    margin-top: 4rem;
+    margin-bottom: 1.25rem;
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .blog-prose .tiptap h2::before {
+      content: counter(section, decimal-leading-zero);
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 3.5rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--muted-foreground);
+  }
+
+  /* H3 — Subsection */
+  .blog-prose .tiptap h3 {
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+    line-height: 1.3;
+    font-weight: 650;
+  }
+
+  /* H4 — Minor subsection */
+  .blog-prose .tiptap h4 {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  /* H5 — Small heading */
+  .blog-prose .tiptap h5 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  /*.blog-prose .tiptap > * + :where(h2, h3, h4, h5) {
     margin-top: 3.5rem;
   }
 
   .blog-prose .tiptap :where(h2, h3, h4, h5) {
     counter-increment: section;
+    color: var(--foreground);
   }
 
   .blog-prose .tiptap :where(h2, h3, h4, h5)::before {
@@ -331,7 +386,7 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     color: var(--muted-foreground);
-  }
+  }*/
 
   .blog-prose .tiptap ol {
     list-style: none;

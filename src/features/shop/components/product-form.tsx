@@ -385,11 +385,13 @@ export function ProductForm({
     initialData ? initialData.isFeatured === true : false,
   );
   const [seoMetaTitle, setSeoMetaTitle] = useState(
-    initialData?.seo?.metaTitle ?? "",
+    initialData?.seo?.metaTitle ?? initialData?.name ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? "",
+    initialData?.seo?.metaDescription ?? initialData?.description?.slice(0, 160) ?? "",
   );
+  const seoMetaTitleTouched = useRef(isEdit);
+  const seoMetaDescriptionTouched = useRef(isEdit);
   const [contentMaterialsAndCare, setContentMaterialsAndCare] = useState(
     initialData?.content?.materialsAndCare ?? "",
   );
@@ -550,6 +552,19 @@ export function ProductForm({
       if (categoryFetchTimer.current) clearTimeout(categoryFetchTimer.current);
     };
   }, []);
+
+  // Auto-sync SEO fields from source fields (unless user has edited them)
+  useEffect(() => {
+    if (!seoMetaTitleTouched.current) {
+      setSeoMetaTitle(name);
+    }
+  }, [name]);
+
+  useEffect(() => {
+    if (!seoMetaDescriptionTouched.current) {
+      setSeoMetaDescription(description.slice(0, 160));
+    }
+  }, [description]);
 
   // ── Fetch category attributes ──
   const fetchCategoryAttributes = useCallback((categoryId: string) => {
@@ -1871,6 +1886,7 @@ export function ProductForm({
                     id="seo-meta-title"
                     value={seoMetaTitle}
                     onChange={(event) => {
+                      seoMetaTitleTouched.current = true;
                       setSeoMetaTitle(event.target.value);
                       clearFieldError("seo.metaTitle");
                     }}
@@ -1898,6 +1914,7 @@ export function ProductForm({
                     id="seo-meta-description"
                     value={seoMetaDescription}
                     onChange={(event) => {
+                      seoMetaDescriptionTouched.current = true;
                       setSeoMetaDescription(event.target.value);
                       clearFieldError("seo.metaDescription");
                     }}

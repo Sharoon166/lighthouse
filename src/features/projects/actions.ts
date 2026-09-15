@@ -158,6 +158,7 @@ export async function createProject(
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/edit/${slug}`);
     revalidatePath(`/projects/${slug}`);
+    revalidatePath(`/projects`);
     updateTag("projects");
 
     return { ok: true, slug };
@@ -237,6 +238,7 @@ export async function updateProject(
     revalidatePath("/admin/projects");
     revalidatePath(`/admin/projects/edit/${nextSlug}`);
     revalidatePath(`/projects/${nextSlug}`);
+    revalidatePath(`/projects`);
     updateTag("projects");
 
     return { ok: true, slug: nextSlug };
@@ -317,6 +319,7 @@ export async function deleteProject(
 
   revalidatePath("/admin/projects");
   revalidatePath("/admin/projects/trash");
+  revalidatePath(`/projects`);
   updateTag("projects");
 
   return { ok: true, message: "Moved to trash." };

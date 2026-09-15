@@ -220,10 +220,10 @@ export function ProductFiltersSidebar({
   return (
     <>
       {/* ── Mobile: filter button ── */}
-      <div className="lg:hidden mb-6">
+      <div className="lg:hidden">
         <Button
           type="button"
-          variant="outline"
+          variant="secondary"
           onClick={() => setMobileOpen(true)}
           className="flex items-center gap-2 rounded-full"
         >

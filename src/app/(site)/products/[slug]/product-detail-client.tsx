@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ProductImageGallery } from "@/components/shop/product-image-gallery";
 import { ProductPurchasePanel } from "@/components/shop/product-purchase-panel";
 import type { ShopProductItem, ShopProductVariant } from "@/lib/shop-data";
@@ -14,15 +14,16 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
     ShopProductVariant | undefined
   >(() => product.variants.find((v) => v.isDefault) || product.variants[0]);
 
-  // Determine which image should be highlighted/selected
-  const highlightedImage =
-    selectedVariant?.images && selectedVariant.images.length > 0
-      ? selectedVariant.images[0]
-      : product.images[0];
+  // Just pick the variant's first image to highlight — don't reorder anything
+  const highlightedImage = useMemo(() => {
+    const variantImages = selectedVariant?.images ?? [];
+    if (variantImages.length > 0) return variantImages[0];
+    return product.images[0];
+  }, [selectedVariant, product.images]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-      {/* Left: Image Gallery */}
+      {/* Left: Image Gallery — images stay in fixed order */}
       <ProductImageGallery
         images={product.images}
         name={product.name}

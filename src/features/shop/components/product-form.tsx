@@ -29,7 +29,10 @@ import {
   ColorSwatch,
   PRESET_COLORS,
 } from "@/components/shared/color-picker";
-import { ImageDropzone } from "@/components/shared/image-dropzone";
+import {
+  GalleryManager,
+  type GalleryImage,
+} from "@/components/shared/gallery-manager";
 import { RichTextEditor } from "@/components/shared/rich-text-editor";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
@@ -69,6 +72,7 @@ import { FIELD_LIMITS } from "@/lib/field-limits";
 import { slugify } from "@/lib/utils";
 import { getCategoryAttributes } from "../actions/category-actions";
 import { deleteShopImage, uploadShopImage } from "../actions/image-actions";
+import { extractPublicId } from "@/lib/cloudinary-utils";
 import {
   createProduct,
   type Product,
@@ -368,12 +372,10 @@ export function ProductForm({
   const [brand, setBrand] = useState<string | null>(
     initialData?.brand?._id ? String(initialData.brand._id) : null,
   );
-  const [images, setImages] = useState<
-    Array<{ url: string; publicId: string }>
-  >(
+  const [images, setImages] = useState<GalleryImage[]>(
     initialData?.images?.map((img) => ({
       url: img,
-      publicId: img,
+      publicId: extractPublicId(img) ?? img,
     })) ?? [],
   );
   const [isActive, setIsActive] = useState(
@@ -496,7 +498,10 @@ export function ProductForm({
           salePrice: v.salePrice ?? undefined,
           costPrice: v.costPrice ?? undefined,
           stock: v.stock,
-          images: (v.images ?? []).map((img) => ({ url: img, publicId: img })),
+          images: (v.images ?? []).map((img) => ({
+            url: img,
+            publicId: extractPublicId(img) ?? img,
+          })),
           isActive: v.isActive ?? true,
         };
       });
@@ -1196,27 +1201,18 @@ export function ProductForm({
               </div>
 
               <div className="space-y-2" data-field="images">
-                <Label>Product images</Label>
-                <ImageDropzone
-                  value={images[0] ?? null}
-                  onChange={(img) => {
-                    if (img) {
-                      setImages((previous) =>
-                        previous.length > 0
-                          ? [img, ...previous.slice(1)]
-                          : [img],
-                      );
-                    } else {
-                      setImages([]);
-                    }
+                <GalleryManager
+                  images={images}
+                  onChange={(imgs) => {
+                    setImages(imgs);
                     clearFieldError("images");
                   }}
                   upload={uploadShopImage}
                   deleteImage={deleteShopImage}
-                  emptyLabel="Primary product image"
+                  maxImages={10}
+                  label="Product images"
                   aspectRatio={1}
-                  lockAspect
-                  optimizationPreset="product"
+                  showCaptions={false}
                 />
                 {fieldError("images") && (
                   <p className="text-xs text-destructive">

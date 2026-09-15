@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  ArrowDown02Icon,
+  ArrowUp02Icon,
   Delete02Icon,
   DragDropIcon,
   ImageUploadIcon,
@@ -30,6 +32,7 @@ interface GalleryManagerProps {
   maxImages?: number;
   label?: string;
   aspectRatio?: number;
+  showCaptions?: boolean;
 }
 
 interface QueueItem {
@@ -44,6 +47,7 @@ export function GalleryManager({
   maxImages = 12,
   label = "Gallery",
   aspectRatio = 4 / 3,
+  showCaptions = true,
 }: GalleryManagerProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -163,6 +167,20 @@ export function GalleryManager({
     onChange(updated);
   };
 
+  const handleMoveUp = (index: number) => {
+    if (index === 0) return;
+    const updated = [...images];
+    [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+    onChange(updated);
+  };
+
+  const handleMoveDown = (index: number) => {
+    if (index === images.length - 1) return;
+    const updated = [...images];
+    [updated[index], updated[index + 1]] = [updated[index + 1], updated[index]];
+    onChange(updated);
+  };
+
   const handleCancelCrop = () => {
     setCurrentCrop(null);
     setCropQueue([]);
@@ -243,6 +261,28 @@ export function GalleryManager({
                   className="object-cover"
                 />
                 <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleMoveUp(index)}
+                      className="size-8 p-0"
+                    >
+                      <HugeiconsIcon icon={ArrowUp02Icon} size={16} />
+                    </Button>
+                  )}
+                  {index < images.length - 1 && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleMoveDown(index)}
+                      className="size-8 p-0"
+                    >
+                      <HugeiconsIcon icon={ArrowDown02Icon} size={16} />
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     size="sm"
@@ -257,12 +297,14 @@ export function GalleryManager({
                   #{index + 1}
                 </div>
               </div>
-              <Input
-                placeholder="Add caption (optional)"
-                value={image.caption || ""}
-                onChange={(e) => handleCaptionChange(index, e.target.value)}
-                className="h-8 text-xs"
-              />
+              {showCaptions && (
+                <Input
+                  placeholder="Add caption (optional)"
+                  value={image.caption || ""}
+                  onChange={(e) => handleCaptionChange(index, e.target.value)}
+                  className="h-8 text-xs"
+                />
+              )}
             </div>
           ))}
         </div>

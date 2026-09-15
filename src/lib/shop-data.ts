@@ -54,7 +54,7 @@ export interface ShopProductItem {
   discountPercentage?: number;
   shortDescription: string;
   description: string;
-  images: string[]; // Now includes main product + all variant images
+  images: string[]; // Includes main product + all variant images
   finishes: { name: string; hex: string }[];
   variantAttributes: string[];
   variants: ShopProductVariant[];

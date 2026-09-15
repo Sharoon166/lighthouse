@@ -11,10 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default async function NewProductPage() {
-  const [tree, brands] = await Promise.all([
-    getCategoryTree(),
-    getAllBrands(),
-  ]);
+  const [tree, brands] = await Promise.all([getCategoryTree(), getAllBrands()]);
   const categories = (await flattenCategoryTree(tree)).map((c) => ({
     id: c.id,
     name: c.name,

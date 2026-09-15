@@ -1,8 +1,8 @@
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import { buttonVariants } from "@/components/ui/button";
 import { listTrashedProducts } from "@/features/shop/actions/product-actions";
 import { ProductTrashManager } from "@/features/shop/components/product-trash-manager";

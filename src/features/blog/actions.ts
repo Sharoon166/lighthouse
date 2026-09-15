@@ -1,7 +1,12 @@
 "use server";
 
 import type { QueryFilter } from "mongoose";
-import { revalidatePath, unstable_cache, updateTag } from "next/cache";
+import {
+  revalidatePath,
+  revalidateTag,
+  unstable_cache,
+  updateTag,
+} from "next/cache";
 import { z } from "zod";
 import { requireAdminForAction } from "@/lib/admin-guard";
 import {
@@ -17,6 +22,29 @@ import {
   BlogPostModel,
 } from "@/models/blog-post";
 import { blogPostInputSchema } from "./validation";
+
+function revalidateBlogCaches(slug?: string) {
+  revalidatePath("/admin/blog");
+  revalidatePath("/admin/blog/trash");
+  revalidatePath("/blogs");
+  revalidatePath("/blogs", "page");
+  revalidatePath("/");
+  if (slug) {
+    revalidatePath(`/blogs/${slug}`);
+    revalidatePath(`/blogs/${slug}`, "page");
+    revalidatePath(`/admin/blog/edit/${slug}`);
+  }
+  try {
+    revalidateTag("blog-posts", "max");
+  } catch {
+    // ignore
+  }
+  try {
+    updateTag("blog-posts");
+  } catch {
+    // ignore
+  }
+}
 
 export type BlogPostActionResult =
   | { ok: true; slug: string }
@@ -157,8 +185,7 @@ export async function createBlogPost(
       publishedAt,
     });
 
-    revalidatePath("/admin/blog");
-    updateTag("blog-posts");
+    revalidateBlogCaches(slug);
 
     return { ok: true, slug };
   } catch (error) {
@@ -231,8 +258,10 @@ export async function updateBlogPost(
 
     await existing.save();
 
-    revalidatePath("/admin/blog");
-    updateTag("blog-posts");
+    revalidateBlogCaches(nextSlug);
+    if (slug !== nextSlug) {
+      revalidateBlogCaches(slug);
+    }
 
     return { ok: true, slug: nextSlug };
   } catch (error) {
@@ -308,9 +337,7 @@ export async function deleteBlogPost(
   existing.deletedAt = new Date();
   await existing.save();
 
-  revalidatePath("/admin/blog");
-  revalidatePath("/admin/blog/trash");
-  updateTag("blog-posts");
+  revalidateBlogCaches(slug);
 
   return { ok: true, message: "Moved to trash." };
 }
@@ -334,9 +361,7 @@ export async function restoreBlogPost(
   existing.deletedAt = null;
   await existing.save();
 
-  revalidatePath("/admin/blog");
-  revalidatePath("/admin/blog/trash");
-  updateTag("blog-posts");
+  revalidateBlogCaches(slug);
 
   return { ok: true, message: "Restored." };
 }
@@ -365,9 +390,7 @@ export async function permanentlyDeleteBlogPost(
 
   await existing.deleteOne();
 
-  revalidatePath("/admin/blog");
-  revalidatePath("/admin/blog/trash");
-  updateTag("blog-posts");
+  revalidateBlogCaches(slug);
 
   return { ok: true, message: "Deleted forever." };
 }
@@ -619,8 +642,7 @@ export async function toggleFeaturedBlogPost(
   existing.featured = !existing.featured;
   await existing.save();
 
-  revalidatePath("/admin/blog");
-  updateTag("blog-posts");
+  revalidateBlogCaches(slug);
 
   return { ok: true, featured: existing.featured };
 }

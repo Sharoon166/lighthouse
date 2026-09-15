@@ -19,7 +19,6 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
-import { authClient } from "@/lib/auth-client";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,11 +29,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import {
   Empty,
   EmptyContent,
   EmptyDescription,
@@ -42,16 +36,22 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
+import { authClient } from "@/lib/auth-client";
 import { formatDate } from "@/lib/date-utils";
-import { formatCurrency, formatPriceRange } from "@/lib/format";
+import { formatPriceRange } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
   deleteProduct,
   listProducts,
-  updateProductStatus,
   type ProductListItem,
   type ProductListResult,
+  updateProductStatus,
 } from "../actions/product-actions";
 
 const columnHelper = createColumnHelper<ProductListItem>();

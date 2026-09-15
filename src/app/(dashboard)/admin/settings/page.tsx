@@ -1,20 +1,20 @@
 "use client";
 
-import { Activity, useState } from "react";
-import Link from "next/link";
 import { UserShield01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
+import { Activity, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { Label } from "@/components/ui/label";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 const TABS = [

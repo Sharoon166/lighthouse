@@ -1,7 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { ObjectId } from "mongodb";
+import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
@@ -433,6 +434,7 @@ export async function blockStaffAccount(
       body: { userId },
     });
 
+    revalidatePath("admin/settings/staff");
     return { ok: true, message: "Staff member blocked and signed out." };
   } catch (err) {
     return {

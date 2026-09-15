@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const WHATSAPP_PHONE = "923001234567";
 const WHATSAPP_MESSAGE =

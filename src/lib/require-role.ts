@@ -1,11 +1,11 @@
 import "server-only";
 
+import { ObjectId } from "mongodb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { auth } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
 
 export const getCurrentSession = cache(async () => {
   return await auth.api.getSession({ headers: await headers() });

@@ -1,7 +1,7 @@
+import { unstable_cache } from "next/cache";
 import { connectToDatabase } from "@/lib/db";
 import { CategoryModel } from "@/models/category";
 import { ProductModel } from "@/models/product";
-import { unstable_cache } from "next/cache";
 
 const COLOR_NAME_TO_HEX: Record<string, string> = {
   Black: "#000000",
@@ -747,10 +747,34 @@ const HOMEPAGE_CATEGORY_SLUGS = [
 ];
 
 const HOMEPAGE_FALLBACK_CATEGORIES: HomepageCategory[] = [
-  { id: "pendant-lights", title: "Pendant Lights", slug: "pendant-lights", href: "/categories/pendant-lights", items: 69 },
-  { id: "floor-lamps", title: "Floor Lamps", slug: "floor-lamps", href: "/categories/floor-lamps", items: 41 },
-  { id: "wall-lights", title: "Wall lights", slug: "wall-lights", href: "/categories/wall-lights", items: 29 },
-  { id: "chandeliers", title: "Chandeliers", slug: "chandeliers", href: "/categories/chandeliers", items: 19 },
+  {
+    id: "pendant-lights",
+    title: "Pendant Lights",
+    slug: "pendant-lights",
+    href: "/categories/pendant-lights",
+    items: 69,
+  },
+  {
+    id: "floor-lamps",
+    title: "Floor Lamps",
+    slug: "floor-lamps",
+    href: "/categories/floor-lamps",
+    items: 41,
+  },
+  {
+    id: "wall-lights",
+    title: "Wall lights",
+    slug: "wall-lights",
+    href: "/categories/wall-lights",
+    items: 29,
+  },
+  {
+    id: "chandeliers",
+    title: "Chandeliers",
+    slug: "chandeliers",
+    href: "/categories/chandeliers",
+    items: 19,
+  },
 ];
 
 async function fetchHomepageCategoriesUncached(): Promise<HomepageCategory[]> {

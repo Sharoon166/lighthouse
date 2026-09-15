@@ -2,17 +2,17 @@
 
 import Image from "next/image";
 import { StatusBadge } from "@/components/shared/status-badge";
+import {
+  type NormalizedTrashResult,
+  TrashManager,
+} from "@/components/shared/trash-manager";
 import { formatDate } from "@/lib/date-utils";
 import {
-  TrashManager,
-  type NormalizedTrashResult,
-} from "@/components/shared/trash-manager";
-import {
   listTrashedProjects,
-  permanentlyDeleteProject,
-  restoreProject,
   type ProjectListItem,
   type ProjectListResult,
+  permanentlyDeleteProject,
+  restoreProject,
 } from "../actions";
 
 const fetchProjectTrashItems = async (input: {

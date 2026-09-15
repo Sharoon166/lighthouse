@@ -23,7 +23,7 @@ export function SegmentedControl<T extends string>({
   return (
     <fieldset
       aria-label={label}
-      className="m-0 inline-flex items-center gap-0.5 rounded-full border border-border bg-card p-1"
+      className="m-0 inline-flex items-center justify-center gap-0.5 rounded-full border border-border bg-card p-1"
     >
       {options.map((option) => (
         <button

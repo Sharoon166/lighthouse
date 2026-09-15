@@ -2,9 +2,9 @@
 
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { PROJECT_CATEGORIES } from "@/lib/constants";
 import { ScrollBlurContainer } from "@/components/shared/scroll-blur-container";
 import { Button } from "@/components/ui/button";
+import { PROJECT_CATEGORIES } from "@/lib/constants";
 
 const allCategories = [
   { label: "All Projects", value: "all" },

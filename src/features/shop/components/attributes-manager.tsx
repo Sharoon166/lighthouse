@@ -16,7 +16,6 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
-import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import {
@@ -33,6 +32,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
+import { authClient } from "@/lib/auth-client";
 import { formatDate } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import {

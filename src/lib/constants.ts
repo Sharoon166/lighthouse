@@ -2,17 +2,33 @@ import {
   FacebookIcon,
   InstagramIcon,
   LinkedinIcon,
-  TikTokIcon,
   LocationIcon,
+  TikTokIcon,
 } from "@/components/hero/social-icons";
 
 export const IS_PHASE_2 = false;
 
 export const heroLinks = [
-  { label: "Facebook", href: "https://www.facebook.com/lighthouseisb", icon: FacebookIcon },
-  { label: "Instagram", href: "https://www.instagram.com/lighthouse.isb", icon: InstagramIcon },
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/light-house-islamabad", icon: LinkedinIcon },
-  { label: "TikTok", href: "https://www.tiktok.com/@light.house.isb", icon: TikTokIcon },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/lighthouseisb",
+    icon: FacebookIcon,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/lighthouse.isb",
+    icon: InstagramIcon,
+  },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/company/light-house-islamabad",
+    icon: LinkedinIcon,
+  },
+  {
+    label: "TikTok",
+    href: "https://www.tiktok.com/@light.house.isb",
+    icon: TikTokIcon,
+  },
   { label: "Location", href: "/contact#showrooms", icon: LocationIcon },
 ];
 
@@ -31,25 +47,25 @@ export const dummyCategories = [
     id: "pendant-lights",
     title: "Pendant Lights",
     items: 69,
-    href: "/categories/pendant-lights"
+    href: "/categories/pendant-lights",
   },
   {
     id: "floor-lamps",
     title: "Floor Lamps",
     items: 41,
-    href: "/categories/floor-lamps"
+    href: "/categories/floor-lamps",
   },
   {
     id: "wall-lights",
     title: "Wall lights",
     items: 29,
-    href: "/categories/wall-lights"
+    href: "/categories/wall-lights",
   },
   {
     id: "chandeliers",
     title: "Chandeliers",
     items: 19,
-    href: "/categories/chandeliers"
+    href: "/categories/chandeliers",
   },
 ];
 
@@ -309,7 +325,10 @@ export const contactInfo = {
 export const socialLinks = [
   { name: "Facebook", url: "https://www.facebook.com/lighthouseisb" },
   { name: "Instagram", url: "https://www.instagram.com/lighthouse.isb" },
-  { name: "LinkedIn", url: "https://www.linkedin.com/company/light-house-islamabad" },
+  {
+    name: "LinkedIn",
+    url: "https://www.linkedin.com/company/light-house-islamabad",
+  },
   { name: "TikTok", url: "https://www.tiktok.com/@light.house.isb" },
 ];
 
@@ -317,7 +336,8 @@ export const showrooms = [
   {
     id: "blue-area",
     label: "Blue Area, Islamabad",
-    address: "Shop 1, Bilal Plaza, Blue, Area G 7/3 Blue Area, Islamabad, 44000, Pakistan",
+    address:
+      "Shop 1, Bilal Plaza, Blue, Area G 7/3 Blue Area, Islamabad, 44000, Pakistan",
     embedUrl:
       "https://maps.google.com/maps?q=33.716574,73.0698142&t=&z=17&ie=UTF8&iwloc=&output=embed",
   },

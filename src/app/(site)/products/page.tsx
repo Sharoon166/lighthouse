@@ -54,19 +54,23 @@ export default async function ProductsPage({
       : undefined;
   const sortBy = params.sort;
 
-  const [{ products: rawProducts, total }, filterMeta, newArrivalsResult, categoryTree] =
-    await Promise.all([
-      fetchStoreProducts({
-        categorySlug,
-        search,
-        brandSlug: brandSlug?.[0],
-        priceRange,
-        sortBy,
-      }),
-      fetchFilterMetadata(),
-      fetchStoreProducts({ sortBy: "newest" }),
-      getCategoryTree({ activeOnly: true }),
-    ]);
+  const [
+    { products: rawProducts, total },
+    filterMeta,
+    newArrivalsResult,
+    categoryTree,
+  ] = await Promise.all([
+    fetchStoreProducts({
+      categorySlug,
+      search,
+      brandSlug: brandSlug?.[0],
+      priceRange,
+      sortBy,
+    }),
+    fetchFilterMetadata(),
+    fetchStoreProducts({ sortBy: "newest" }),
+    getCategoryTree({ activeOnly: true }),
+  ]);
 
   const products = JSON.parse(JSON.stringify(rawProducts));
   const newArrivals: ShopProductItem[] = JSON.parse(

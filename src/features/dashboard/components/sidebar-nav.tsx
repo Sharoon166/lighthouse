@@ -16,11 +16,9 @@ import {
   UserShield01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import Image from "next/image";
 import Link from "next/link";
-import Image from "next/image"
 import { usePathname } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -31,6 +29,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -125,7 +125,15 @@ export function SidebarNav({
             className="flex items-center gap-2.5 font-heading text-xl text-secondary font-semibold truncate"
           >
             {/*Lighthouse*/}
-            <Image src="/logo-dark.png" alt="" unoptimized height={500} width={500} className="w-12"/> Admin Panel
+            <Image
+              src="/logo-dark.png"
+              alt=""
+              unoptimized
+              height={500}
+              width={500}
+              className="w-12"
+            />{" "}
+            Admin Panel
           </Link>
         )}
         {!isMobile && (
@@ -230,12 +238,12 @@ export function SidebarNav({
             side={collapsed ? "right" : "top"}
             sideOffset={8}
           >
-              <DropdownMenuGroup>
-                <div className="px-2.5 py-2">
-                  <p className="text-sm font-medium text-foreground">{name}</p>
-                  <p className="text-xs text-muted-foreground">{email}</p>
-                </div>
-              </DropdownMenuGroup>
+            <DropdownMenuGroup>
+              <div className="px-2.5 py-2">
+                <p className="text-sm font-medium text-foreground">{name}</p>
+                <p className="text-xs text-muted-foreground">{email}</p>
+              </div>
+            </DropdownMenuGroup>
             {!collapsed && <DropdownMenuSeparator />}
             <DropdownMenuItem
               onClick={handleSignOut}

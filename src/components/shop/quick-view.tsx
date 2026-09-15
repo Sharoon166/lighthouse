@@ -1,5 +1,8 @@
 "use client";
 
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import Link from "next/link";
 import {
   createContext,
   useCallback,
@@ -8,13 +11,10 @@ import {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
-import Link from "next/link";
+import type { ShopProductItem } from "@/lib/shop-data";
 import { cn } from "@/lib/utils";
 import { ProductImageGallery } from "./product-image-gallery";
 import { ProductPurchasePanel } from "./product-purchase-panel";
-import type { ShopProductItem } from "@/lib/shop-data";
 
 interface QuickViewContextType {
   open: (product: ShopProductItem) => void;

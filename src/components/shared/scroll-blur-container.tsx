@@ -1,4 +1,5 @@
-import React, { useRef, useState, useEffect } from "react";
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ScrollBlurContainerProps {
   children: React.ReactNode;

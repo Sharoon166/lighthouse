@@ -1,14 +1,14 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
 import {
+  CancelCircleIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   FilterHorizontalIcon,
-  CancelCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { CategoryTreeNode } from "@/features/shop/actions/category-actions";
 import type { ShopProductItem } from "@/lib/shop-data";
@@ -164,7 +164,8 @@ export function ProductFiltersSidebar({
     return slugs;
   }, [categoryTree, initialCategory]);
 
-  const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(initialExpanded);
+  const [expandedSlugs, setExpandedSlugs] =
+    useState<Set<string>>(initialExpanded);
 
   const toggleExpand = useCallback((slug: string) => {
     setExpandedSlugs((prev) => {

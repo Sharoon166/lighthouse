@@ -1,6 +1,7 @@
 "use server";
 
 import type { QueryFilter } from "mongoose";
+import { Types } from "mongoose";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAdminForAction } from "@/lib/admin-guard";
@@ -11,7 +12,6 @@ import { BrandModel } from "@/models/brand";
 import { CategoryModel } from "@/models/category";
 import { type Product, ProductModel } from "@/models/product";
 import { productInputSchema } from "../validation/product";
-import { Types } from "mongoose";
 
 export type { Product };
 
@@ -61,7 +61,13 @@ async function adjustCategoryProductCount(
 ): Promise<void> {
   await CategoryModel.collection.updateOne(
     { _id: new Types.ObjectId(categoryId) },
-    [{ $set: { productCount: { $max: [0, { $add: ["$productCount", delta] }] } } }],
+    [
+      {
+        $set: {
+          productCount: { $max: [0, { $add: ["$productCount", delta] }] },
+        },
+      },
+    ],
   );
 }
 
@@ -261,7 +267,11 @@ export async function updateProduct(
 
     if (oldStatus === "active" && newStatus !== "active" && oldCategoryId) {
       await adjustCategoryProductCount(oldCategoryId, -1);
-    } else if (oldStatus !== "active" && newStatus === "active" && newCategoryId) {
+    } else if (
+      oldStatus !== "active" &&
+      newStatus === "active" &&
+      newCategoryId
+    ) {
       await adjustCategoryProductCount(newCategoryId, 1);
     }
 
@@ -276,7 +286,10 @@ export async function updateProduct(
 
     revalidatePath("/admin/products");
     revalidateProductCaches(existing.category?.slug);
-    if (productData.category?.slug && productData.category.slug !== existing.category?.slug) {
+    if (
+      productData.category?.slug &&
+      productData.category.slug !== existing.category?.slug
+    ) {
       revalidatePath(`/categories/${productData.category.slug}`);
     }
 
@@ -324,7 +337,9 @@ export async function updateProductStatus(
   product.status = status;
   await product.save();
 
-  const categoryId = product.category?._id ? String(product.category._id) : null;
+  const categoryId = product.category?._id
+    ? String(product.category._id)
+    : null;
   if (categoryId) {
     if (oldStatus === "active" && status !== "active") {
       await adjustCategoryProductCount(categoryId, -1);

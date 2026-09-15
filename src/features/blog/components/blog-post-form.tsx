@@ -8,10 +8,10 @@ import {
   CheckmarkCircle02Icon,
   CodeXmlIcon,
   Edit02Icon,
+  ExpandIcon,
   EyeIcon,
   FileCodeIcon,
   Loading02Icon,
-  Maximize02Icon,
   Rocket01Icon,
   SaveIcon,
   Warning,
@@ -229,7 +229,9 @@ export function BlogPostForm({
     initialData?.seo?.metaTitle ?? initialData?.title ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? initialData?.summary?.slice(0, 160) ?? "",
+    initialData?.seo?.metaDescription ??
+      initialData?.summary?.slice(0, 160) ??
+      "",
   );
   const [seoFocusKeyword, setSeoFocusKeyword] = useState(
     initialData?.seo?.focusKeyword ?? "",
@@ -291,7 +293,11 @@ export function BlogPostForm({
       setPublishedAt(d.toISOString().slice(0, 16));
     }
     setSeoMetaTitle(initialData.seo?.metaTitle ?? initialData.title ?? "");
-    setSeoMetaDescription(initialData.seo?.metaDescription ?? initialData.summary?.slice(0, 160) ?? "");
+    setSeoMetaDescription(
+      initialData.seo?.metaDescription ??
+        initialData.summary?.slice(0, 160) ??
+        "",
+    );
     seoMetaTitleTouched.current = false;
     seoMetaDescriptionTouched.current = false;
     setSeoFocusKeyword(initialData.seo?.focusKeyword ?? "");
@@ -882,19 +888,21 @@ export function BlogPostForm({
                           variant="outline"
                           onClick={() => setZenMode(true)}
                         >
-                          <HugeiconsIcon icon={Maximize02Icon} size={14} />
+                          <HugeiconsIcon icon={ExpandIcon} size={14} />
                           Zen mode
                         </Button>
                       )}
                     </div>
-                    <div className="max-h-[40rem]">
+                    <div className="h-[calc(70dvh-1.5rem)]">
                       <RichTextEditor
                         value={content}
                         onChange={(next) => {
-                        setContent(next);
+                          setContent(next);
                           clearFieldError("content");
                         }}
                         placeholder="Write your story…"
+                        className="flex h-full flex-col"
+                        editorClassName="max-h-none min-h-0 flex-1"
                       />
                     </div>
                     {fieldError("content") && (

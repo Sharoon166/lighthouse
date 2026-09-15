@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { calculateReadingTime } from "@/features/blog/seo-helpers";
 import { formatDate } from "@/lib/date-utils";
+import { slugify } from "@/lib/utils";
 import type { BlogPostDraftData, BlogPostListItem } from "../actions";
 import { BlogCard } from "./blog-card";
 import { HeroActions } from "./hero-actions";
@@ -32,7 +33,6 @@ function extractTableOfContents(content: JSONContent | null): TocItem[] {
   if (!content || !Array.isArray(content.content)) return [];
 
   const items: TocItem[] = [];
-  let counter = 1;
 
   const walk = (nodes: JSONContent[]) => {
     for (const node of nodes) {
@@ -42,13 +42,12 @@ function extractTableOfContents(content: JSONContent | null): TocItem[] {
           node.content.map((n) => (n.type === "text" ? n.text : "")).join("") ||
           "";
 
-        if (text && level >= 2 && level <= 4) {
+        if (text && level === 2) {
           items.push({
-            id: `heading-${counter}`,
+            id: slugify(text),
             text,
             level,
           });
-          counter++;
         }
       }
 

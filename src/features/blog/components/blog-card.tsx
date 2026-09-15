@@ -1,3 +1,5 @@
+import { Newspaper } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import { BLOG_CATEGORIES } from "@/lib/constants";
@@ -24,7 +26,9 @@ export function BlogCard({ post }: { post: BlogPostListItem }) {
           />
         ) : (
           <div className="flex aspect-3/2 items-center justify-center bg-muted">
-            <span className="text-4xl text-muted-foreground">📰</span>
+            <span className="text-4xl text-muted-foreground">
+              <HugeiconsIcon icon={Newspaper} />
+            </span>
           </div>
         )}
       </div>

@@ -496,9 +496,9 @@ export async function listCategories(
   };
 }
 
-export async function getCategoryTree(
-  opts?: { activeOnly?: boolean },
-): Promise<CategoryTreeNode[]> {
+export async function getCategoryTree(opts?: {
+  activeOnly?: boolean;
+}): Promise<CategoryTreeNode[]> {
   await connectToDatabase();
 
   const query = opts?.activeOnly ? { isActive: true } : {};
@@ -611,9 +611,7 @@ export async function getCategoryBySlug(
   };
 }
 
-export async function getSubcategories(
-  parentId: string,
-): Promise<
+export async function getSubcategories(parentId: string): Promise<
   {
     id: string;
     name: string;

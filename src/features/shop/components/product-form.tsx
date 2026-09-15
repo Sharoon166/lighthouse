@@ -30,8 +30,8 @@ import {
   PRESET_COLORS,
 } from "@/components/shared/color-picker";
 import {
-  GalleryManager,
   type GalleryImage,
+  GalleryManager,
 } from "@/components/shared/gallery-manager";
 import { RichTextEditor } from "@/components/shared/rich-text-editor";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -68,11 +68,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { extractPublicId } from "@/lib/cloudinary-utils";
 import { FIELD_LIMITS } from "@/lib/field-limits";
 import { slugify } from "@/lib/utils";
 import { getCategoryAttributes } from "../actions/category-actions";
 import { deleteShopImage, uploadShopImage } from "../actions/image-actions";
-import { extractPublicId } from "@/lib/cloudinary-utils";
 import {
   createProduct,
   type Product,
@@ -388,7 +388,9 @@ export function ProductForm({
     initialData?.seo?.metaTitle ?? initialData?.name ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? initialData?.description?.slice(0, 160) ?? "",
+    initialData?.seo?.metaDescription ??
+      initialData?.description?.slice(0, 160) ??
+      "",
   );
   const seoMetaTitleTouched = useRef(isEdit);
   const seoMetaDescriptionTouched = useRef(isEdit);

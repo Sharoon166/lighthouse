@@ -11,7 +11,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
-import { authClient } from "@/lib/auth-client";
 import { SegmentedControl } from "@/components/shared/segmented-control";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -30,6 +29,7 @@ import {
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import {
   deleteProject,

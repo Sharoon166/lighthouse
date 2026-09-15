@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
-import { CategoryModel } from "@/models/category";
 import { FALLBACK_CATEGORIES } from "@/lib/shop-data";
+import { CategoryModel } from "@/models/category";
 
 export async function GET() {
   try {

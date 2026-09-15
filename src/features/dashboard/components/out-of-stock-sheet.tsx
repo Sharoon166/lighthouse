@@ -1,17 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from "@/components/ui/sheet";
-import { getOutOfStockProducts } from "../actions";
 import type { OutOfStockProduct } from "../actions";
+import { getOutOfStockProducts } from "../actions";
 
 export function OutOfStockSheet({
   open,

@@ -3,9 +3,9 @@
 import { Menu01Icon, Menu02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
 import { CommandPaletteTrigger } from "@/components/shared/command-palette";
+import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
 
 const TITLES: Record<string, string> = {
   "/admin": "Dashboard",

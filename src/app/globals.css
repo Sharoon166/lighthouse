@@ -324,22 +324,23 @@
   /* H2 — Major section */
   .blog-prose .tiptap h2 {
     counter-increment: section;
-    margin-top: 4rem;
+    /*margin-top: 4rem;*/
     margin-bottom: 1.25rem;
     font-size: 2rem;
     line-height: 1.2;
     font-weight: 700;
     letter-spacing: -0.02em;
+    @apply not-first:mt-[4rem];
   }
 
   .blog-prose .tiptap h2::before {
-      content: counter(section, decimal-leading-zero);
-      display: block;
-      margin-bottom: 0.5rem;
-      font-size: 3.5rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      color: var(--muted-foreground);
+    content: counter(section, decimal-leading-zero);
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--muted-foreground);
   }
 
   /* H3 — Subsection */
@@ -369,10 +370,10 @@
     font-weight: 600;
   }
 
-  /*.blog-prose .tiptap > * + :where(h2, h3, h4, h5) {
-    margin-top: 3.5rem;
+  .blog-prose .tiptap > a {
+    color: var(--secondary);
   }
-
+  /*
   .blog-prose .tiptap :where(h2, h3, h4, h5) {
     counter-increment: section;
     color: var(--foreground);
@@ -424,6 +425,79 @@
     color: var(--secondary-foreground);
     font-size: 1.0625rem;
     font-weight: 700;
+  }
+
+  /* Figure container */
+  .blog-prose .tiptap figure {
+    margin: 2rem 0;
+    max-width: 100%;
+  }
+
+  .blog-prose .tiptap figure img {
+    display: block;
+    max-width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid hsl(var(--border));
+  }
+
+  /* Center (default) */
+  .blog-prose .tiptap figure[data-align="center"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Left / right float — extra margin on all sides so wrapped
+     text (beside AND below) keeps a safe distance from the image */
+  .blog-prose .tiptap figure[data-align="left"] {
+    float: left;
+    margin: 0.25rem 3rem 1.5rem 0;
+    max-width: 50%;
+    width: fit-content;
+  }
+
+  .blog-prose .tiptap figure[data-align="right"] {
+    float: right;
+    margin: 0.25rem 0 1.5rem 3rem;
+    max-width: 50%;
+    width: fit-content;
+  }
+
+  .blog-prose .tiptap figure[data-align="left"] img,
+  .blog-prose .tiptap figure[data-align="right"] img {
+    display: block;
+  }
+
+  /* Caption */
+  .blog-prose .tiptap figcaption {
+    margin-top: 0.625rem;
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    color: var(--muted-foreground);
+    text-align: center;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  .blog-prose .tiptap figcaption:empty::before {
+    content: "Add a caption…";
+    color: var(--muted-foreground);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  /* Selected figure — setNodeSelection selects the figure node
+     itself, so this is the only selector that will ever match */
+  .blog-prose .tiptap figure.ProseMirror-selectednode {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 3px;
+    border-radius: 0.5rem;
   }
 }
 

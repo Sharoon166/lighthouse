@@ -1,9 +1,9 @@
 "use client";
 
 import {
+  Grid3X3Icon,
   ListViewIcon,
   Search01Icon,
-  Grid3X3Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -12,9 +12,9 @@ import { Pagination } from "@/components/shared/pagination";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import type { ShopProductItem } from "@/lib/shop-data";
+import { cn } from "@/lib/utils";
 import { ProductCard } from "./product-card";
 import { ProductListItem } from "./product-list-item";
-import { cn } from "@/lib/utils";
 
 interface ProductGridToolbarProps {
   products: ShopProductItem[];

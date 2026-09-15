@@ -91,7 +91,7 @@ export default async function Home() {
                 />
               </Link>
             }
-            />
+          />
         </div>
         <HeroLinks />
       </section>

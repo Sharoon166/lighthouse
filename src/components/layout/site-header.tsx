@@ -18,8 +18,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import LogoImage from "@/components/shared/logo-img";
-import { cn } from "@/lib/utils";
-
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -28,6 +26,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 
 const IS_PHASE_2 = false;
 
@@ -160,12 +159,16 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
   };
 
   const handleProductsMouseEnter = () => {
-    if (productsHoverTimeoutRef.current) clearTimeout(productsHoverTimeoutRef.current);
+    if (productsHoverTimeoutRef.current)
+      clearTimeout(productsHoverTimeoutRef.current);
     setProductsOpen(true);
   };
 
   const handleProductsMouseLeave = () => {
-    productsHoverTimeoutRef.current = setTimeout(() => setProductsOpen(false), 150);
+    productsHoverTimeoutRef.current = setTimeout(
+      () => setProductsOpen(false),
+      150,
+    );
   };
 
   return (
@@ -649,7 +652,11 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                 onClick={() => setMobileCategoriesOpen(false)}
                 className="flex w-full items-center gap-3 rounded-2xl px-5 py-3.5 text-xl font-medium text-foreground/80 transition-all hover:bg-muted/60 hover:text-foreground"
               >
-                <HugeiconsIcon icon={ChevronRightIcon} size={20} className="rotate-180" />
+                <HugeiconsIcon
+                  icon={ChevronRightIcon}
+                  size={20}
+                  className="rotate-180"
+                />
                 <span>Back</span>
               </button>
 

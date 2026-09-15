@@ -17,7 +17,6 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
-import { authClient } from "@/lib/auth-client";
 import { buttonVariants } from "@/components/ui/button";
 import {
   Empty,
@@ -33,6 +32,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Pagination } from "@/components/ui/pagination";
+import { authClient } from "@/lib/auth-client";
 import { formatDate } from "@/lib/date-utils";
 import { cn } from "@/lib/utils";
 import {

@@ -6,9 +6,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { useQuickView } from "./quick-view";
-import type { ShopProductItem } from "@/lib/shop-data";
 import { formatCurrency, formatPriceRange } from "@/lib/format";
+import type { ShopProductItem } from "@/lib/shop-data";
+import { useQuickView } from "./quick-view";
 
 interface ProductListItemProps {
   product: ShopProductItem;

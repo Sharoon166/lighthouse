@@ -1,19 +1,19 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { authClient } from "@/lib/auth-client";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import logo from "@/assets/logo-dark.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import logo from "@/assets/logo-dark.png";
+import { Label } from "@/components/ui/label";
+import { authClient } from "@/lib/auth-client";
 
 function FloatingOrb({ className }: { className?: string }) {
   return <div className={`absolute rounded-full blur-3xl ${className}`} />;
@@ -211,7 +211,7 @@ export default function AdminLoginPage() {
         <FloatingOrb className="bottom-[-15%] right-[-5%] size-100 bg-[#702f5c]/20" />
         <FloatingOrb className="left-[20%] top-[40%] size-75 bg-gold/10" />
 
-      {/* Grid pattern overlay */}
+        {/* Grid pattern overlay */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{

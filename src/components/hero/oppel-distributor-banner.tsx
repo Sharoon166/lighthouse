@@ -4,10 +4,14 @@ import Image from "next/image";
 import LogoImage from "../shared/logo-img";
 import { Button } from "../ui/button";
 
-export function OppelDistributorBanner({ hideButton = false }: { hideButton?: boolean }) {
+export function OppelDistributorBanner({
+  hideButton = false,
+}: {
+  hideButton?: boolean;
+}) {
   return (
     <section className="bg-opple-banner bg-right relative w-full aspect-2/3 sm:h-155 max-sm:pt-0">
-    {/*<section className="bg-opple-banner bg-right relative h-[90vh] sm:h-155 max-sm:pt-0">*/}
+      {/*<section className="bg-opple-banner bg-right relative h-[90vh] sm:h-155 max-sm:pt-0">*/}
       {/*<picture className="absolute inset-0 -z-10">
           <source
             media="(max-width: 639px)"
@@ -51,7 +55,10 @@ export function OppelDistributorBanner({ hideButton = false }: { hideButton?: bo
 
             <address className="not-italic">
               <div className="flex items-center gap-2 sm:gap-4 uppercase sm:text-xl">
-                <HugeiconsIcon icon={MapPin} className="text-gold size-4 sm:size-6" />
+                <HugeiconsIcon
+                  icon={MapPin}
+                  className="text-gold size-4 sm:size-6"
+                />
                 <p>
                   In{" "}
                   <span className="text-gold font-semibold">

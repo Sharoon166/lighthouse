@@ -1,15 +1,15 @@
 "use client";
 
+import {
+  ArrowUpRight,
+  LayoutGrid,
+  PackageX,
+  Plus,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import {
-  PackageX,
-  LayoutGrid,
-  TrendingUp,
-  TrendingDown,
-  Plus,
-  ArrowUpRight,
-} from "lucide-react";
 import type { DashboardStats } from "../actions";
 import { OutOfStockSheet } from "./out-of-stock-sheet";
 

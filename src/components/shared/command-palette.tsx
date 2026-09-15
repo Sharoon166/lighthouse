@@ -1,15 +1,6 @@
 "use client";
 
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { useRouter } from "next/navigation";
-import { Command } from "cmdk";
-import {
   DashboardSquare03Icon,
   Folder02Icon,
   NewsIcon,
@@ -20,6 +11,15 @@ import {
   TagsIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import { Command } from "cmdk";
+import { useRouter } from "next/navigation";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
 
 interface SearchResult {

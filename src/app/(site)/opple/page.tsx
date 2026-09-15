@@ -42,17 +42,18 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
       : undefined;
   const sortBy = params.sort;
 
-  const [{ products: rawProducts, total }, filterMeta, categoryTree] = await Promise.all([
-    fetchStoreProducts({
-      categorySlug,
-      brandSlug: "opple",
-      search,
-      priceRange,
-      sortBy,
-    }),
-    fetchFilterMetadata(),
-    getCategoryTree({ activeOnly: true }),
-  ]);
+  const [{ products: rawProducts, total }, filterMeta, categoryTree] =
+    await Promise.all([
+      fetchStoreProducts({
+        categorySlug,
+        brandSlug: "opple",
+        search,
+        priceRange,
+        sortBy,
+      }),
+      fetchFilterMetadata(),
+      getCategoryTree({ activeOnly: true }),
+    ]);
 
   const products = JSON.parse(JSON.stringify(rawProducts));
 

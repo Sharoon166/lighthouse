@@ -90,7 +90,9 @@ export function BrandForm({
     initialData?.seo?.metaTitle ?? initialData?.name ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? initialData?.description?.slice(0, 160) ?? "",
+    initialData?.seo?.metaDescription ??
+      initialData?.description?.slice(0, 160) ??
+      "",
   );
   const seoMetaTitleTouched = useRef(isEdit);
   const seoMetaDescriptionTouched = useRef(isEdit);

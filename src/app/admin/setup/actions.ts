@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@/lib/auth";
 import { MongoClient } from "mongodb";
+import { auth } from "@/lib/auth";
 
 export async function createFirstAdmin({
   name,

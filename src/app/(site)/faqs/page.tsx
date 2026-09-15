@@ -155,7 +155,7 @@ export default function FAQsPage() {
 
           {/* FAQ Sections */}
           <div className="space-y-16">
-            {FAQ_SECTIONS.map((section, idx) => (
+            {FAQ_SECTIONS.map((section) => (
               <article key={section.title}>
                 <div className="mb-8">
                   <h2 className="text-2xl font-heading text-secondary mb-2">

@@ -2,7 +2,7 @@
 
 import { ArrowDown02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useState, useId } from "react";
+import { useId, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface FAQItem {

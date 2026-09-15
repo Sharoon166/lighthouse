@@ -2,6 +2,9 @@
 
 import { Search01Icon, StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import Image from "next/image";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 import {
   Empty,
   EmptyDescription,
@@ -9,9 +12,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import Image from "next/image";
-import Link from "next/link";
-import { useMemo, useState } from "react";
 import type { ShopCategoryItem } from "@/lib/shop-data";
 
 interface CategorySearchFilterProps {
@@ -76,7 +76,8 @@ export function CategorySearchFilter({
             </button>
           )}
           <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
-            {filtered.length} {filtered.length === 1 ? "category" : "categories"}
+            {filtered.length}{" "}
+            {filtered.length === 1 ? "category" : "categories"}
           </span>
         </div>
       </div>

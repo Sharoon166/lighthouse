@@ -1,24 +1,24 @@
 "use client";
 
 import {
-  createColumnHelper,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  ShieldBanIcon,
   Delete02Icon,
   Edit02Icon,
   Key01Icon,
   LogoutIcon,
   PlusSignIcon,
+  ShieldBanIcon,
   ShieldCheck,
   UserShield01Icon,
   ViewIcon,
   ViewOffIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { useEffect, useRef, useState } from "react";
 import { useConfirm } from "@/components/shared/confirm-provider";
 import { Button } from "@/components/ui/button";
@@ -39,20 +39,20 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
-import { formatDate } from "@/lib/date-utils";
-import { cn } from "@/lib/utils";
 import {
-  type StaffAccount,
   blockStaffAccount,
   createStaffAccount,
   deleteStaffAccount,
   listStaffAccounts,
   revokeAllStaffSessions,
   revokeStaffSessions,
+  type StaffAccount,
   setStaffPassword,
   unblockStaffAccount,
   updateStaffDetails,
 } from "@/features/users/actions/staff-actions";
+import { formatDate } from "@/lib/date-utils";
+import { cn } from "@/lib/utils";
 
 type Notice = { type: "ok" | "err"; text: string } | null;
 
@@ -516,7 +516,7 @@ function StaffTable({
                   "flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white",
                   account.isBlocked
                     ? "bg-muted text-muted-foreground"
-                    : "bg-[#2a1b45]",
+                    : "bg-secondary",
                 )}
               >
                 {initials}
@@ -544,7 +544,7 @@ function StaffTable({
                 )}
                 {account.isOnline && !account.isBlocked && (
                   <span className="shrink-0 text-[11px] font-medium text-chart-2">
-                    Online
+                    Logged In
                   </span>
                 )}
               </div>
@@ -943,7 +943,7 @@ export function StaffManager({
             }
             onEdit={setEditing}
             onChangePassword={setPasswordTarget}
-            onBlock={(account) => console.log("")}
+            onBlock={(account) => void handleBlock(account)}
             onLogout={(account) => void handleLogout(account)}
             onDelete={(account) => void handleDelete(account)}
           />

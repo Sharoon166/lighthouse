@@ -2,11 +2,11 @@
 
 import { RestoreBinIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { formatDate } from "@/lib/date-utils";
 import {
-  TrashManager,
   type NormalizedTrashResult,
+  TrashManager,
 } from "@/components/shared/trash-manager";
+import { formatDate } from "@/lib/date-utils";
 import {
   listTrashedProducts,
   permanentlyDeleteProduct,

@@ -3,6 +3,7 @@
 import { NewsIcon, Search01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useEffect, useRef, useState } from "react";
+import { ScrollBlurContainer } from "@/components/shared/scroll-blur-container";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -24,7 +25,6 @@ import {
   listBlogPosts,
 } from "../actions";
 import { BlogCard } from "./blog-card";
-import { ScrollBlurContainer } from "@/components/shared/scroll-blur-container";
 
 const SKELETON_KEYS = ["one", "two", "three", "four", "five", "six"];
 

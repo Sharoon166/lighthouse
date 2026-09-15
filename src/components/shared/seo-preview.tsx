@@ -45,9 +45,7 @@ export function SeoPreview({
           <div className="text-xs text-muted-foreground">
             Meta Title ({displayTitle.length}/60)
           </div>
-          <div className="text-sm font-medium">
-            {displayTitle}
-          </div>
+          <div className="text-sm font-medium">{displayTitle}</div>
         </div>
 
         <div className="space-y-2">

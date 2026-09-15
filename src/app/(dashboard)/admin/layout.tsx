@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Tenor_Sans } from "next/font/google";
 import type { ReactNode } from "react";
-import { ConfirmProvider } from "@/components/shared/confirm-provider";
 import { CommandPaletteProvider } from "@/components/shared/command-palette";
+import { ConfirmProvider } from "@/components/shared/confirm-provider";
 import { DashboardShell } from "@/features/dashboard/components/dashboard-shell";
 import { requireDashboardAccess } from "@/lib/require-role";
 

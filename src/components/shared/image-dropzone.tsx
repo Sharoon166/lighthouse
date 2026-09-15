@@ -18,10 +18,10 @@ import {
   useTransition,
 } from "react";
 import { Button } from "@/components/ui/button";
+import type { IMAGE_OPTIMIZATION_PRESETS } from "@/lib/image-optimizer";
 import { cn } from "@/lib/utils";
 import { ImageCropDialog } from "./image-crop-dialog";
 import { ImageZoom } from "./image-zoom";
-import { IMAGE_OPTIMIZATION_PRESETS } from "@/lib/image-optimizer";
 
 export type UploadedImage = { url: string; publicId: string };
 

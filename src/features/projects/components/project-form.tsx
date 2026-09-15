@@ -160,7 +160,9 @@ export function ProjectForm({
     initialData?.seo?.metaTitle ?? initialData?.title ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? initialData?.description?.slice(0, 160) ?? "",
+    initialData?.seo?.metaDescription ??
+      initialData?.description?.slice(0, 160) ??
+      "",
   );
   const [seoFocusKeyword, setSeoFocusKeyword] = useState(
     initialData?.seo?.focusKeyword ?? "",
@@ -216,7 +218,11 @@ export function ProjectForm({
       setPublishedAt(d.toISOString().slice(0, 16));
     }
     setSeoMetaTitle(initialData.seo?.metaTitle ?? initialData.title ?? "");
-    setSeoMetaDescription(initialData.seo?.metaDescription ?? initialData.description?.slice(0, 160) ?? "");
+    setSeoMetaDescription(
+      initialData.seo?.metaDescription ??
+        initialData.description?.slice(0, 160) ??
+        "",
+    );
     seoMetaTitleTouched.current = isEdit;
     seoMetaDescriptionTouched.current = isEdit;
     setSeoFocusKeyword(initialData.seo?.focusKeyword ?? "");
@@ -887,7 +893,11 @@ export function ProjectForm({
                     type="button"
                     variant="outline"
                     onClick={() =>
-                      setTestimonial({ quote: "", author: "", role: "" })
+                      setTestimonial({
+                        quote: "",
+                        author: !isEdit ? client.trim() : "",
+                        role: "",
+                      })
                     }
                   >
                     Add Testimonial
@@ -912,9 +922,9 @@ export function ProjectForm({
 
                     <div className="grid gap-6 sm:grid-cols-2">
                       <div className="space-y-2">
-                        <Label htmlFor="testimonial-author">Author</Label>
+                        <Label htmlFor="testimonial-from">From</Label>
                         <Input
-                          id="testimonial-author"
+                          id="testimonial-from"
                           value={testimonial.author}
                           onChange={(event) =>
                             setTestimonial({

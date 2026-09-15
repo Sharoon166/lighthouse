@@ -2,21 +2,21 @@
 
 import { useMemo } from "react";
 import {
-  Bar,
-  BarChart,
   Area,
   AreaChart,
+  Bar,
+  BarChart,
   Cell,
+  Pie,
+  PieChart,
   XAxis,
   YAxis,
-  PieChart,
-  Pie,
 } from "recharts";
 import {
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  type ChartConfig,
 } from "@/components/ui/chart";
 import type { DashboardStats } from "../actions";
 

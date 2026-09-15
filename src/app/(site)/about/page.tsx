@@ -1,13 +1,9 @@
-import { ArrowRight02Icon } from "@hugeicons/core-free-icons";
-import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { CTA } from "@/components/hero/cta";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { Clients } from "@/components/shared/clients";
 import { Partners } from "@/components/shared/partners";
-import { Button } from "@/components/ui/button";
 import { aboutStats, ceoMessage, howWeWork } from "@/lib/constants";
 
 export const metadata: Metadata = {

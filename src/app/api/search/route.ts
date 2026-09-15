@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { type NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/db";
+import { BlogPostModel } from "@/models/blog-post";
 import { ProductModel } from "@/models/product";
 import { ProjectModel } from "@/models/project";
-import { BlogPostModel } from "@/models/blog-post";
 
 function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

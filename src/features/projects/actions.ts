@@ -595,6 +595,7 @@ export async function toggleFeaturedProject(
   await existing.save();
 
   revalidatePath("/admin/projects");
+  revalidatePath("/projects");
   updateTag("projects");
 
   return { ok: true, featured: existing.featured };

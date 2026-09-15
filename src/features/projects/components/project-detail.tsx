@@ -299,8 +299,15 @@ export function ProjectDetail({
             <p className="font-heading text-2xl font-semibold leading-snug text-secondary md:text-3xl">
               &ldquo;{project.testimonial.quote}&rdquo;
             </p>
-            <footer className="mt-6 text-sm font-semibold uppercase tracking-[0.2em] text-gold">
-              — {project.testimonial.author}
+            <footer className="mt-6 flex flex-col items-center gap-1">
+              <span className="text-sm font-semibold uppercase tracking-[0.2em] text-gold">
+                — {project.testimonial.author}
+              </span>
+              {project.testimonial.role && (
+                <span className="text-xs font-medium tracking-normal text-muted-foreground">
+                  {project.testimonial.role}
+                </span>
+              )}
             </footer>
           </blockquote>
         </section>

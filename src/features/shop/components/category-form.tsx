@@ -155,7 +155,9 @@ export function CategoryForm({
     initialData?.seo?.metaTitle ?? initialData?.name ?? "",
   );
   const [seoMetaDescription, setSeoMetaDescription] = useState(
-    initialData?.seo?.metaDescription ?? initialData?.description?.slice(0, 160) ?? "",
+    initialData?.seo?.metaDescription ??
+      initialData?.description?.slice(0, 160) ??
+      "",
   );
   const seoMetaTitleTouched = useRef(isEdit);
   const seoMetaDescriptionTouched = useRef(isEdit);
@@ -557,8 +559,8 @@ export function CategoryForm({
                   optimizationPreset="product"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Used on the category detail hero. Prefer images with transparent
-                  backgrounds for best effect.
+                  Used on the category detail hero. Prefer images with
+                  transparent backgrounds for best effect.
                 </p>
               </div>
             </CardContent>

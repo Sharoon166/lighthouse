@@ -12,15 +12,15 @@ import {
   StarIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useEffect, useMemo, useState } from "react";
 import { RollingNumber } from "@kitlangton/rolling-number/react";
+import { useEffect, useMemo, useState } from "react";
 import "@kitlangton/rolling-number/styles.css";
-import { formatCurrency } from "@/lib/format";
-import { PRESET_COLORS } from "@/components/shared/color-picker";
-import type { ShopProductItem, ShopProductVariant } from "@/lib/shop-data";
-import { IS_PHASE_2 } from "@/lib/constants";
-import { Button } from "../ui/button";
 import Link from "next/link";
+import { PRESET_COLORS } from "@/components/shared/color-picker";
+import { IS_PHASE_2 } from "@/lib/constants";
+import { formatCurrency } from "@/lib/format";
+import type { ShopProductItem, ShopProductVariant } from "@/lib/shop-data";
+import { Button } from "../ui/button";
 
 interface ProductPurchasePanelProps {
   product: ShopProductItem;

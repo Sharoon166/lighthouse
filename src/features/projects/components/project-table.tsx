@@ -93,7 +93,7 @@ export function ProjectTable({
         cell: (info) =>
           info.getValue() ? (
             <Badge className="bg-amber-100 text-amber-800 border-amber-200">
-              ★ Featured
+              <HugeiconsIcon icon={StarIcon} /> Featured
             </Badge>
           ) : (
             <span className="text-muted-foreground">—</span>

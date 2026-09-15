@@ -887,14 +887,16 @@ export function BlogPostForm({
                         </Button>
                       )}
                     </div>
-                    <RichTextEditor
-                      value={content}
-                      onChange={(next) => {
+                    <div className="max-h-[40rem]">
+                      <RichTextEditor
+                        value={content}
+                        onChange={(next) => {
                         setContent(next);
-                        clearFieldError("content");
-                      }}
-                      placeholder="Write your story…"
-                    />
+                          clearFieldError("content");
+                        }}
+                        placeholder="Write your story…"
+                      />
+                    </div>
                     {fieldError("content") && (
                       <p className="text-xs text-destructive">
                         {fieldError("content")}

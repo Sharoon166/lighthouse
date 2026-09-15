@@ -3,6 +3,7 @@ import { CTA } from "@/components/hero/cta";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
+import { getCategoryTree } from "@/features/shop/actions/category-actions";
 import { fetchFilterMetadata, fetchStoreProducts } from "@/lib/shop-data";
 
 export const metadata: Metadata = {
@@ -41,7 +42,7 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
       : undefined;
   const sortBy = params.sort;
 
-  const [{ products: rawProducts, total }, filterMeta] = await Promise.all([
+  const [{ products: rawProducts, total }, filterMeta, categoryTree] = await Promise.all([
     fetchStoreProducts({
       categorySlug,
       brandSlug: "opple",
@@ -50,6 +51,7 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
       sortBy,
     }),
     fetchFilterMetadata(),
+    getCategoryTree({ activeOnly: true }),
   ]);
 
   const products = JSON.parse(JSON.stringify(rawProducts));
@@ -64,10 +66,11 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-col lg:flex-row gap-8">
             <ProductFiltersSidebar
-              categories={filterMeta.categories}
+              categoryTree={categoryTree}
               brands={[]}
               priceRange={filterMeta.priceRange}
               products={products}
+              showCategoryCounts={false}
             />
 
             <div className="flex-1 min-w-0 mt-6 lg:mt-0">

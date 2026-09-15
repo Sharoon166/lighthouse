@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { getAllActiveAttributeDefinitions } from "@/features/shop/actions/attribute-definition-actions";
-import { getAllCategoriesAdmin } from "@/features/shop/actions/category-actions";
+import {
+  flattenCategoryTree,
+  getCategoryTree,
+} from "@/features/shop/actions/category-actions";
 import { CategoryForm } from "@/features/shop/components/category-form";
 
 export const metadata: Metadata = {
@@ -8,10 +11,18 @@ export const metadata: Metadata = {
 };
 
 export default async function NewCategoryPage() {
-  const [allCategories, allAttributes] = await Promise.all([
-    getAllCategoriesAdmin(),
+  const [tree, allAttributes] = await Promise.all([
+    getCategoryTree(),
     getAllActiveAttributeDefinitions(),
   ]);
+  const allCategories = (await flattenCategoryTree(tree)).map((c) => ({
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    level: c.level,
+    parent: c.parentId,
+    ancestors: c.ancestors,
+  }));
 
   return (
     <CategoryForm

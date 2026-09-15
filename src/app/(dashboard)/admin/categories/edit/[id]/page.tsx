@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAllAttributeDefinitions } from "@/features/shop/actions/attribute-definition-actions";
 import {
-  getAllCategoriesAdmin,
+  flattenCategoryTree,
   getCategoryById,
+  getCategoryTree,
 } from "@/features/shop/actions/category-actions";
 import { CategoryForm } from "@/features/shop/components/category-form";
 
@@ -19,15 +20,23 @@ export default async function EditCategoryPage({
   params,
 }: EditCategoryPageProps) {
   const { id } = await params;
-  const [category, allCategories, allAttributes] = await Promise.all([
+  const [category, tree, allAttributes] = await Promise.all([
     getCategoryById(id),
-    getAllCategoriesAdmin(),
+    getCategoryTree(),
     getAllAttributeDefinitions(),
   ]);
 
   if (!category) notFound();
 
   const serializedCategory = JSON.parse(JSON.stringify(category));
+  const allCategories = (await flattenCategoryTree(tree)).map((c) => ({
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    level: c.level,
+    parent: c.parentId,
+    ancestors: c.ancestors,
+  }));
 
   return (
     <CategoryForm

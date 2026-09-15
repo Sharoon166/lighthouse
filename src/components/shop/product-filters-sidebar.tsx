@@ -3,32 +3,125 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import {
+  ChevronDownIcon,
+  ChevronRightIcon,
   FilterHorizontalIcon,
   CancelCircleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
+import type { CategoryTreeNode } from "@/features/shop/actions/category-actions";
 import type { ShopProductItem } from "@/lib/shop-data";
 
 interface FilterSidebarProps {
-  categories: { name: string; slug: string; count: number }[];
+  categoryTree: CategoryTreeNode[];
   brands: { name: string; slug: string; logo: string; count: number }[];
   priceRange: { min: number; max: number };
   products: ShopProductItem[];
+  showCategoryCounts?: boolean;
 }
 
 const PRICE_BANDS = [
   { label: "Under Rs. 10,000", value: "under-10k" },
   { label: "Rs. 10,000 – 25,000", value: "10k-25k" },
   { label: "Rs. 25,000 – 50,000", value: "25k-50k" },
-  { label: "Rs. 50,000 – 100,000", value: "50k-100k" },
+  { label: "Rs. 50,000 – 100,000", value: "100k-plus" },
   { label: "Rs. 100,000+", value: "100k-plus" },
 ];
 
+function collectAncestorSlugs(nodes: CategoryTreeNode[]): Set<string> {
+  const slugs = new Set<string>();
+  for (const node of nodes) {
+    for (const s of node.ancestorSlugs) slugs.add(s);
+  }
+  return slugs;
+}
+
+function CategoryTreeItem({
+  node,
+  selectedSlug,
+  expandedSlugs,
+  onToggle,
+  onSelect,
+  depth,
+  showCount,
+}: {
+  node: CategoryTreeNode;
+  selectedSlug: string;
+  expandedSlugs: Set<string>;
+  onToggle: (slug: string) => void;
+  onSelect: (slug: string) => void;
+  depth: number;
+  showCount: boolean;
+}) {
+  const hasChildren = node.children.length > 0;
+  const isExpanded = expandedSlugs.has(node.slug);
+  const isSelected = selectedSlug === node.slug;
+
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => {
+          onSelect(node.slug);
+          if (hasChildren) onToggle(node.slug);
+        }}
+        className={`flex w-full items-center justify-between py-1.5 text-left text-sm transition-colors ${
+          isSelected
+            ? "font-semibold text-gold"
+            : "text-foreground/80 hover:text-foreground"
+        }`}
+        style={{ paddingLeft: `${depth * 1}rem` }}
+      >
+        <span className="flex items-center gap-1.5">
+          {hasChildren && (
+            <HugeiconsIcon
+              icon={isExpanded ? ChevronDownIcon : ChevronRightIcon}
+              size={14}
+              className="shrink-0 transition-transform duration-200"
+            />
+          )}
+          {node.name}
+        </span>
+        {showCount && node.productCount > 0 && (
+          <span className="text-xs text-muted-foreground">
+            ({node.productCount})
+          </span>
+        )}
+      </button>
+      {hasChildren && (
+        <div
+          className="overflow-hidden transition-[grid-template-rows] duration-200 ease-in-out"
+          style={{
+            display: "grid",
+            gridTemplateRows: isExpanded ? "1fr" : "0fr",
+          }}
+        >
+          <ul className="min-h-0">
+            {node.children.map((child) => (
+              <CategoryTreeItem
+                key={child.slug}
+                node={child}
+                selectedSlug={selectedSlug}
+                expandedSlugs={expandedSlugs}
+                onToggle={onToggle}
+                onSelect={onSelect}
+                depth={depth + 1}
+                showCount={showCount}
+              />
+            ))}
+          </ul>
+        </div>
+      )}
+    </li>
+  );
+}
+
 export function ProductFiltersSidebar({
-  categories,
+  categoryTree,
   brands,
   products,
+  showCategoryCounts = true,
 }: FilterSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -49,6 +142,38 @@ export function ProductFiltersSidebar({
   const [selectedBrands, setSelectedBrands] =
     useState<Set<string>>(initialBrands);
   const [selectedPrice, setSelectedPrice] = useState<Set<string>>(initialPrice);
+
+  // Auto-expand ancestors of the current category
+  const initialExpanded = useMemo(() => {
+    if (!initialCategory || initialCategory === "all") return new Set<string>();
+    const slugs = new Set<string>();
+    function findAndExpand(nodes: CategoryTreeNode[]): boolean {
+      for (const node of nodes) {
+        if (node.slug === initialCategory) {
+          for (const a of node.ancestorSlugs) slugs.add(a);
+          return true;
+        }
+        if (node.children.length > 0 && findAndExpand(node.children)) {
+          slugs.add(node.slug);
+          return true;
+        }
+      }
+      return false;
+    }
+    findAndExpand(categoryTree);
+    return slugs;
+  }, [categoryTree, initialCategory]);
+
+  const [expandedSlugs, setExpandedSlugs] = useState<Set<string>>(initialExpanded);
+
+  const toggleExpand = useCallback((slug: string) => {
+    setExpandedSlugs((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  }, []);
 
   const toggleSet = (
     setter: React.Dispatch<React.SetStateAction<Set<string>>>,
@@ -92,48 +217,39 @@ export function ProductFiltersSidebar({
 
   const filterContent = (
     <div className="space-y-8">
-      {/* Category — only show if categories are provided */}
-      {categories.length > 0 && (
+      {/* Category tree */}
+      {categoryTree.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             CATEGORY
           </h3>
-          <div className="space-y-1.5 text-sm">
-            <button
-              type="button"
-              onClick={() => setCategory("all")}
-              className={`flex w-full items-center justify-between py-1 text-left transition-colors ${
-                category === "all"
-                  ? "font-semibold text-gold"
-                  : "text-foreground/80 hover:text-foreground"
-              }`}
-            >
-              <span>All Products</span>
-              <span className="text-xs text-muted-foreground">
-                ({products.length})
-              </span>
-            </button>
-            {categories.map((cat) => {
-              const isSelected = category === cat.slug;
-              return (
-                <button
-                  key={cat.slug}
-                  type="button"
-                  onClick={() => setCategory(cat.slug)}
-                  className={`flex w-full items-center justify-between py-1 text-left transition-colors ${
-                    isSelected
-                      ? "font-semibold text-gold"
-                      : "text-foreground/80 hover:text-foreground"
-                  }`}
-                >
-                  <span>{cat.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    ({cat.count})
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+          <ul className="space-y-0.5">
+            <li>
+              <button
+                type="button"
+                onClick={() => setCategory("all")}
+                className={`flex w-full items-center justify-between py-1 text-left text-sm transition-colors ${
+                  category === "all"
+                    ? "font-semibold text-gold"
+                    : "text-foreground/80 hover:text-foreground"
+                }`}
+              >
+                <span>All Products</span>
+              </button>
+            </li>
+            {categoryTree.map((node) => (
+              <CategoryTreeItem
+                key={node.slug}
+                node={node}
+                selectedSlug={category}
+                expandedSlugs={expandedSlugs}
+                onToggle={toggleExpand}
+                onSelect={setCategory}
+                depth={0}
+                showCount={showCategoryCounts}
+              />
+            ))}
+          </ul>
         </div>
       )}
 

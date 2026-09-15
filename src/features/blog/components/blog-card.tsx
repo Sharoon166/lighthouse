@@ -35,7 +35,7 @@ export function BlogCard({ post }: { post: BlogPostListItem }) {
           </span>
         )}
         <h3
-          className="mt-3 font-heading text-lg leading-snug line-clamp-2"
+          className="mt-3 font-heading font-semibold text-lg leading-snug line-clamp-2"
           title={post.title}
         >
           {post.title}

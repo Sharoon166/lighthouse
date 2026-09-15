@@ -3,6 +3,7 @@ import { CTA } from "@/components/hero/cta";
 import { PageHero } from "@/components/shared/page-hero";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
+import { getCategoryTree } from "@/features/shop/actions/category-actions";
 import {
   fetchFilterMetadata,
   fetchStoreProducts,
@@ -53,7 +54,7 @@ export default async function ProductsPage({
       : undefined;
   const sortBy = params.sort;
 
-  const [{ products: rawProducts, total }, filterMeta, newArrivalsResult] =
+  const [{ products: rawProducts, total }, filterMeta, newArrivalsResult, categoryTree] =
     await Promise.all([
       fetchStoreProducts({
         categorySlug,
@@ -64,6 +65,7 @@ export default async function ProductsPage({
       }),
       fetchFilterMetadata(),
       fetchStoreProducts({ sortBy: "newest" }),
+      getCategoryTree({ activeOnly: true }),
     ]);
 
   const products = JSON.parse(JSON.stringify(rawProducts));
@@ -115,7 +117,7 @@ export default async function ProductsPage({
       <section className="container">
         <div className="flex flex-col lg:flex-row gap-8">
           <ProductFiltersSidebar
-            categories={filterMeta.categories}
+            categoryTree={categoryTree}
             brands={filterMeta.brands}
             priceRange={filterMeta.priceRange}
             products={products}

@@ -205,13 +205,13 @@ export default function AdminLoginPage() {
   return (
     <div data-theme="dashboard" className="flex min-h-dvh bg-background p-6">
       {/* ── Left: Brand panel ── */}
-      <div className="relative hidden overflow-hidden bg-[#2a1b45] lg:flex lg:w-[45%] rounded-md">
+      <div className="relative hidden overflow-hidden bg-noise lg:flex lg:w-[45%] rounded-md">
         {/* Decorative orbs */}
         <FloatingOrb className="left-[-10%] top-[-10%] size-125 bg-[#702f5c]/30" />
         <FloatingOrb className="bottom-[-15%] right-[-5%] size-100 bg-[#702f5c]/20" />
         <FloatingOrb className="left-[20%] top-[40%] size-75 bg-gold/10" />
 
-        {/* Grid pattern overlay */}
+      {/* Grid pattern overlay */}
         <div
           className="absolute inset-0 opacity-[0.04]"
           style={{

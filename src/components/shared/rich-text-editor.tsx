@@ -10,6 +10,7 @@ import {
   QuoteUpIcon,
   RedoIcon,
   SeparatorHorizontalIcon,
+  TextClearIcon,
   TextItalicIcon,
   TextUnderlineIcon,
   UndoIcon,
@@ -341,6 +342,11 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
         />
         <span className="mx-1 h-5 w-px bg-border" />
+        <ToolbarButton
+          label="Clear formatting"
+          icon={TextClearIcon}
+          onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+        />
         <ToolbarButton
           label="Undo"
           icon={UndoIcon}

@@ -496,10 +496,13 @@ export async function listCategories(
   };
 }
 
-export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
+export async function getCategoryTree(
+  opts?: { activeOnly?: boolean },
+): Promise<CategoryTreeNode[]> {
   await connectToDatabase();
 
-  const all = await CategoryModel.find()
+  const query = opts?.activeOnly ? { isActive: true } : {};
+  const all = await CategoryModel.find(query)
     .sort({ level: 1, sortOrder: 1, name: 1 })
     .lean();
 
@@ -541,6 +544,20 @@ export async function getCategoryTree(): Promise<CategoryTreeNode[]> {
   }
 
   return roots;
+}
+
+export async function flattenCategoryTree(
+  tree: CategoryTreeNode[],
+): Promise<CategoryTreeNode[]> {
+  const result: CategoryTreeNode[] = [];
+  function walk(nodes: CategoryTreeNode[]) {
+    for (const node of nodes) {
+      result.push(node);
+      if (node.children.length > 0) walk(node.children);
+    }
+  }
+  walk(tree);
+  return result;
 }
 
 export async function getAllCategories(): Promise<

@@ -17,6 +17,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
+import Image from "next/image"
 import { usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { useLocalStorage } from "@/hooks/use-local-storage";
@@ -109,7 +110,7 @@ export function SidebarNav({
   }
 
   return (
-    <div className="flex h-full flex-col gap-6 p-2">
+    <div className="flex h-full flex-col gap-6 p-2 z-100">
       <div
         className={cn(
           "flex items-center gap-2 pt-1 transition-[width] duration-300 ease-in-out",
@@ -121,9 +122,10 @@ export function SidebarNav({
             href="/admin"
             onClick={navigate}
             aria-label="Lighthouse dashboard"
-            className="flex items-center gap-2.5 font-heading text-2xl text-secondary font-semibold"
+            className="flex items-center gap-2.5 font-heading text-xl text-secondary font-semibold truncate"
           >
-            Lighthouse
+            {/*Lighthouse*/}
+            <Image src="/logo-dark.png" alt="" unoptimized height={500} width={500} className="w-12"/> Admin Panel
           </Link>
         )}
         {!isMobile && (
@@ -160,9 +162,9 @@ export function SidebarNav({
         })}
       </nav>
 
-      <Separator className="mx-auto" />
+      <Separator className="mx-auto mt-auto" />
 
-      <nav className="flex flex-col gap-1">
+      <nav className="flex flex-col gap-1 ">
         <Link
           href="/admin/settings"
           onClick={navigate}
@@ -195,7 +197,7 @@ export function SidebarNav({
       </nav>
 
       {/* Avatar dropdown */}
-      <div className="mt-auto">
+      <div>
         <DropdownMenu>
           <DropdownMenuTrigger
             className={cn(
@@ -228,31 +230,13 @@ export function SidebarNav({
             side={collapsed ? "right" : "top"}
             sideOffset={8}
           >
-            {!collapsed && (
               <DropdownMenuGroup>
                 <div className="px-2.5 py-2">
                   <p className="text-sm font-medium text-foreground">{name}</p>
                   <p className="text-xs text-muted-foreground">{email}</p>
                 </div>
               </DropdownMenuGroup>
-            )}
             {!collapsed && <DropdownMenuSeparator />}
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={navigate}>
-                <HugeiconsIcon icon={UserCircleIcon} size={16} />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={navigate}>
-                <Link
-                  href="/admin/settings"
-                  className="flex items-center gap-2"
-                >
-                  <HugeiconsIcon icon={Settings01Icon} size={16} />
-                  Settings
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={handleSignOut}
               className="text-destructive"

@@ -166,7 +166,7 @@ export default async function CategoryPage({
       <section className="container">
         <div className="flex flex-col gap-8 lg:flex-row">
           <ProductFiltersSidebar
-            categories={[]}
+            categoryTree={[]}
             brands={filteredBrands}
             priceRange={filterMeta.priceRange}
             products={products}

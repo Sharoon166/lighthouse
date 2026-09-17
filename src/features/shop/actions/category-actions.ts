@@ -5,6 +5,8 @@ import { Types } from "mongoose";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { requireAdminForAction } from "@/lib/admin-guard";
+import { deleteImage } from "@/lib/cloudinary";
+import { extractPublicId } from "@/lib/cloudinary-utils";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { AttributeDefinitionModel } from "@/models/attribute-definition";
@@ -384,6 +386,21 @@ export async function deleteCategory(
       ok: false,
       message: `Cannot delete this category because ${productCount} product${productCount !== 1 ? "s are" : " is"} assigned to it. Reassign or remove them first.`,
     };
+  }
+
+  // Clean up Cloudinary assets before deleting
+  for (const imageUrl of [existing.image, existing.featuredImage]) {
+    if (imageUrl) {
+      const publicId = extractPublicId(imageUrl);
+      if (publicId) {
+        await deleteImage(publicId).catch((error) => {
+          console.error(
+            "Failed to delete category image from Cloudinary:",
+            error,
+          );
+        });
+      }
+    }
   }
 
   await existing.deleteOne();

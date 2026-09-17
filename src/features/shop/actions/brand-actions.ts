@@ -4,6 +4,8 @@ import type { QueryFilter } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdminForAction } from "@/lib/admin-guard";
+import { deleteImage } from "@/lib/cloudinary";
+import { extractPublicId } from "@/lib/cloudinary-utils";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import { type Brand, BrandModel } from "@/models/brand";
@@ -168,6 +170,16 @@ export async function deleteBrand(
       ok: false,
       message: `Cannot delete this brand because ${productCount} product${productCount !== 1 ? "s are" : " is"} assigned to it. Reassign or remove them first.`,
     };
+  }
+
+  // Clean up Cloudinary logo before deleting
+  if (existing.logo) {
+    const publicId = extractPublicId(existing.logo);
+    if (publicId) {
+      await deleteImage(publicId).catch((error) => {
+        console.error("Failed to delete brand logo from Cloudinary:", error);
+      });
+    }
   }
 
   await existing.deleteOne();

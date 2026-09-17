@@ -14,6 +14,7 @@ import {
   deleteImage,
   uploadImage,
 } from "@/lib/cloudinary";
+import { extractPublicId } from "@/lib/cloudinary-utils";
 import { connectToDatabase } from "@/lib/db";
 import { slugify } from "@/lib/utils";
 import {
@@ -44,6 +45,35 @@ function revalidateBlogCaches(slug?: string) {
   } catch {
     // ignore
   }
+}
+
+/**
+ * Recursively extract all image URLs from a TipTap/ProseMirror JSON content tree.
+ * Looks for nodes with type "image" and extracts their "src" attribute.
+ */
+function extractImageUrlsFromContent(content: unknown): string[] {
+  const urls: string[] = [];
+  if (!content || typeof content !== "object") return urls;
+
+  if (Array.isArray(content)) {
+    for (const item of content) {
+      urls.push(...extractImageUrlsFromContent(item));
+    }
+    return urls;
+  }
+
+  const node = content as Record<string, unknown>;
+  if (node.type === "image" && node.attrs) {
+    const attrs = node.attrs as Record<string, unknown>;
+    if (typeof attrs.src === "string" && attrs.src.includes("cloudinary")) {
+      urls.push(attrs.src);
+    }
+  }
+  if (Array.isArray(node.content)) {
+    urls.push(...extractImageUrlsFromContent(node.content));
+  }
+
+  return urls;
 }
 
 export type BlogPostActionResult =
@@ -386,6 +416,20 @@ export async function permanentlyDeleteBlogPost(
     await deleteImage(existing.heroImage.publicId).catch((error) => {
       console.error("Failed to delete hero image from Cloudinary:", error);
     });
+  }
+
+  // Clean up inline images embedded in rich text content
+  const contentUrls = extractImageUrlsFromContent(existing.content);
+  for (const url of contentUrls) {
+    const publicId = extractPublicId(url);
+    if (publicId) {
+      await deleteImage(publicId).catch((error) => {
+        console.error(
+          "Failed to delete inline image from Cloudinary:",
+          error,
+        );
+      });
+    }
   }
 
   await existing.deleteOne();

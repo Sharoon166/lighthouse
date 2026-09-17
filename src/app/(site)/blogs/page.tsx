@@ -8,15 +8,19 @@ import { FeaturedBlogCard } from "@/features/blog/components/featured-blog-card"
 export const metadata: Metadata = {
   title: "Blog | Lighthouse",
   description:
-    "Discover lighting design tips, trends, and inspiration for your home and commercial spaces.",
+    "Expert lighting guides, interior design trends, and practical tips to help you choose and style fixtures for beautiful, functional spaces.",
   openGraph: {
     title: "Blog | Lighthouse",
     description:
-      "Discover lighting design tips, trends, and inspiration for your home and commercial spaces.",
+      "Expert lighting guides, interior design trends, and practical tips to help you choose and style fixtures for beautiful, functional spaces.",
     type: "website",
   },
   alternates: {
     canonical: "/blogs",
+    languages: {
+      "en-pk": "/blogs",
+      "x-default": "/blogs",
+    },
   },
 };
 

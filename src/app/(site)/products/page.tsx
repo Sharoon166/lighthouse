@@ -17,15 +17,19 @@ import {
 export const metadata: Metadata = {
   title: "Our Collection | Lighthouse",
   description:
-    "Explore our curated lighting collections, thoughtfully selected to bring warmth, character, and style to every space.",
+    "Browse our curated collection of premium pendant lights, chandeliers, wall lights, and architectural fixtures for every space in Pakistan.",
   openGraph: {
     title: "Our Collection | Lighthouse",
     description:
-      "Explore our curated lighting collections, thoughtfully selected to bring warmth, character, and style to every space.",
+      "Browse our curated collection of premium pendant lights, chandeliers, wall lights, and architectural fixtures for every space in Pakistan.",
     type: "website",
   },
   alternates: {
     canonical: "/products",
+    languages: {
+      "en-pk": "/products",
+      "x-default": "/products",
+    },
   },
 };
 

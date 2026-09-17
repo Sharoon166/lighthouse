@@ -19,7 +19,13 @@ export const metadata: Metadata = {
   ),
   title: "Lighthouse | Premium Lighting Solutions in Pakistan",
   description:
-    "Premium pendants, chandeliers, and architectural lighting fixtures for homes and commercial spaces across Pakistan.",
+    "Premium pendants, chandeliers, and architectural lighting fixtures for homes and commercial spaces across Pakistan. Shop curated collections online.",
+  alternates: {
+    languages: {
+      "en-pk": "/",
+      "x-default": "/",
+    },
+  },
 };
 
 export default function RootLayout({

@@ -13,15 +13,19 @@ import { fetchFilterMetadata, fetchStoreProducts } from "@/lib/shop-data";
 export const metadata: Metadata = {
   title: "OPPLE Collection | Lighthouse",
   description:
-    "Explore our curated OPPLE lighting collection, official distributor in Rawalpindi and Islamabad.",
+    "Explore the official OPPLE lighting collection at Lighthouse. Premium LED panels, downlights, and smart lighting solutions in Pakistan.",
   openGraph: {
     title: "OPPLE Collection | Lighthouse",
     description:
-      "Explore our curated OPPLE lighting collection, official distributor in Rawalpindi and Islamabad.",
+      "Explore the official OPPLE lighting collection at Lighthouse. Premium LED panels, downlights, and smart lighting solutions in Pakistan.",
     type: "website",
   },
   alternates: {
     canonical: "/opple",
+    languages: {
+      "en-pk": "/opple",
+      "x-default": "/opple",
+    },
   },
 };
 

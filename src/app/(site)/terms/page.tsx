@@ -4,15 +4,19 @@ import { PageHero } from "@/components/shared/page-hero";
 export const metadata: Metadata = {
   title: "Terms and Conditions | Lighthouse",
   description:
-    "Read the terms and conditions governing your use of Lighthouse website and services.",
+    "Read the terms and conditions for using the Lighthouse website, placing orders, and accessing our lighting products and services.",
   openGraph: {
     title: "Terms and Conditions | Lighthouse",
     description:
-      "Read the terms and conditions governing your use of Lighthouse website and services.",
+      "Read the terms and conditions for using the Lighthouse website, placing orders, and accessing our lighting products and services.",
     type: "website",
   },
   alternates: {
     canonical: "/terms",
+    languages: {
+      "en-pk": "/terms",
+      "x-default": "/terms",
+    },
   },
 };
 

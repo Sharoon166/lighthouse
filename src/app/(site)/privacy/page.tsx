@@ -4,15 +4,19 @@ import { PageHero } from "@/components/shared/page-hero";
 export const metadata: Metadata = {
   title: "Privacy Policy | Lighthouse",
   description:
-    "Learn how Lighthouse collects, uses, and protects your personal information.",
+    "Understand how Lighthouse collects, uses, and protects your personal data when you browse our site, place orders, or contact us.",
   openGraph: {
     title: "Privacy Policy | Lighthouse",
     description:
-      "Learn how Lighthouse collects, uses, and protects your personal information.",
+      "Understand how Lighthouse collects, uses, and protects your personal data when you browse our site, place orders, or contact us.",
     type: "website",
   },
   alternates: {
     canonical: "/privacy",
+    languages: {
+      "en-pk": "/privacy",
+      "x-default": "/privacy",
+    },
   },
 };
 

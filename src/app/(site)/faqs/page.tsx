@@ -8,15 +8,19 @@ import { PageHero } from "@/components/shared/page-hero";
 export const metadata: Metadata = {
   title: "Frequently Asked Questions | Lighthouse",
   description:
-    "Find answers to common questions about Lighthouse products, orders, shipping, and returns.",
+    "Get answers about Lighthouse lighting products, orders, payment methods, shipping across Pakistan, delivery timelines, and return policies.",
   openGraph: {
     title: "Frequently Asked Questions | Lighthouse",
     description:
-      "Find answers to common questions about Lighthouse products, orders, shipping, and returns.",
+      "Get answers about Lighthouse lighting products, orders, payment methods, shipping across Pakistan, delivery timelines, and return policies.",
     type: "website",
   },
   alternates: {
     canonical: "/faqs",
+    languages: {
+      "en-pk": "/faqs",
+      "x-default": "/faqs",
+    },
   },
 };
 

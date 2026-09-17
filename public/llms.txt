@@ -1,0 +1,79 @@
+# Lighthouse — Premium Lighting Solutions in Pakistan
+
+> Lighthouse is Pakistan's curated lighting destination, offering pendant lights, chandeliers, wall lights, floor lamps, table lamps, commercial lighting, and architectural fixtures. We serve homeowners, architects, and interior designers across Islamabad, Rawalpindi, and nationwide delivery.
+
+## About
+
+Lighthouse is a premium lighting retailer based in Islamabad, Pakistan. We source and curate high-quality lighting fixtures — from handcrafted chandeliers to modern pendant lights — designed to transform how a room feels. Our collection spans residential, commercial, and hospitality projects.
+
+- **Website**: https://lighthouse.pk
+- **Showroom**: Shop 1, Bilal Plaza, Blue Area G 7/3, Islamabad 44000, Pakistan
+- **Phone**: +92 21 3456 7890
+- **WhatsApp**: +92 300 1234 567
+- **Email**: hello@lighthouse.pk
+- **Hours**: Mon–Sat, 9 AM – 7 PM
+
+## Product Categories
+
+- **Pendant Lights** — Suspended fixtures for dining tables, kitchen islands, and entryways. Modern, industrial, and transitional styles.
+- **Chandeliers** — Statement pieces for living rooms, lobbies, and formal dining. Crystal, brass, and contemporary designs.
+- **Wall Lights** — Indoor and outdoor wall-mounted fixtures. Sconces, uplights, and decorative panels.
+- **Ceiling Lights** — Flush-mount and semi-flush fixtures for rooms with lower ceilings.
+- **Floor Lamps** — Standing lamps for reading corners, living rooms, and bedrooms.
+- **Table Lamps** — Bedside and desk lighting with curated shade options.
+- **Commercial Lights** — Track lighting, panel lights, and high-bay fixtures for offices, retail, and hospitality.
+- **Picture Lights** — Accent lighting for artwork and gallery walls.
+- **Mirror Lights** — Vanity and bathroom mirror-integrated lighting.
+- **Gate Lights** — Outdoor security and decorative gate fixtures.
+- **Garden Lights** — Landscape and pathway lighting.
+- **Switches** — Premium electrical switches and accessories.
+
+## Brand Partners
+
+- **OPPLE** — Official distributor in Islamabad and Rawalpindi. LED panels, downlights, smart lighting, and energy-efficient solutions.
+- Additional partner brands available in-store.
+
+## Key Pages
+
+- Products: https://lighthouse.pk/products
+- Categories: https://lighthouse.pk/categories
+- OPPLE Collection: https://lighthouse.pk/opple
+- Projects: https://lighthouse.pk/projects
+- Blog: https://lighthouse.pk/blogs
+- About: https://lighthouse.pk/about
+- Contact: https://lighthouse.pk/contact
+- FAQs: https://lighthouse.pk/faqs
+- Shipping & Returns: https://lighthouse.pk/shipping
+
+## Services
+
+- **Nationwide delivery** across Pakistan via trusted courier partners
+- **Cash on delivery** available for most orders
+- **Project consultation** for architects, interior designers, and contractors
+- **Showroom visits** — see and touch fixtures in our Islamabad showroom
+- **Bulk and commercial orders** with dedicated support
+
+## Shipping & Returns
+
+- Delivery within 3–5 business days for major cities
+- Free shipping on orders above a specified threshold
+- 7-day return policy for unused items in original packaging
+- Exchange available for defective or incorrect items
+
+## Content
+
+The Lighthouse blog covers lighting design guides, interior trends, installation tips, project spotlights, and buying guides. Content is written for homeowners, designers, and architects looking for practical lighting advice in the Pakistani context.
+
+## Technology
+
+- Built with Next.js (App Router)
+- MongoDB database
+- Cloudinary for image management
+- Server-side rendering for SEO performance
+
+## Social Media
+
+- Facebook: https://www.facebook.com/lighthouseisb
+- Instagram: https://www.instagram.com/lighthouse.isb
+- LinkedIn: https://www.linkedin.com/company/light-house-islamabad
+- TikTok: https://www.tiktok.com/@light.house.isb

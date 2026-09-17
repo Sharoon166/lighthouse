@@ -9,15 +9,19 @@ import { aboutStats, ceoMessage, howWeWork } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "About | Lighthouse",
   description:
-    "Learn about Lighthouse — our craftsmanship, approach, and the team behind Pakistan's premium lighting solutions.",
+    "Learn about Lighthouse — Pakistan's trusted source for premium lighting. Discover our craftsmanship, showroom, and design philosophy.",
   openGraph: {
     title: "About | Lighthouse",
     description:
-      "Learn about Lighthouse — our craftsmanship, approach, and the team behind Pakistan's premium lighting solutions.",
+      "Learn about Lighthouse — Pakistan's trusted source for premium lighting. Discover our craftsmanship, showroom, and design philosophy.",
     type: "website",
   },
   alternates: {
     canonical: "/about",
+    languages: {
+      "en-pk": "/about",
+      "x-default": "/about",
+    },
   },
 };
 
@@ -31,7 +35,7 @@ export default function AboutPage() {
             items={[{ label: "Home", href: "/" }, { label: "About" }]}
           />
           <div className="space-y-4">
-            <h1 className="lg:text-5x">About Lighthouse</h1>
+            <h1 className="lg:text-5xl">About Lighthouse</h1>
             <p className="max-w-2xl">
               Premium lighting, carefully chosen for quality, style, and
               performance. Beautiful fixtures that make every space feel warm

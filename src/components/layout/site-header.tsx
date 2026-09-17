@@ -320,9 +320,9 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                     <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold">
                       Collections
                     </p>
-                    <h3 className="font-heading text-lg sm:text-xl font-semibold tracking-tight text-secondary">
+                    <p className="font-heading text-lg sm:text-xl font-semibold tracking-tight text-secondary">
                       Shop by category
-                    </h3>
+                    </p>
                   </div>
                   <span className="text-xs text-muted-foreground">
                     {categories.length} categories
@@ -404,9 +404,9 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
                       <div className="text-xs text-gold font-semibold uppercase">
                         Featured collection
                       </div>
-                      <h3 className="font-heading text-xl sm:text-2xl font-semibold tracking-tight text-white">
+                      <span className="font-heading text-xl sm:text-2xl font-semibold tracking-tight text-white">
                         {featuredCategory.name}
-                      </h3>
+                      </span>
                       {featuredCategory.description && (
                         <p className="mt-1.5 line-clamp-2 max-w-70 text-xs leading-relaxed text-white/70">
                           {featuredCategory.description}

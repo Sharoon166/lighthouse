@@ -11,15 +11,19 @@ import { PageHero } from "@/components/shared/page-hero";
 export const metadata: Metadata = {
   title: "Shipping and Returns | Lighthouse",
   description:
-    "Learn about Lighthouse shipping options, delivery times, and return policy for lighting products.",
+    "Details on Lighthouse shipping across Pakistan, delivery timelines, cash-on-delivery options, and our hassle-free return and exchange policy.",
   openGraph: {
     title: "Shipping and Returns | Lighthouse",
     description:
-      "Learn about Lighthouse shipping options, delivery times, and return policy for lighting products.",
+      "Details on Lighthouse shipping across Pakistan, delivery timelines, cash-on-delivery options, and our hassle-free return and exchange policy.",
     type: "website",
   },
   alternates: {
     canonical: "/shipping",
+    languages: {
+      "en-pk": "/shipping",
+      "x-default": "/shipping",
+    },
   },
 };
 

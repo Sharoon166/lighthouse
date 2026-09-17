@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/contact",
+    languages: {
+      "en-pk": "/contact",
+      "x-default": "/contact",
+    },
   },
 };
 

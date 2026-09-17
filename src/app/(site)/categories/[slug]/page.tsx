@@ -89,7 +89,7 @@ export default async function CategoryPage({
     fetchFilterMetadata(),
   ]);
 
-  const products: ShopProductItem[] = JSON.parse(JSON.stringify(rawProducts));
+  const products: ShopProductItem[] = rawProducts;
 
   const filteredBrands = filterMeta.brands.filter((b) => {
     return products.some(

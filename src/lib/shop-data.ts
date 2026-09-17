@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
 import { connectToDatabase } from "@/lib/db";
 import { CategoryModel } from "@/models/category";
@@ -840,10 +841,10 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
   try {
     await connectToDatabase();
 
-    const [categories, brandAgg, priceAgg] = await Promise.all([
+    const [allCategories, brandAgg, priceAgg] = await Promise.all([
       CategoryModel.find({ isActive: true })
-        .select({ name: 1, slug: 1, productCount: 1 })
-        .lean(),
+        .sort({ level: 1, sortOrder: 1, name: 1 })
+        .lean({ serialize: true }),
       (ProductModel as any).aggregate([
         { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
         {
@@ -870,10 +871,57 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
       ]),
     ]);
 
-    meta.categories = categories.map((c) => ({
+    // Build tree and compute cumulative counts (own + descendants)
+    // Mirrors getCategoryTree logic to keep filter sidebar counts in sync
+    type TreeNode = {
+      id: string;
+      parentId: string | null;
+      productCount: number;
+      children: TreeNode[];
+    };
+    const nodeMap = new Map<string, TreeNode>();
+    for (const c of allCategories) {
+      nodeMap.set(String(c._id), {
+        id: String(c._id),
+        parentId: c.parent ? String(c.parent) : null,
+        productCount: c.productCount || 0,
+        children: [],
+      });
+    }
+    const roots: TreeNode[] = [];
+    for (const node of nodeMap.values()) {
+      if (node.parentId && nodeMap.has(node.parentId)) {
+        nodeMap.get(node.parentId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+    function computeCounts(node: TreeNode): number {
+      let total = node.productCount;
+      for (const child of node.children) {
+        total += computeCounts(child);
+      }
+      node.productCount = total;
+      return total;
+    }
+    for (const root of roots) {
+      computeCounts(root);
+    }
+    // Flatten back to a slug→count map
+    const countBySlug = new Map<string, number>();
+    function flatten(nodes: TreeNode[]) {
+      for (const node of nodes) {
+        const cat = allCategories.find((c) => String(c._id) === node.id);
+        if (cat) countBySlug.set(cat.slug, node.productCount);
+        flatten(node.children);
+      }
+    }
+    flatten(roots);
+
+    meta.categories = allCategories.map((c) => ({
       name: c.name,
       slug: c.slug,
-      count: c.productCount || 0,
+      count: countBySlug.get(c.slug) ?? c.productCount ?? 0,
     }));
 
     meta.brands = brandAgg
@@ -932,7 +980,7 @@ export async function fetchStoreProducts(
       query.name = { $regex: options.search, $options: "i" };
     }
 
-    const dbProducts = await ProductModel.find(query).lean();
+    const dbProducts = await ProductModel.find(query).lean({ serialize: true });
     if (dbProducts && dbProducts.length > 0) {
       products = dbProducts.map((p) => {
         const minPrice = p.priceRange?.min || 15000;
@@ -1070,10 +1118,10 @@ export async function fetchStoreProducts(
 
   // Filter in memory for search/category/price/material/design
   if (options.categorySlugs && options.categorySlugs.length > 0) {
-    const slugSet = new Set(
-      options.categorySlugs.map((s) => s.toLowerCase()),
+    const slugSet = new Set(options.categorySlugs.map((s) => s.toLowerCase()));
+    products = products.filter((p) =>
+      slugSet.has(p.categorySlug.toLowerCase()),
     );
-    products = products.filter((p) => slugSet.has(p.categorySlug.toLowerCase()));
   } else if (options.categorySlug && options.categorySlug !== "all") {
     products = products.filter(
       (p) =>
@@ -1130,10 +1178,189 @@ export async function fetchStoreProducts(
   return { products, total: products.length };
 }
 
-export async function fetchProductBySlug(
-  slug: string,
-): Promise<ShopProductItem | null> {
-  const { products } = await fetchStoreProducts();
-  const found = products.find((p) => p.slug === slug);
-  return found || null;
+function mapDbProductToShopItem(p: any): ShopProductItem {
+  const minPrice = p.priceRange?.min || 15000;
+  const defaultVar = p.variants?.[0];
+  const origPrice =
+    defaultVar?.price && defaultVar?.salePrice
+      ? defaultVar.price
+      : undefined;
+
+  const variants: ShopProductVariant[] = (p.variants || [])
+    .filter((v: any) => v.isActive)
+    .map((v: any) => ({
+      id: String(v._id),
+      sku: v.sku,
+      title: v.title,
+      attributes:
+        v.attributes instanceof Map
+          ? Object.fromEntries(v.attributes)
+          : (v.attributes as Record<string, string>) || {},
+      colorHex: v.colorHex || "",
+      price: v.salePrice || v.price,
+      salePrice:
+        v.salePrice && v.salePrice < v.price ? v.salePrice : undefined,
+      images: v.images?.length ? v.images : [],
+      stock: v.stock,
+      availability: v.availability,
+      isDefault: v.isDefault,
+    }));
+
+  const allProductImages = [
+    ...(p.images || []),
+    ...variants.flatMap((v) => v.images || []),
+  ];
+  const uniqueImages = Array.from(new Set(allProductImages));
+
+  const variantAttributes = p.variantAttributes || [];
+  const finishAttrKey = variantAttributes.find((key: string) =>
+    ["finish", "color", "colour"].includes(key.toLowerCase()),
+  );
+  const finishes: { name: string; hex: string }[] = [];
+  if (finishAttrKey && variants.length > 0) {
+    const seen = new Set<string>();
+    for (const v of variants) {
+      const val = v.attributes[finishAttrKey];
+      if (val && !seen.has(val)) {
+        seen.add(val);
+        finishes.push({
+          name: val,
+          hex: v.colorHex || COLOR_NAME_TO_HEX[val] || "#888888",
+        });
+      }
+    }
+  }
+  if (finishes.length === 0) {
+    finishes.push(
+      { name: "Brass", hex: COLOR_NAME_TO_HEX["Brass"] },
+      { name: "Black", hex: COLOR_NAME_TO_HEX["Black"] },
+    );
+  }
+
+  return {
+    id: String(p._id),
+    name: p.name,
+    slug: p.slug,
+    tag: `${p.category?.name?.toUpperCase() || "LIGHTING"} / DECORATIVE`,
+    categoryName: p.category?.name || "Pendant Lights",
+    categorySlug: p.category?.slug || "pendant-lights",
+    price: minPrice,
+    originalPrice: origPrice,
+    discountPercentage: origPrice
+      ? Math.round(((origPrice - minPrice) / origPrice) * 100)
+      : undefined,
+    shortDescription:
+      p.shortDescription || p.description?.slice(0, 120) || "",
+    description: p.description || "",
+    images: uniqueImages.length ? uniqueImages : ["/products/1.png"],
+    finishes,
+    variantAttributes,
+    variants,
+    ratings: p.ratings?.count
+      ? {
+          average: p.ratings.average || 4.8,
+          count: p.ratings.count || 12,
+          distribution: [
+            {
+              stars: 5,
+              count: Math.round((p.ratings.count || 12) * 0.8),
+            },
+            {
+              stars: 4,
+              count: Math.round((p.ratings.count || 12) * 0.2),
+            },
+          ],
+        }
+      : {
+          average: 4.8,
+          count: 15,
+          distribution: [
+            { stars: 5, count: 12 },
+            { stars: 4, count: 3 },
+          ],
+        },
+    reviews: [],
+    content: {
+      materialsAndCare:
+        p.content?.materialsAndCare || "Solid brass construction.",
+      shippingAndReturns:
+        p.content?.shippingAndReturns || "Delivery in 3-5 business days.",
+      payment: p.content?.payment || "All major credit cards accepted.",
+      installationAndBulbs:
+        p.content?.installationAndBulbs || "Standard E27 fitting.",
+    },
+    specifications: p.specifications || [
+      { key: "Brand", value: p.brand?.name || "Lighthouse" },
+    ],
+    designStyle: "Modern",
+    material: "Brass",
+    inStock: p.inStock ?? true,
+    seo: {
+      metaTitle: p.seo?.metaTitle || "",
+      metaDescription: p.seo?.metaDescription || "",
+      focusKeyword: p.seo?.focusKeyword || "",
+      noIndex: p.seo?.noIndex ?? false,
+    },
+  };
+}
+
+export const fetchProductBySlug = cache(
+  async (slug: string): Promise<ShopProductItem | null> => {
+    try {
+      await connectToDatabase();
+      const p = await ProductModel.findOne({
+        slug,
+        status: { $ne: "archived" },
+        deletedAt: { $eq: null },
+      }).lean({ serialize: true });
+      if (!p) return null;
+      return mapDbProductToShopItem(p);
+    } catch (error) {
+      console.warn("Failed to fetch product by slug:", error);
+      const { products } = await fetchStoreProducts();
+      return products.find((p) => p.slug === slug) || null;
+    }
+  },
+);
+
+export async function fetchRelatedProducts(
+  currentSlug: string,
+  categorySlug: string,
+  limit = 4,
+): Promise<ShopProductItem[]> {
+  const baseFilter = {
+    slug: { $ne: currentSlug },
+    deletedAt: { $eq: null },
+  };
+
+  try {
+    await connectToDatabase();
+
+    // First try: same category, active products
+    let dbProducts = await ProductModel.find({
+      ...baseFilter,
+      "category.slug": categorySlug,
+      status: "active",
+    })
+      .limit(limit)
+      .lean({ serialize: true });
+
+    // Fallback: any non-archived products if category match yields nothing
+    if (dbProducts.length === 0) {
+      dbProducts = await ProductModel.find({
+        ...baseFilter,
+        status: { $ne: "archived" },
+      })
+        .limit(limit)
+        .lean({ serialize: true });
+    }
+
+    return dbProducts.map(mapDbProductToShopItem);
+  } catch (error) {
+    console.warn("Failed to fetch related products:", error);
+    const { products } = await fetchStoreProducts();
+    return products
+      .filter((p) => p.slug !== currentSlug)
+      .slice(0, limit);
+  }
 }

@@ -91,10 +91,8 @@ export default async function ProductsPage({
     getCategoryTree({ activeOnly: true }),
   ]);
 
-  const products = JSON.parse(JSON.stringify(rawProducts));
-  const newArrivals: ShopProductItem[] = JSON.parse(
-    JSON.stringify(newArrivalsResult.products.slice(0, 20)),
-  );
+  const products = rawProducts;
+  const newArrivals: ShopProductItem[] = newArrivalsResult.products.slice(0, 20);
 
   const showNewArrivals =
     !categorySlugs &&

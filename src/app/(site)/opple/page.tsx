@@ -74,7 +74,7 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
       getCategoryTree({ activeOnly: true }),
     ]);
 
-  const products = JSON.parse(JSON.stringify(rawProducts));
+  const products = rawProducts;
 
   return (
     <main className="min-h-screen bg-background">

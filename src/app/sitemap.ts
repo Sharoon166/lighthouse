@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { connectToDatabase } from "@/lib/db";
+import { BlogPostModel } from "@/models/blog-post";
 import { ProjectModel } from "@/models/project";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lighthouse.pk";
@@ -85,7 +86,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let dynamicPages: MetadataRoute.Sitemap = [];
 
   try {
-    const [products, projects, categories] = await Promise.all([
+    const [products, projects, categories, blogs] = await Promise.all([
       import("@/models/product").then(async (mod) => {
         const { ProductModel } = mod;
         return ProductModel.find({
@@ -104,6 +105,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           .select("slug updatedAt")
           .lean();
       }),
+      BlogPostModel.find({ status: "published", deletedAt: null })
+        .select("slug updatedAt")
+        .lean({ serialize: true }),
     ]);
 
     const productPages: MetadataRoute.Sitemap = products.map((p) => ({
@@ -127,7 +131,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    dynamicPages = [...productPages, ...projectPages, ...categoryPages];
+    const blogPages: MetadataRoute.Sitemap = blogs.map((b) => ({
+      url: `${siteUrl}/blogs/${b.slug}`,
+      lastModified: b.updatedAt ? new Date(b.updatedAt) : new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
+
+    dynamicPages = [...productPages, ...projectPages, ...categoryPages, ...blogPages];
   } catch {
     // If DB query fails, return static pages only
   }

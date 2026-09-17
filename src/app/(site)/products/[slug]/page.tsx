@@ -7,7 +7,7 @@ import { ScrollToTop } from "@/components/shared/scroll-to-top";
 import { ProductCard } from "@/components/shop/product-card";
 import { ProductDetailTabs } from "@/components/shop/product-detail-tabs";
 import { generateProductJsonLd, generateSeoMetadata } from "@/lib/seo-helpers";
-import { fetchProductBySlug, fetchStoreProducts } from "@/lib/shop-data";
+import { fetchProductBySlug, fetchRelatedProducts } from "@/lib/shop-data";
 import { ProductDetailClient } from "./product-detail-client";
 
 interface ProductPageProps {
@@ -53,10 +53,10 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const { products: allProducts } = await fetchStoreProducts();
-  const relatedProducts = allProducts
-    .filter((p) => p.id !== product.id)
-    .slice(0, 4);
+  const relatedProducts = await fetchRelatedProducts(
+    product.slug,
+    product.categorySlug,
+  );
 
   const jsonLd = generateProductJsonLd({
     name: product.name,

@@ -5,10 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { CTA } from "@/components/hero/cta";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
-import {
-  renderTiptapToHtml,
-  tiptapContentClassName,
-} from "@/components/shared/rich-text-constants";
+import { renderTiptapToHtml } from "@/components/shared/rich-text-server";
+import { tiptapContentClassName } from "@/components/shared/rich-text-constants";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { calculateReadingTime } from "@/features/blog/seo-helpers";

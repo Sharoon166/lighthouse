@@ -17,7 +17,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Pagination } from "@/components/ui/pagination";
+import { Pagination } from "@/components/shared/pagination";
 import { BLOG_CATEGORIES } from "@/lib/constants";
 import {
   type BlogPostListItem,

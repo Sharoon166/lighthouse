@@ -15,7 +15,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import LogoImage from "@/components/shared/logo-img";
 import {
@@ -32,7 +32,7 @@ const IS_PHASE_2 = false;
 
 const NAV_LINKS = [
   { href: "/projects", label: "Projects" },
-  { href: "/blogs", label: "Blog" },
+  { href: "/blogs", label: "Blogs" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
   { href: "/opple", label: "Opple" },
@@ -58,6 +58,8 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
   const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
   const [categories, setCategories] = useState<MegaCategory[]>([]);
   const [productsOpen, setProductsOpen] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
   const productsHoverTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const productsMenuRef = useRef<HTMLDivElement>(null);
 
@@ -84,7 +86,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [pathname]);
 
   /*
    * --------------------------------------------------
@@ -103,6 +105,35 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
       document.body.style.overflow = "";
     };
   }, [mobileOpen]);
+
+  /*
+   * --------------------------------------------------
+   * Sticky header: hide on scroll down, show on scroll up
+   * --------------------------------------------------
+   */
+
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY;
+    const delta = currentScrollY - lastScrollY.current;
+
+    // Only toggle after scrolling past a threshold to avoid jitter
+    if (Math.abs(delta) < 8) return;
+
+    if (delta > 0 && currentScrollY > 80) {
+      // Scrolling down & past threshold → hide
+      setHeaderVisible(false);
+    } else if (delta < 0) {
+      // Scrolling up → always show
+      setHeaderVisible(true);
+    }
+
+    lastScrollY.current = currentScrollY;
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   /*
    * --------------------------------------------------
@@ -174,8 +205,11 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
   return (
     <header
       className={cn(
-        "z-50 w-full",
-        isHero ? "absolute top-0 py-4" : "relative bg-background py-3",
+        "z-50 w-full transition-transform duration-300 ease-in-out",
+        isHero
+          ? "absolute top-0 py-4"
+          : "sticky top-0 bg-background py-3 backdrop-blur-md border-b border-border/50",
+        !isHero && !headerVisible && "-translate-y-full",
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">

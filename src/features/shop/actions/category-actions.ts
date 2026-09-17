@@ -178,6 +178,7 @@ export async function createCategory(
     });
 
     revalidatePath("/admin/categories");
+    revalidatePath("/admin/brands");
     revalidateTag("homepage", "max");
 
     return { ok: true, slug };
@@ -334,6 +335,8 @@ export async function updateCategory(
 
     revalidatePath("/admin/categories");
     revalidatePath("/admin/products");
+    revalidatePath("/admin/brands");
+    revalidatePath("/categories");
     revalidateTag("homepage", "max");
 
     return { ok: true, slug: nextSlug };
@@ -386,6 +389,7 @@ export async function deleteCategory(
   await existing.deleteOne();
 
   revalidatePath("/admin/categories");
+  revalidatePath("/admin/brands");
   revalidateTag("homepage", "max");
 
   return { ok: true, message: "Category deleted." };
@@ -777,9 +781,34 @@ export async function getCategoryAttributes(categoryId: string): Promise<
   return result.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
+/**
+ * Returns all slugs of the given category plus all its descendants.
+ * Uses the indexed `ancestors` field for a single efficient query.
+ */
+export async function getDescendantSlugs(
+  categoryId: string,
+): Promise<string[]> {
+  await connectToDatabase();
+
+  // Fetch the category itself to get its slug
+  const category = await CategoryModel.findById(categoryId)
+    .select("slug")
+    .lean();
+  if (!category) return [];
+
+  // Find all descendants where ancestors contains the categoryId
+  const descendants = await CategoryModel.find({
+    ancestors: new Types.ObjectId(categoryId),
+    isActive: true,
+  })
+    .select("slug")
+    .lean();
+
+  return [category.slug, ...descendants.map((d) => d.slug)];
+}
+
 export type ToggleFeaturedResult =
-  | { ok: true; featured: boolean }
-  | { ok: false; message: string };
+  { ok: true; featured: boolean } | { ok: false; message: string };
 
 export async function toggleFeaturedCategory(
   id: string,
@@ -811,6 +840,7 @@ export async function toggleFeaturedCategory(
   await existing.save();
 
   revalidatePath("/admin/categories");
+  revalidatePath("/admin/brands");
   revalidateTag("homepage", "max");
 
   return { ok: true, featured: existing.featured };
@@ -869,6 +899,7 @@ export async function reorderCategories(
     await CategoryModel.bulkWrite(bulkOps);
 
     revalidatePath("/admin/categories");
+    revalidatePath("/admin/brands");
     revalidatePath("/categories");
     revalidateTag("homepage", "max");
 

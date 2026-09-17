@@ -900,6 +900,7 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
 
 export interface FetchProductsOptions {
   categorySlug?: string;
+  categorySlugs?: string[];
   brandSlug?: string;
   search?: string;
   designStyle?: string[];
@@ -919,7 +920,9 @@ export async function fetchStoreProducts(
       status: { $ne: "archived" },
       deletedAt: { $eq: null },
     };
-    if (options.categorySlug && options.categorySlug !== "all") {
+    if (options.categorySlugs && options.categorySlugs.length > 0) {
+      query["category.slug"] = { $in: options.categorySlugs };
+    } else if (options.categorySlug && options.categorySlug !== "all") {
       query["category.slug"] = options.categorySlug;
     }
     if (options.brandSlug && options.brandSlug !== "all") {
@@ -1066,7 +1069,12 @@ export async function fetchStoreProducts(
   }
 
   // Filter in memory for search/category/price/material/design
-  if (options.categorySlug && options.categorySlug !== "all") {
+  if (options.categorySlugs && options.categorySlugs.length > 0) {
+    const slugSet = new Set(
+      options.categorySlugs.map((s) => s.toLowerCase()),
+    );
+    products = products.filter((p) => slugSet.has(p.categorySlug.toLowerCase()));
+  } else if (options.categorySlug && options.categorySlug !== "all") {
     products = products.filter(
       (p) =>
         p.categorySlug.toLowerCase() === options.categorySlug?.toLowerCase(),

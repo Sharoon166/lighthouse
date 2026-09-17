@@ -28,12 +28,18 @@ export async function requireRole(roles: readonly string[]) {
     );
 
   if (user?.blocked) {
-    // Revoke all sessions for blocked user
-    await auth.api.revokeUserSessions({
-      headers: await headers(),
-      body: { userId: session.user.id },
-    });
-    redirect("/admin/login");
+    // Attempt to revoke sessions — may fail if the blocked user's own
+    // session lacks permission. That's fine; we still redirect.
+    try {
+      await auth.api.revokeUserSessions({
+        headers: await headers(),
+        body: { userId: session.user.id },
+      });
+    } catch {
+      // Session revocation failed (e.g. 403 FORBIDDEN).
+      // The redirect below will still invalidate the cookie.
+    }
+    redirect("/admin/login?blocked=1");
   }
 
   return session;

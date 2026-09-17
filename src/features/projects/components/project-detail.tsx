@@ -242,7 +242,7 @@ export function ProjectDetail({
               {project.gallery.map((img, i) => (
                 <div
                   key={img.publicId}
-                  className={`relative overflow-hidden bg-muted ${
+                  className={`group relative overflow-hidden bg-muted ${
                     i === 0 ? "col-span-2 row-span-2" : ""
                   }`}
                 >
@@ -251,8 +251,17 @@ export function ProjectDetail({
                     alt={img.caption || `${project.title} gallery ${i + 1}`}
                     width={800}
                     height={600}
-                    className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+
+                  {/* Dark overlay and caption container */}
+                  <div className="absolute inset-0 bg-black/50 p-4 flex flex-col justify-end opacity-0 transition-opacity duration-300 group-hover:opacity-100 z-20">
+                    {img.caption && (
+                      <p className="text-gold font-semibold line-clamp-2 text-sm md:text-base" title={img.caption}>
+                        {img.caption}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

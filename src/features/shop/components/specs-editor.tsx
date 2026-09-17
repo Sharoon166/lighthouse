@@ -66,7 +66,7 @@ export function SpecsEditor({
   return (
     <div className="space-y-3">
       {value.length > 0 && (
-        <div className="space-y-2">
+        <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
           {value.map((spec, index) => {
             const suggestedType = suggestedSpecs.find(
               (s) => s.key.toLowerCase() === spec.key.toLowerCase(),

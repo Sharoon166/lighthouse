@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CTA } from "@/components/hero/cta";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
+import { ScrollToTop } from "@/components/shared/scroll-to-top";
 import { ProductCard } from "@/components/shop/product-card";
 import { ProductDetailTabs } from "@/components/shop/product-detail-tabs";
 import { generateProductJsonLd, generateSeoMetadata } from "@/lib/seo-helpers";
@@ -77,6 +78,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <>
+      <ScrollToTop />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

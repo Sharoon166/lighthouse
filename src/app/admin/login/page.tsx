@@ -22,6 +22,7 @@ function FloatingOrb({ className }: { className?: string }) {
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from") || "/admin";
+  const isBlocked = searchParams.get("blocked") === "1";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -140,6 +141,17 @@ function LoginForm() {
           </InputGroupAddon>
         </InputGroup>
       </div>
+
+      {isBlocked && (
+        <div className="rounded-lg border border-amber-300/40 bg-amber-50 px-4 py-3 dark:border-amber-400/20 dark:bg-amber-950/30">
+          <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            Your account has been blocked.
+          </p>
+          <p className="mt-1 text-xs text-amber-600/80 dark:text-amber-400/70">
+            Please contact your administrator to regain access.
+          </p>
+        </div>
+      )}
 
       {error && (
         <div className="rounded-lg border border-destructive/20 bg-destructive/4 px-4 py-3">

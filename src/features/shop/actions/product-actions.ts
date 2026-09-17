@@ -19,6 +19,7 @@ function revalidateProductCaches(categorySlug?: string) {
   revalidateTag("homepage", "max");
   revalidatePath("/categories");
   revalidatePath("/products");
+  revalidatePath("/admin/brands");
   if (categorySlug) {
     revalidatePath(`/categories/${categorySlug}`);
   }
@@ -61,6 +62,22 @@ async function adjustCategoryProductCount(
 ): Promise<void> {
   await CategoryModel.collection.updateOne(
     { _id: new Types.ObjectId(categoryId) },
+    [
+      {
+        $set: {
+          productCount: { $max: [0, { $add: ["$productCount", delta] }] },
+        },
+      },
+    ],
+  );
+}
+
+async function adjustBrandProductCount(
+  brandId: string,
+  delta: 1 | -1,
+): Promise<void> {
+  await BrandModel.collection.updateOne(
+    { _id: new Types.ObjectId(brandId) },
     [
       {
         $set: {
@@ -198,6 +215,9 @@ export async function createProduct(
     if (productData.status === "active" && productData.category?._id) {
       await adjustCategoryProductCount(String(productData.category._id), 1);
     }
+    if (productData.brand?._id) {
+      await adjustBrandProductCount(String(productData.brand._id), 1);
+    }
 
     revalidatePath("/admin/products");
     revalidateProductCaches(productData.category?.slug);
@@ -249,6 +269,9 @@ export async function updateProduct(
     const oldCategoryId = existing.category?._id
       ? String(existing.category._id)
       : null;
+    const oldBrandId = existing.brand?._id
+      ? String(existing.brand._id)
+      : null;
     const oldStatus = existing.status;
 
     const productData = await buildProductData(data);
@@ -262,6 +285,9 @@ export async function updateProduct(
 
     const newCategoryId = productData.category?._id
       ? String(productData.category._id)
+      : null;
+    const newBrandId = productData.brand?._id
+      ? String(productData.brand._id)
       : null;
     const newStatus = productData.status;
 
@@ -281,6 +307,26 @@ export async function updateProduct(
       }
       if (newStatus === "active") {
         await adjustCategoryProductCount(newCategoryId, 1);
+      }
+    }
+
+    // Adjust brand product counts
+    if (oldStatus === "active" && newStatus !== "active" && oldBrandId) {
+      await adjustBrandProductCount(oldBrandId, -1);
+    } else if (
+      oldStatus !== "active" &&
+      newStatus === "active" &&
+      newBrandId
+    ) {
+      await adjustBrandProductCount(newBrandId, 1);
+    }
+
+    if (oldBrandId && newBrandId && oldBrandId !== newBrandId) {
+      if (oldStatus === "active") {
+        await adjustBrandProductCount(oldBrandId, -1);
+      }
+      if (newStatus === "active") {
+        await adjustBrandProductCount(newBrandId, 1);
       }
     }
 
@@ -348,6 +394,15 @@ export async function updateProductStatus(
     }
   }
 
+  const brandId = product.brand?._id ? String(product.brand._id) : null;
+  if (brandId) {
+    if (oldStatus === "active" && status !== "active") {
+      await adjustBrandProductCount(brandId, -1);
+    } else if (oldStatus !== "active" && status === "active") {
+      await adjustBrandProductCount(brandId, 1);
+    }
+  }
+
   revalidatePath("/admin/products");
   revalidateProductCaches(product.category?.slug);
 
@@ -377,6 +432,9 @@ export async function deleteProduct(
   if (existing.status === "active" && existing.category?._id) {
     await adjustCategoryProductCount(String(existing.category._id), -1);
   }
+  if (existing.status === "active" && existing.brand?._id) {
+    await adjustBrandProductCount(String(existing.brand._id), -1);
+  }
 
   revalidatePath("/admin/products");
   revalidateProductCaches(existing.category?.slug);
@@ -402,6 +460,9 @@ export async function restoreProduct(
 
   if (existing.status === "active" && existing.category?._id) {
     await adjustCategoryProductCount(String(existing.category._id), 1);
+  }
+  if (existing.status === "active" && existing.brand?._id) {
+    await adjustBrandProductCount(String(existing.brand._id), 1);
   }
 
   revalidatePath("/admin/products");
@@ -449,6 +510,9 @@ export async function permanentlyDeleteProduct(
 
   if (existing.status === "active" && existing.category?._id) {
     await adjustCategoryProductCount(String(existing.category._id), -1);
+  }
+  if (existing.status === "active" && existing.brand?._id) {
+    await adjustBrandProductCount(String(existing.brand._id), -1);
   }
 
   await existing.deleteOne();

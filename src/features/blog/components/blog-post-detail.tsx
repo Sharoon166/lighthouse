@@ -259,7 +259,7 @@ export function BlogPostDetail({
                           />
                         </div>
                       )}
-                      <h4 className="text-sm font-medium leading-snug line-clamp-2 group-hover:text-primary">
+                      <h4 className="text-sm font-medium leading-snug line-clamp-2 group-hover:text-gold">
                         {rp.title}
                       </h4>
                     </Link>

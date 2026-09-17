@@ -1696,24 +1696,27 @@ export function ProductForm({
                 <p className="text-xs text-muted-foreground">
                   Rich text description for the specifications section.
                 </p>
-                <RichTextEditor
-                  value={
-                    specificationsDescription
-                      ? (() => {
-                          try {
-                            return JSON.parse(specificationsDescription);
-                          } catch {
-                            return specificationsDescription;
-                          }
-                        })()
-                      : undefined
-                  }
-                  onChange={(json) => {
-                    setSpecificationsDescription(JSON.stringify(json));
-                  }}
-                  placeholder="Add a detailed specifications description..."
-                  editorClassName="max-h-60"
-                />
+                <div className="h-[calc(70dvh-1.5rem)]">
+                  <RichTextEditor
+                    value={
+                      specificationsDescription
+                        ? (() => {
+                            try {
+                              return JSON.parse(specificationsDescription);
+                            } catch {
+                              return specificationsDescription;
+                            }
+                          })()
+                        : undefined
+                    }
+                    onChange={(json) => {
+                      setSpecificationsDescription(JSON.stringify(json));
+                    }}
+                    placeholder="Add a detailed specifications description..."
+                    className="flex h-full flex-col"
+                    editorClassName="max-h-none min-h-0 flex-1"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>

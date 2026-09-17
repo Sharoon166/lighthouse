@@ -25,7 +25,7 @@ const PRICE_BANDS = [
   { label: "Under Rs. 10,000", value: "under-10k" },
   { label: "Rs. 10,000 – 25,000", value: "10k-25k" },
   { label: "Rs. 25,000 – 50,000", value: "25k-50k" },
-  { label: "Rs. 50,000 – 100,000", value: "100k-plus" },
+  { label: "Rs. 50,000 – 100,000", value: "50k-100k" },
   { label: "Rs. 100,000+", value: "100k-plus" },
 ];
 

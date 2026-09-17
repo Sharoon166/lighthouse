@@ -1,97 +1,138 @@
 "use client";
 
+import {
+  ArrowLeft01Icon,
+  ArrowRight01Icon,
+} from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Button } from "@/components/ui/button";
+import { usePagination } from "@/hooks/use-pagination";
 import { cn } from "@/lib/utils";
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  /** Total number of items across all pages. When provided, a "Showing X–Y of Z" summary is displayed. */
+  totalItems?: number;
+  /** Items per page. Required to compute the "Showing" range correctly. */
+  pageSize?: number;
+  /** Available page-size options. When provided, a page-size selector is shown. */
+  pageSizeOptions?: number[];
+  /** Callback when the user picks a different page size. */
+  onPageSizeChange?: (pageSize: number) => void;
+  /** Number of sibling pages shown around the current page. Defaults to 1. */
+  siblingCount?: number;
   className?: string;
-}
-
-function getPageNumbers(current: number, total: number): (number | "...")[] {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-
-  const pages: (number | "...")[] = [1];
-
-  if (current > 3) pages.push("...");
-
-  const start = Math.max(2, current - 1);
-  const end = Math.min(total - 1, current + 1);
-
-  for (let i = start; i <= end; i++) pages.push(i);
-
-  if (current < total - 2) pages.push("...");
-
-  pages.push(total);
-
-  return pages;
 }
 
 export function Pagination({
   currentPage,
   totalPages,
   onPageChange,
+  totalItems,
+  pageSize,
+  pageSizeOptions = [9, 18, 27],
+  onPageSizeChange,
+  siblingCount,
   className,
 }: PaginationProps) {
-  if (totalPages <= 1) return null;
+  const pages = usePagination({ currentPage, totalPages, siblingCount });
 
-  const pages = getPageNumbers(currentPage, totalPages);
+  const firstItem =
+    totalItems != null && totalItems > 0
+      ? (currentPage - 1) * (pageSize ?? 1) + 1
+      : 0;
+  const lastItem =
+    totalItems != null
+      ? Math.min(currentPage * (pageSize ?? 1), totalItems)
+      : 0;
 
   return (
-    <nav
-      aria-label="Pagination"
+    <div
       className={cn(
-        "flex items-center justify-center gap-1.5 border-t border-border/60 pt-8",
+        "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
     >
-      <button
-        type="button"
-        onClick={() => onPageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-3 py-1.5 text-xs font-semibold rounded border border-border bg-background text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-        aria-label="Previous page"
-      >
-        &lt;
-      </button>
+      {/* Left: summary + page-size selector */}
+      <div className="flex flex-wrap items-center gap-3">
+        {totalItems != null && (
+          <p className="text-sm text-muted-foreground">
+            Showing{" "}
+            <span className="font-medium text-foreground">{firstItem}</span>–
+            <span className="font-medium text-foreground">{lastItem}</span> of{" "}
+            <span className="font-medium text-foreground">{totalItems}</span>
+          </p>
+        )}
+        {onPageSizeChange && pageSize != null && (
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="sr-only">Rows per page</span>
+            <select
+              value={pageSize}
+              onChange={(event) => onPageSizeChange(Number(event.target.value))}
+              className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {pageSizeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option} / page
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
 
-      {pages.map((page, i) =>
-        page === "..." ? (
-          <span
-            key={`ellipsis-${i}`}
-            className="px-2 py-1.5 text-xs text-muted-foreground"
-          >
-            ...
-          </span>
-        ) : (
-          <button
-            key={page}
-            type="button"
-            onClick={() => onPageChange(page)}
-            className={cn(
-              "px-3.5 py-1.5 text-xs font-semibold rounded transition-colors",
-              page === currentPage
-                ? "bg-slate-900 text-white"
-                : "border border-border bg-background text-foreground hover:bg-muted",
-            )}
-            aria-label={`Page ${page}`}
-            aria-current={page === currentPage ? "page" : undefined}
-          >
-            {page}
-          </button>
-        ),
-      )}
-
-      <button
-        type="button"
-        onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className="px-3 py-1.5 text-xs font-semibold rounded border border-border bg-background text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed"
-        aria-label="Next page"
+      {/* Right: page buttons */}
+      <nav
+        aria-label="Pagination"
+        className="flex flex-wrap items-center gap-1.5"
       >
-        &gt;
-      </button>
-    </nav>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          aria-label="Previous page"
+          disabled={currentPage <= 1}
+          onClick={() => onPageChange(currentPage - 1)}
+        >
+          <HugeiconsIcon icon={ArrowLeft01Icon} size={16} />
+        </Button>
+
+        {pages.map((item) =>
+          item.kind === "ellipsis" ? (
+            <span
+              key={item.id}
+              className="flex size-8 items-center justify-center text-sm text-muted-foreground"
+            >
+              …
+            </span>
+          ) : (
+            <Button
+              key={item.page}
+              type="button"
+              variant={item.page === currentPage ? "default" : "outline"}
+              size="icon-sm"
+              aria-label={`Page ${item.page}`}
+              aria-current={item.page === currentPage ? "page" : undefined}
+              onClick={() => onPageChange(item.page)}
+            >
+              {item.page}
+            </Button>
+          ),
+        )}
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          aria-label="Next page"
+          disabled={currentPage >= totalPages}
+          onClick={() => onPageChange(currentPage + 1)}
+        >
+          <HugeiconsIcon icon={ArrowRight01Icon} size={16} />
+        </Button>
+      </nav>
+    </div>
   );
 }

@@ -23,12 +23,14 @@ export function ProductDetailClient({ product }: ProductDetailClientProps) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-      {/* Left: Image Gallery — images stay in fixed order */}
-      <ProductImageGallery
-        images={product.images}
-        name={product.name}
-        initialSelectedImage={highlightedImage}
-      />
+      {/* Left: Image Gallery — sticky so it stays visible while scrolling the purchase panel */}
+      <div className="sticky top-24">
+        <ProductImageGallery
+          images={product.images}
+          name={product.name}
+          initialSelectedImage={highlightedImage}
+        />
+      </div>
 
       {/* Right: Purchase & Info Panel */}
       <ProductPurchasePanel

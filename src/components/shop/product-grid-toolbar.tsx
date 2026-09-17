@@ -7,7 +7,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pagination } from "@/components/shared/pagination";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -43,6 +43,12 @@ export function ProductGridToolbar({
   );
   const isSmallScreen = !useMediaQuery("(min-width: 640px)");
   const effectiveView = isSmallScreen ? "grid" : view;
+
+  // Client-side pagination: slice products for the current page
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return products.slice(start, start + PAGE_SIZE);
+  }, [products, currentPage]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -142,16 +148,16 @@ export function ProductGridToolbar({
       </div>
 
       {/* Product Grid or List */}
-      {products.length > 0 ? (
+      {paginatedProducts.length > 0 ? (
         effectiveView === "grid" ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {paginatedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {products.map((product) => (
+            {paginatedProducts.map((product) => (
               <ProductListItem key={product.id} product={product} />
             ))}
           </div>
@@ -166,6 +172,8 @@ export function ProductGridToolbar({
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
+        totalItems={total}
+        pageSize={PAGE_SIZE}
         onPageChange={handlePageChange}
       />
     </div>

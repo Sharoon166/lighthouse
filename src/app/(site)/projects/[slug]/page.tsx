@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CTA } from "@/components/hero/cta";
+import { ScrollToTop } from "@/components/shared/scroll-to-top";
 import { getProject, getRelatedProjects } from "@/features/projects/actions";
 import { ProjectDetail } from "@/features/projects/components/project-detail";
 import { generateSeoMetadata } from "@/lib/seo-helpers";
@@ -57,6 +58,7 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <>
+      <ScrollToTop />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

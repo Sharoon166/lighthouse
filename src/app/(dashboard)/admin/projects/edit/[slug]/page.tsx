@@ -16,6 +16,7 @@ export default async function EditProjectPage({
 }: EditProjectPageProps) {
   const { slug } = await params;
   const project = await getProject(slug);
+  console.log({ project });
 
   if (!project) notFound();
 

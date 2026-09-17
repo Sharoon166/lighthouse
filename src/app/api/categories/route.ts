@@ -12,31 +12,46 @@ export async function GET() {
       .lean();
 
     if (categories.length > 0) {
-      return NextResponse.json({
-        categories: categories.map((c) => ({
-          id: String(c._id),
-          name: c.name,
-          slug: c.slug,
-          description: c.description || "",
-          image: c.image || "/products/6.png",
-          productCount: c.productCount || 0,
-          featured: c.featured,
-          featuredImage: c.featuredImage || "",
-        })),
-      });
+      return NextResponse.json(
+        {
+          categories: categories.map((c) => ({
+            id: String(c._id),
+            name: c.name,
+            slug: c.slug,
+            description: c.description || "",
+            image: c.image || "/products/6.png",
+            productCount: c.productCount || 0,
+            featured: c.featured,
+            featuredImage: c.featuredImage || "",
+          })),
+        },
+        {
+          headers: {
+            "Cache-Control":
+              "private, no-cache, no-store, must-revalidate",
+          },
+        },
+      );
     }
   } catch {}
 
-  return NextResponse.json({
-    categories: FALLBACK_CATEGORIES.map((c) => ({
-      id: c.id,
-      name: c.name,
-      slug: c.slug,
-      description: c.description,
-      image: c.image,
-      productCount: c.designsCount,
-      featured: false,
-      featuredImage: "",
-    })),
-  });
+  return NextResponse.json(
+    {
+      categories: FALLBACK_CATEGORIES.map((c) => ({
+        id: c.id,
+        name: c.name,
+        slug: c.slug,
+        description: c.description,
+        image: c.image,
+        productCount: c.designsCount,
+        featured: false,
+        featuredImage: "",
+      })),
+    },
+    {
+      headers: {
+        "Cache-Control": "private, no-cache, no-store, must-revalidate",
+      },
+    },
+  );
 }

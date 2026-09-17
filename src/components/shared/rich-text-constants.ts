@@ -251,7 +251,7 @@ export function createTiptapExtensions(placeholder: string) {
     Placeholder.configure({
       placeholder: ({ node }) => {
         if (node.type.name === "figcaption") {
-          return "Add a caption…";
+          return "";
         }
 
         return placeholder;

@@ -8,6 +8,7 @@ import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
 import {
   getCategoryBySlug,
+  getDescendantSlugs,
   getSubcategories,
 } from "@/features/shop/actions/category-actions";
 import { generateSeoMetadata } from "@/lib/seo-helpers";
@@ -59,7 +60,12 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const categoryId = String((category as any)._id);
-  const subcategories = await getSubcategories(categoryId);
+
+  // Get all descendant slugs (category + subcategories) in one efficient query
+  const [subcategories, categorySlugs] = await Promise.all([
+    getSubcategories(categoryId),
+    getDescendantSlugs(categoryId),
+  ]);
 
   const brandSlug = Array.isArray(sp.brand)
     ? sp.brand
@@ -74,7 +80,7 @@ export default async function CategoryPage({
 
   const [{ products: rawProducts, total }, filterMeta] = await Promise.all([
     fetchStoreProducts({
-      categorySlug: slug,
+      categorySlugs,
       search: sp.search,
       brandSlug: brandSlug?.[0],
       priceRange,
@@ -88,7 +94,7 @@ export default async function CategoryPage({
   const filteredBrands = filterMeta.brands.filter((b) => {
     return products.some(
       (p) =>
-        p.categorySlug === slug ||
+        categorySlugs.includes(p.categorySlug) ||
         p.specifications?.some(
           (s) =>
             s.key === "Brand" && s.value.toLowerCase() === b.name.toLowerCase(),

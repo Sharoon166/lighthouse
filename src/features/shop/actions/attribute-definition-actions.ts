@@ -81,6 +81,7 @@ export async function createAttributeDefinition(
 
     revalidatePath("/admin/attributes");
     revalidatePath("/admin/categories");
+    revalidatePath("/admin/products");
 
     return { ok: true, key, id: String(created._id) };
   } catch (error) {
@@ -136,6 +137,7 @@ export async function updateAttributeDefinition(
 
     revalidatePath("/admin/attributes");
     revalidatePath("/admin/categories");
+    revalidatePath("/admin/products");
 
     return { ok: true, key: existing.key, id: String(existing._id) };
   } catch (error) {
@@ -194,6 +196,7 @@ export async function deleteAttributeDefinition(
 
   revalidatePath("/admin/attributes");
   revalidatePath("/admin/categories");
+  revalidatePath("/admin/products");
 
   return { ok: true, message: "Attribute deleted." };
 }

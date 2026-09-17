@@ -486,7 +486,7 @@
   }
 
   .blog-prose .tiptap figcaption:empty::before {
-    content: "Add a caption…";
+    content: "";
     color: var(--muted-foreground);
     opacity: 0.6;
     pointer-events: none;

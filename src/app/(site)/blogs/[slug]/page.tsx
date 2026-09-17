@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ScrollToTop } from "@/components/shared/scroll-to-top";
 import { getBlogPost, listBlogPosts } from "@/features/blog/actions";
 import { BlogPostDetail } from "@/features/blog/components/blog-post-detail";
 import {
@@ -63,6 +64,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
+      <ScrollToTop />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

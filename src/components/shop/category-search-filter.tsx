@@ -95,6 +95,7 @@ export function CategorySearchFilter({
               src={category.image || "/wall-lights.png"}
               alt={category.name}
               fill
+              unoptimized
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               loading="lazy"
               className="object-cover object-top transition-transform duration-500 group-hover:scale-105"

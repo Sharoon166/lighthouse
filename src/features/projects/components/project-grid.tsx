@@ -2,7 +2,8 @@
 
 import { FolderOpenIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Pagination } from "@/components/shared/pagination";
 import {
   Empty,
   EmptyDescription,
@@ -13,9 +14,12 @@ import {
 import { ProjectCard, type ProjectItem } from "./project-card";
 import { ProjectFilters } from "./project-filters";
 
+const PAGE_SIZE = 9;
+
 export function ProjectGrid({ projects }: { projects: ProjectItem[] }) {
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
 
   const filtered = projects.filter((p) => {
     const matchesCategory =
@@ -27,19 +31,37 @@ export function ProjectGrid({ projects }: { projects: ProjectItem[] }) {
     return matchesCategory && matchesSearch;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
+  // Reset to page 1 when filters change
+  const handleCategoryChange = (cat: string) => {
+    setCategory(cat);
+    setPage(1);
+  };
+
+  const handleSearchChange = (val: string) => {
+    setSearch(val);
+    setPage(1);
+  };
+
+  const paginatedProjects = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filtered.slice(start, start + PAGE_SIZE);
+  }, [filtered, page]);
+
   return (
     <>
       <ProjectFilters
         activeCategory={category}
-        onCategoryChange={setCategory}
+        onCategoryChange={handleCategoryChange}
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={handleSearchChange}
         count={filtered.length}
       />
       <div className="container pb-12 md:pb-16">
-        {filtered.length > 0 ? (
+        {paginatedProjects.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((project) => (
+            {paginatedProjects.map((project) => (
               <ProjectCard
                 key={project.id}
                 project={project}
@@ -59,6 +81,18 @@ export function ProjectGrid({ projects }: { projects: ProjectItem[] }) {
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
+        )}
+
+        {totalPages > 1 && (
+          <div className="mt-12">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={filtered.length}
+              pageSize={PAGE_SIZE}
+              onPageChange={setPage}
+            />
+          </div>
         )}
       </div>
     </>

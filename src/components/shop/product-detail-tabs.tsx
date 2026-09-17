@@ -3,14 +3,20 @@
 import { StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { ShopProductItem } from "@/lib/shop-data";
 
 interface ProductDetailTabsProps {
   product: ShopProductItem;
+  descriptionContent?: ReactNode;
+  specificationsContent?: ReactNode;
 }
 
-export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
+export function ProductDetailTabs({
+  product,
+  descriptionContent,
+  specificationsContent,
+}: ProductDetailTabsProps) {
   const [activeTab, setActiveTab] = useState<
     "description" | "specifications" | "reviews"
   >("description");
@@ -20,9 +26,12 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
   return (
     <div className="space-y-8 bg-muted">
       {/* Tabs Bar */}
-      <div className="flex items-center gap-8 border-b border-border/60">
+      <nav role="tablist" className="flex items-center gap-8 border-b border-border/60">
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === "description"}
+          aria-controls="panel-description"
           onClick={() => setActiveTab("description")}
           className={`relative font-medium transition-colors pb-3 ${
             activeTab === "description"
@@ -35,6 +44,9 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
         <button
           type="button"
+          role="tab"
+          aria-selected={activeTab === "specifications"}
+          aria-controls="panel-specifications"
           onClick={() => setActiveTab("specifications")}
           className={`relative font-medium transition-colors pb-3 ${
             activeTab === "specifications"
@@ -47,7 +59,9 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
         <button
           type="button"
-          onClick={() => setActiveTab("reviews")}
+          role="tab"
+          aria-selected={activeTab === "reviews"}
+          aria-controls="panel-reviews"
           className={`hidden relative font-medium transition-colors pb-3 ${
             activeTab === "reviews"
               ? "text-foreground font-semibold border-b-2 border-gold"
@@ -56,27 +70,33 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
         >
           Reviews ({product.reviews.length || 3})
         </button>
-      </div>
+      </nav>
 
       {/* Tab 1: Description Content */}
       {activeTab === "description" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-7 space-y-4">
-            <span className="text-xs font-semibold uppercase tracking-widest text-gold">
-              DESIGN &amp; CRAFTSMANSHIP
-            </span>
-            <h3 className="font-serif leading-none font-normal text-foreground">
-              Crafted for the spaces that matter most
-            </h3>
-            <p className="text-muted-foreground leading-relaxed">
-              {product.description}
-            </p>
-            <p className="text-muted-foreground leading-relaxed">
-              Each piece is meticulously inspected for quality, ensuring smooth
-              movement across all joints and flawless luster across the
-              lacquered metal surfaces.
-            </p>
-          </div>
+        <div
+          id="panel-description"
+          role="tabpanel"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+        >
+          {descriptionContent ?? (
+            <div className="lg:col-span-7 space-y-4">
+              <span className="text-xs font-semibold uppercase tracking-widest text-gold">
+                DESIGN &amp; CRAFTSMANSHIP
+              </span>
+              <h3 className="font-serif leading-none font-normal text-foreground">
+                Crafted for the spaces that matter most
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                {product.description}
+              </p>
+              <p className="text-muted-foreground leading-relaxed">
+                Each piece is meticulously inspected for quality, ensuring smooth
+                movement across all joints and flawless luster across the
+                lacquered metal surfaces.
+              </p>
+            </div>
+          )}
           <div className="lg:col-span-5 relative aspect-square">
             <Image
               src={product.images[1] || product.images[0] || "/products/2.png"}
@@ -90,34 +110,40 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
       {/* Tab 2: Specifications Content */}
       {activeTab === "specifications" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          <div className="lg:col-span-7 space-y-6">
-            <span className="text-xs font-semibold uppercase tracking-widest text-gold">
-              TECHNICAL SPECIFICATIONS
-            </span>
-            <h3 className="font-serif leading-none font-normal text-foreground">
-              Built to last. Specified to perform.
-            </h3>
-            <p className="text-muted-foreground leading-relaxed">
-              Every dimension and material choice in the {product.name} is
-              deliberate. Solid brass construction, linen diffusion, and a
-              weighted marble base are the result of a two-year development
-              process focused entirely on longevity and light quality.
-            </p>
+        <div
+          id="panel-specifications"
+          role="tabpanel"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+        >
+          {specificationsContent ?? (
+            <div className="lg:col-span-7 space-y-6">
+              <span className="text-xs font-semibold uppercase tracking-widest text-gold">
+                TECHNICAL SPECIFICATIONS
+              </span>
+              <h3 className="font-serif leading-none font-normal text-foreground">
+                Built to last. Specified to perform.
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Every dimension and material choice in the {product.name} is
+                deliberate. Solid brass construction, linen diffusion, and a
+                weighted marble base are the result of a two-year development
+                process focused entirely on longevity and light quality.
+              </p>
 
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
-              {product.specifications.map((spec) => (
-                <div key={spec.key} className="space-y-1">
-                  <dt className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                    {spec.key}
-                  </dt>
-                  <dd className="text-xl font-medium text-black font-heading">
-                    {spec.value}
-                  </dd>
-                </div>
-              ))}
+              <dl className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
+                {product.specifications.map((spec) => (
+                  <div key={spec.key} className="space-y-1">
+                    <dt className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                      {spec.key}
+                    </dt>
+                    <dd className="text-xl font-medium text-black font-heading">
+                      {spec.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-          </div>
+          )}
           <div className="lg:col-span-5 relative aspect-square">
             <Image
               src={
@@ -136,7 +162,11 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
 
       {/* Tab 3: Reviews Content matching Image 4 */}
       {activeTab === "reviews" && (
-        <div className="space-y-8">
+        <div
+          id="panel-reviews"
+          role="tabpanel"
+          className="space-y-8"
+        >
           {/* Summary Box & Star breakdown */}
           <div className="flex flex-col sm:flex-row items-stretch gap-6 rounded-xl border border-border/60 bg-muted/10 p-6">
             {/* Rating score box */}
@@ -194,12 +224,10 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
           </div>
 
           {/* Review List matching Image 4 */}
-          <div className="space-y-4">
+          <ul className="space-y-4">
             {product.reviews.map((rev) => (
-              <div
-                key={rev.id}
-                className="rounded-xl border border-border/60 bg-card p-6 space-y-3"
-              >
+              <li key={rev.id}>
+                <article className="rounded-xl border border-border/60 bg-card p-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-heading font-semibold text-base text-foreground">
@@ -229,9 +257,10 @@ export function ProductDetailTabs({ product }: ProductDetailTabsProps) {
                 <p className="text-sm text-foreground/80 leading-relaxed">
                   {rev.comment}
                 </p>
-              </div>
+                </article>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
     </div>

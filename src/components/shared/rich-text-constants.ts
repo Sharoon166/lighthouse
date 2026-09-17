@@ -361,3 +361,25 @@ export function addHeadingIdsToHtml(html: string): string {
     },
   );
 }
+
+/**
+ * Server-side rendering of TipTap JSON content to HTML.
+ * Uses generateHTML from @tiptap/html which is a pure function
+ * and can run on the server without browser APIs.
+ */
+export function renderTiptapToHtml(
+  content: unknown,
+  placeholder = "",
+): string {
+  // Dynamic import to avoid bundling @tiptap/html in client chunks
+  // but it IS safe to run on the server since it's a pure function
+  const { generateHTML } = require("@tiptap/html") as typeof import("@tiptap/html");
+  const raw = generateHTML(
+    (content as import("@tiptap/react").JSONContent) ?? {
+      type: "doc",
+      content: [],
+    },
+    createTiptapExtensions(placeholder),
+  );
+  return addHeadingIdsToHtml(raw);
+}

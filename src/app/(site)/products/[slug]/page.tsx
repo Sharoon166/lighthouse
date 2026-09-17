@@ -106,7 +106,55 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
         <section className="bg-muted">
           <div className="container">
-            <ProductDetailTabs product={product} />
+            <ProductDetailTabs
+              product={product}
+              descriptionContent={
+                <div className="lg:col-span-7 space-y-4">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gold">
+                    DESIGN &amp; CRAFTSMANSHIP
+                  </span>
+                  <h3 className="font-serif leading-none font-normal text-foreground">
+                    Crafted for the spaces that matter most
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {product.description}
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Each piece is meticulously inspected for quality, ensuring
+                    smooth movement across all joints and flawless luster across
+                    the lacquered metal surfaces.
+                  </p>
+                </div>
+              }
+              specificationsContent={
+                <div className="lg:col-span-7 space-y-6">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gold">
+                    TECHNICAL SPECIFICATIONS
+                  </span>
+                  <h3 className="font-serif leading-none font-normal text-foreground">
+                    Built to last. Specified to perform.
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Every dimension and material choice in the {product.name} is
+                    deliberate. Solid brass construction, linen diffusion, and a
+                    weighted marble base are the result of a two-year development
+                    process focused entirely on longevity and light quality.
+                  </p>
+                  <dl className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
+                    {product.specifications.map((spec) => (
+                      <div key={spec.key} className="space-y-1">
+                        <dt className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                          {spec.key}
+                        </dt>
+                        <dd className="text-xl font-medium text-black font-heading">
+                          {spec.value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              }
+            />
           </div>
         </section>
 
@@ -125,15 +173,16 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {relatedProducts.map((relProduct) => (
-                  <ProductCard
-                    key={relProduct.id}
-                    product={relProduct}
-                    showQuickView
-                  />
+                  <li key={relProduct.id}>
+                    <ProductCard
+                      product={relProduct}
+                      showQuickView
+                    />
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </section>
 

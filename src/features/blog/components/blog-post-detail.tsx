@@ -5,12 +5,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { CTA } from "@/components/hero/cta";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
-import { RichTextPreview } from "@/components/shared/rich-text-preview";
+import {
+  renderTiptapToHtml,
+  tiptapContentClassName,
+} from "@/components/shared/rich-text-constants";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { calculateReadingTime } from "@/features/blog/seo-helpers";
 import { formatDate } from "@/lib/date-utils";
-import { slugify } from "@/lib/utils";
+import { cn, slugify } from "@/lib/utils";
 import type { BlogPostDraftData, BlogPostListItem } from "../actions";
 import { BlogCard } from "./blog-card";
 import { HeroActions } from "./hero-actions";
@@ -137,7 +140,7 @@ export function BlogPostDetail({
 
       {/* Hero Image */}
       {post.heroImage && (
-        <div className="container relative aspect-2/1 w-full overflow-hidden bg-muted">
+        <figure className="container relative aspect-2/1 w-full overflow-hidden bg-muted">
           <Image
             src={post.heroImage.url}
             alt={post.title}
@@ -146,7 +149,7 @@ export function BlogPostDetail({
             sizes="100vw"
             className="object-cover"
           />
-        </div>
+        </figure>
       )}
 
       {/* Mobile TOC - Collapsible */}
@@ -190,12 +193,17 @@ export function BlogPostDetail({
           </aside>
 
           {/* Main Content */}
-          <div className="min-w-0">
-            <div className="prose prose-lg prose-slate max-w-none dark:prose-invert">
-              <RichTextPreview content={post.content as JSONContent} />
+          <section className="min-w-0">
+            <div className={cn(tiptapContentClassName, "prose prose-lg prose-slate max-w-none dark:prose-invert")}>
+              <div
+                className="tiptap"
+                dangerouslySetInnerHTML={{
+                  __html: renderTiptapToHtml(post.content),
+                }}
+              />
             </div>
             <div className="mt-16 p-6 md:p-8 border-t space-y-4">
-              <h4 className="text-2xl font-semibold uppercase">Tagged</h4>
+              <h2 className="text-2xl font-semibold uppercase">Tagged</h2>
               <div className=" flex flex-wrap items-center gap-2">
                 {post.tags.map((tag) => (
                   <Badge key={tag} variant="outline">
@@ -205,7 +213,7 @@ export function BlogPostDetail({
               </div>
             </div>
             {/* Author Bio */}
-            <div className="mt-6 p-6 md:p-8 border-t">
+            <footer className="mt-6 p-6 md:p-8 border-t">
               <div className="flex items-start gap-4">
                 <Avatar className="size-16 shrink-0 md:size-20">
                   <AvatarFallback className="bg-primary/10 text-lg font-medium text-primary">
@@ -231,8 +239,8 @@ export function BlogPostDetail({
                   )}
                 </div>
               </div>
-            </div>
-          </div>
+            </footer>
+          </section>
 
           {/* Right Sidebar - Recent Posts */}
           <aside className="hidden xl:block">
@@ -241,10 +249,10 @@ export function BlogPostDetail({
                 Recent Posts
               </h3>
               {recentPosts.length > 0 ? (
-                <div className="space-y-4">
+                <ul className="space-y-4">
                   {recentPosts.map((rp) => (
+                    <li key={rp.id}>
                     <Link
-                      key={rp.id}
                       href={`/blogs/${rp.slug}`}
                       className="group block"
                     >
@@ -263,8 +271,9 @@ export function BlogPostDetail({
                         {rp.title}
                       </h4>
                     </Link>
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   No recent posts yet.
@@ -290,11 +299,13 @@ export function BlogPostDetail({
               <HugeiconsIcon icon={ArrowRight01Icon} size={14} />
             </Link>
           </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {relatedPosts.map((post) => (
-              <BlogCard key={post.id} post={post} />
+              <li key={post.id}>
+                <BlogCard post={post} />
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
       )}
       <div className="container">

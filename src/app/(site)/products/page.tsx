@@ -3,7 +3,11 @@ import { CTA } from "@/components/hero/cta";
 import { PageHero } from "@/components/shared/page-hero";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
-import { getCategoryTree } from "@/features/shop/actions/category-actions";
+import {
+  getCategoryBySlug,
+  getCategoryTree,
+  getDescendantSlugs,
+} from "@/features/shop/actions/category-actions";
 import {
   fetchFilterMetadata,
   fetchStoreProducts,
@@ -54,6 +58,17 @@ export default async function ProductsPage({
       : undefined;
   const sortBy = params.sort;
 
+  // Expand category to include all subcategory descendants
+  let categorySlugs: string[] | undefined;
+  if (categorySlug && categorySlug !== "all") {
+    const category = await getCategoryBySlug(categorySlug);
+    if (category) {
+      categorySlugs = await getDescendantSlugs(String((category as any)._id));
+    } else {
+      categorySlugs = [categorySlug];
+    }
+  }
+
   const [
     { products: rawProducts, total },
     filterMeta,
@@ -61,7 +76,7 @@ export default async function ProductsPage({
     categoryTree,
   ] = await Promise.all([
     fetchStoreProducts({
-      categorySlug,
+      categorySlugs,
       search,
       brandSlug: brandSlug?.[0],
       priceRange,
@@ -78,7 +93,7 @@ export default async function ProductsPage({
   );
 
   const showNewArrivals =
-    !categorySlug &&
+    !categorySlugs &&
     !search &&
     !brandSlug?.length &&
     !priceRange?.length &&

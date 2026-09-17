@@ -10,14 +10,6 @@ const variantInputSchema = z.object({
       FIELD_LIMITS.variant.sku,
       `SKU must be ${FIELD_LIMITS.variant.sku} characters or fewer`,
     ),
-  name: z
-    .string()
-    .trim()
-    .min(1, "Variant name is required")
-    .max(
-      FIELD_LIMITS.name.medium,
-      `Name must be ${FIELD_LIMITS.name.medium} characters or fewer`,
-    ),
   attributes: z.record(z.string(), z.string()),
   colorHex: z.string().optional().default(""),
   price: z.number().min(0, "Price must be 0 or greater"),
@@ -35,15 +27,6 @@ const variantDraftInputSchema = z.object({
     .max(
       FIELD_LIMITS.variant.sku,
       `SKU must be ${FIELD_LIMITS.variant.sku} characters or fewer`,
-    )
-    .optional()
-    .default(""),
-  name: z
-    .string()
-    .trim()
-    .max(
-      FIELD_LIMITS.name.medium,
-      `Name must be ${FIELD_LIMITS.name.medium} characters or fewer`,
     )
     .optional()
     .default(""),

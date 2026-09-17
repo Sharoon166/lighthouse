@@ -156,10 +156,6 @@ function optionKey(attrs: Record<string, string>, keys: string[]): string {
   return keys.map((k) => attrs[k] ?? "").join("||");
 }
 
-function buildVariantName(attrs: Record<string, string>): string {
-  return Object.values(attrs).filter(Boolean).join(" / ");
-}
-
 function readBaseAttr(
   base: Map<string, string> | Record<string, string> | undefined,
   key: string,
@@ -495,7 +491,6 @@ export function ProductForm({
         return {
           _id: v._id ? String(v._id) : undefined,
           sku: v.sku,
-          name: v.title ?? "",
           attributes: attrs,
           colorHex: v.colorHex || "",
           price: v.price,
@@ -643,13 +638,11 @@ export function ProductForm({
         if (existing) {
           return {
             ...existing,
-            name: buildVariantName(attrs),
             colorHex: colorHex || existing.colorHex,
           };
         }
         return {
           sku: "",
-          name: buildVariantName(attrs),
           attributes: attrs,
           colorHex,
           price: 0,
@@ -766,7 +759,6 @@ export function ProductForm({
     isFeatured,
     variants: variants.map((v) => ({
       sku: v.sku,
-      name: v.name,
       attributes: v.attributes,
       colorHex: v.colorHex || "",
       price: v.price,

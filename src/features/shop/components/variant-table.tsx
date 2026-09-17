@@ -38,7 +38,6 @@ import { Switch } from "@/components/ui/switch";
 export interface VariantRow {
   _id?: string;
   sku: string;
-  name: string;
   attributes: Record<string, string>;
   colorHex: string;
   price: number;
@@ -142,7 +141,6 @@ export function VariantTable({
   const addVariant = () => {
     const newVariant: VariantRow = {
       sku: "",
-      name: "",
       attributes: {},
       colorHex: "",
       price: 0,
@@ -406,7 +404,6 @@ function VariantRow({
   fieldErrors?: Record<string, string[] | undefined>;
 }) {
   const skuError = fieldErrors?.[`variants.${index}.sku`]?.[0];
-  const nameError = fieldErrors?.[`variants.${index}.name`]?.[0];
   const canToggleOptions = optionKeys.length > 0;
 
   return (

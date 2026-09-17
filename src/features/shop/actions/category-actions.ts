@@ -547,6 +547,19 @@ export async function getCategoryTree(opts?: {
     }
   }
 
+  // Compute cumulative product counts (own + all descendants)
+  function computeCounts(node: CategoryTreeNode): number {
+    let total = node.productCount;
+    for (const child of node.children) {
+      total += computeCounts(child);
+    }
+    node.productCount = total;
+    return total;
+  }
+  for (const root of roots) {
+    computeCounts(root);
+  }
+
   return roots;
 }
 

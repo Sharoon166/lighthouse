@@ -153,12 +153,15 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
     isFeatured: data.isFeatured,
     variants: data.variants.map((v, index) => ({
       sku: v.sku,
-      slug: slugify(v.name),
+      slug: slugify(
+        Object.values(v.attributes).filter(Boolean).join(" ") || data.name,
+      ),
       gtin: "",
       mpn: "",
       attributes: new Map(Object.entries(v.attributes)),
       colorHex: v.colorHex || "",
-      title: v.name,
+      title:
+        Object.values(v.attributes).filter(Boolean).join(" / ") || data.name,
       price: v.price,
       salePrice: v.salePrice != null ? v.salePrice : undefined,
       costPrice: v.costPrice != null ? v.costPrice : 0,

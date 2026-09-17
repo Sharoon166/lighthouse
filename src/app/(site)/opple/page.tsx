@@ -3,7 +3,11 @@ import { CTA } from "@/components/hero/cta";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
 import { ProductFiltersSidebar } from "@/components/shop/product-filters-sidebar";
 import { ProductGridToolbar } from "@/components/shop/product-grid-toolbar";
-import { getCategoryTree } from "@/features/shop/actions/category-actions";
+import {
+  getCategoryBySlug,
+  getCategoryTree,
+  getDescendantSlugs,
+} from "@/features/shop/actions/category-actions";
 import { fetchFilterMetadata, fetchStoreProducts } from "@/lib/shop-data";
 
 export const metadata: Metadata = {
@@ -42,10 +46,21 @@ export default async function OpplePage({ searchParams }: OpplePageProps) {
       : undefined;
   const sortBy = params.sort;
 
+  // Expand category to include all subcategory descendants
+  let categorySlugs: string[] | undefined;
+  if (categorySlug && categorySlug !== "all") {
+    const category = await getCategoryBySlug(categorySlug);
+    if (category) {
+      categorySlugs = await getDescendantSlugs(String((category as any)._id));
+    } else {
+      categorySlugs = [categorySlug];
+    }
+  }
+
   const [{ products: rawProducts, total }, filterMeta, categoryTree] =
     await Promise.all([
       fetchStoreProducts({
-        categorySlug,
+        categorySlugs,
         brandSlug: "opple",
         search,
         priceRange,

@@ -63,14 +63,20 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     description: product.shortDescription || product.description,
     slug: product.slug,
     image: product.images[0] || "",
-    price: product.price,
     currency: "PKR",
-    availability: product.inStock ? "in_stock" : "out_of_stock",
     brand:
       product.specifications.find((s) => s.key === "Brand")?.value ||
       "Lighthouse",
     category: product.categoryName,
-    sku: product.variants.find((v) => v.sku)?.sku || product.slug,
+    variants: product.variants.map((v) => ({
+      sku: v.sku || product.slug,
+      name: `${product.name} — ${Object.values(v.attributes).join(", ")}`,
+      price: v.price,
+      salePrice: v.salePrice,
+      images: v.images,
+      availability: v.availability,
+      attributes: v.attributes,
+    })),
     ...(product.ratings.count > 0
       ? { rating: product.ratings.average, ratingCount: product.ratings.count }
       : {}),

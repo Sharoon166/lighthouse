@@ -167,7 +167,7 @@ export function ProductDetailTabs({
           role="tabpanel"
           className="space-y-8"
         >
-          {/* Summary Box & Star breakdown */}
+          {/* Summary Box */}
           <div className="flex flex-col sm:flex-row items-stretch gap-6 rounded-xl border border-border/60 bg-muted/10 p-6">
             {/* Rating score box */}
             <div className="flex flex-col items-center justify-center rounded-lg border border-border/60 bg-background p-6 text-center sm:w-48 shrink-0">
@@ -187,39 +187,6 @@ export function ProductDetailTabs({
               <span className="text-xs text-muted-foreground">
                 {totalReviewsCount} reviews
               </span>
-            </div>
-
-            {/* Star Distribution bars matching Image 4 */}
-            <div className="flex-1 space-y-2 justify-center flex flex-col">
-              {product.ratings.distribution.map((dist) => {
-                const percent = Math.round(
-                  (dist.count / totalReviewsCount) * 100,
-                );
-                return (
-                  <div
-                    key={dist.stars}
-                    className="flex items-center gap-3 text-xs"
-                  >
-                    <span className="w-3 text-right font-medium text-foreground">
-                      {dist.stars}
-                    </span>
-                    <HugeiconsIcon
-                      icon={StarIcon}
-                      size={12}
-                      className="fill-amber-400 text-amber-400 shrink-0"
-                    />
-                    <div className="h-2 flex-1 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-gold"
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                    <span className="w-6 text-right text-muted-foreground">
-                      {dist.count}
-                    </span>
-                  </div>
-                );
-              })}
             </div>
           </div>
 

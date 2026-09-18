@@ -496,6 +496,8 @@ const listBlogPostsSchema = z.object({
   status: z.enum(["all", "draft", "published"]).default("all"),
   category: z.string().trim().default(""),
   tag: z.string().trim().max(100).default(""),
+  /** Exclude a specific post ID (e.g. the featured post) from count & results */
+  excludeId: z.string().trim().default(""),
 });
 
 export type BlogPostListItem = {
@@ -531,7 +533,7 @@ export async function listBlogPosts(
   input: unknown,
 ): Promise<BlogPostListResult> {
   const parsed = listBlogPostsSchema.safeParse(input);
-  const { page, pageSize, search, status, category, tag } = parsed.success
+  const { page, pageSize, search, status, category, tag, excludeId } = parsed.success
     ? parsed.data
     : {
         page: 1,
@@ -554,6 +556,9 @@ export async function listBlogPosts(
   }
   if (tag) {
     filter.tags = { $in: [tag] };
+  }
+  if (excludeId) {
+    filter._id = { $ne: excludeId };
   }
 
   await connectToDatabase();

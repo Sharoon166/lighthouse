@@ -65,48 +65,118 @@ export function generateSeoMetadata({
   };
 }
 
+interface ProductJsonLdVariant {
+  sku: string;
+  name: string;
+  price: number;
+  salePrice?: number;
+  images: string[];
+  availability: "in_stock" | "out_of_stock" | "preorder" | "backorder";
+  attributes: Record<string, string>;
+}
+
 export function generateProductJsonLd(product: {
   name: string;
   description: string;
   slug: string;
   image: string;
-  price: number;
   currency: string;
-  availability: "in_stock" | "out_of_stock";
   brand: string;
   category: string;
-  sku: string;
+  variants: ProductJsonLdVariant[];
   rating?: number;
   ratingCount?: number;
 }) {
+  const productUrl = `${siteUrl}/products/${product.slug}`;
+
+  const availabilityMap: Record<string, string> = {
+    in_stock: "https://schema.org/InStock",
+    out_of_stock: "https://schema.org/OutOfStock",
+    preorder: "https://schema.org/PreOrder",
+    backorder: "https://schema.org/BackOrder",
+  };
+
+  // Single variant or no variants → plain Product
+  if (product.variants.length <= 1) {
+    const v = product.variants[0];
+    return {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.name,
+      description: product.description,
+      image: v?.images?.length ? v.images : [product.image],
+      sku: v?.sku || product.slug,
+      brand: { "@type": "Brand", name: product.brand },
+      category: product.category,
+      offers: {
+        "@type": "Offer",
+        url: productUrl,
+        priceCurrency: product.currency,
+        price: v?.salePrice || v?.price || 0,
+        availability: availabilityMap[v?.availability || "in_stock"],
+      },
+      ...(product.rating && product.ratingCount
+        ? {
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: product.rating,
+              reviewCount: product.ratingCount,
+            },
+          }
+        : {}),
+    };
+  }
+
+  // Multiple variants → ProductGroup with hasVariant
+  const hasVariant = product.variants.map((v) => ({
+    "@type": "Product" as const,
+    name: `${product.name} — ${Object.entries(v.attributes)
+      .map(([, val]) => val)
+      .join(", ")}`,
+    image: v.images.length ? v.images : [product.image],
+    sku: v.sku,
+    additionalProperty: Object.entries(v.attributes).map(
+      ([key, val]) => ({
+        "@type": "PropertyValue" as const,
+        name: key,
+        value: val,
+      }),
+    ),
+    offers: {
+      "@type": "Offer" as const,
+      url: productUrl,
+      priceCurrency: product.currency,
+      price: v.salePrice || v.price,
+      availability: availabilityMap[v.availability] || availabilityMap.in_stock,
+    },
+  }));
+
+  // Collect all unique attribute keys for variesBy
+  const variesByKeys = new Set<string>();
+  for (const v of product.variants) {
+    for (const key of Object.keys(v.attributes)) {
+      variesByKeys.add(key);
+    }
+  }
+
   return {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "ProductGroup",
     name: product.name,
     description: product.description,
-    image: product.image,
-    sku: product.sku,
-    brand: {
-      "@type": "Brand",
-      name: product.brand,
-    },
+    brand: { "@type": "Brand", name: product.brand },
     category: product.category,
-    offers: {
-      "@type": "Offer",
-      url: `${siteUrl}/products/${product.slug}`,
-      priceCurrency: product.currency,
-      price: product.price,
-      availability:
-        product.availability === "in_stock"
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-    },
-    ...(product.rating
+    productGroupID: product.slug,
+    variesBy: Array.from(variesByKeys).map(
+      (key) => `https://schema.org/${key.toLowerCase()}`,
+    ),
+    hasVariant,
+    ...(product.rating && product.ratingCount
       ? {
           aggregateRating: {
             "@type": "AggregateRating",
             ratingValue: product.rating,
-            reviewCount: product.ratingCount || 1,
+            reviewCount: product.ratingCount,
           },
         }
       : {}),

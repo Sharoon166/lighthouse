@@ -62,7 +62,6 @@ export interface ShopProductItem {
   ratings: {
     average: number;
     count: number;
-    distribution: { stars: number; count: number }[];
   };
   reviews: {
     id: string;
@@ -289,13 +288,6 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     ratings: {
       average: 4.8,
       count: 24,
-      distribution: [
-        { stars: 5, count: 19 },
-        { stars: 4, count: 4 },
-        { stars: 3, count: 1 },
-        { stars: 2, count: 1 },
-        { stars: 1, count: 1 },
-      ],
     },
     reviews: [
       {
@@ -400,13 +392,6 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     ratings: {
       average: 4.9,
       count: 18,
-      distribution: [
-        { stars: 5, count: 16 },
-        { stars: 4, count: 2 },
-        { stars: 3, count: 0 },
-        { stars: 2, count: 0 },
-        { stars: 1, count: 0 },
-      ],
     },
     reviews: [],
     content: {
@@ -479,10 +464,6 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     ratings: {
       average: 4.7,
       count: 14,
-      distribution: [
-        { stars: 5, count: 11 },
-        { stars: 4, count: 3 },
-      ],
     },
     reviews: [],
     content: {
@@ -539,7 +520,6 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     ratings: {
       average: 5.0,
       count: 9,
-      distribution: [{ stars: 5, count: 9 }],
     },
     reviews: [],
     content: {
@@ -596,10 +576,6 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     ratings: {
       average: 4.8,
       count: 12,
-      distribution: [
-        { stars: 5, count: 10 },
-        { stars: 4, count: 2 },
-      ],
     },
     reviews: [],
     content: {
@@ -655,10 +631,6 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
     ratings: {
       average: 4.6,
       count: 8,
-      distribution: [
-        { stars: 5, count: 6 },
-        { stars: 4, count: 2 },
-      ],
     },
     reviews: [],
     content: {
@@ -782,26 +754,68 @@ async function fetchHomepageCategoriesUncached(): Promise<HomepageCategory[]> {
   try {
     await connectToDatabase();
 
-    const categories = await CategoryModel.find({
+    const allCategories = await CategoryModel.find({
       slug: { $in: HOMEPAGE_CATEGORY_SLUGS },
       isActive: true,
-    }).lean();
+    })
+      .sort({ level: 1, sortOrder: 1, name: 1 })
+      .lean({ serialize: true });
 
-    if (categories.length !== HOMEPAGE_CATEGORY_SLUGS.length) {
+    if (allCategories.length !== HOMEPAGE_CATEGORY_SLUGS.length) {
       return HOMEPAGE_FALLBACK_CATEGORIES;
     }
 
-    const counts = await ProductModel.aggregate([
-      { $match: { status: "active", deletedAt: null } },
-      { $group: { _id: "$category.slug", count: { $sum: 1 } } },
-    ]);
+    // Also fetch ALL active categories to build tree for cumulative counts
+    const allActiveCategories = await CategoryModel.find({ isActive: true })
+      .sort({ level: 1, sortOrder: 1, name: 1 })
+      .lean({ serialize: true });
 
-    const countMap = new Map<string, number>();
-    for (const entry of counts) {
-      countMap.set(entry._id, entry.count);
+    // Build tree and compute cumulative counts
+    type TreeNode = {
+      id: string;
+      parentId: string | null;
+      productCount: number;
+      children: TreeNode[];
+    };
+    const nodeMap = new Map<string, TreeNode>();
+    for (const c of allActiveCategories) {
+      nodeMap.set(String(c._id), {
+        id: String(c._id),
+        parentId: c.parent ? String(c.parent) : null,
+        productCount: c.productCount || 0,
+        children: [],
+      });
     }
+    const roots: TreeNode[] = [];
+    for (const node of nodeMap.values()) {
+      if (node.parentId && nodeMap.has(node.parentId)) {
+        nodeMap.get(node.parentId)!.children.push(node);
+      } else {
+        roots.push(node);
+      }
+    }
+    function computeCounts(node: TreeNode): number {
+      let total = node.productCount;
+      for (const child of node.children) {
+        total += computeCounts(child);
+      }
+      node.productCount = total;
+      return total;
+    }
+    for (const root of roots) {
+      computeCounts(root);
+    }
+    const countBySlug = new Map<string, number>();
+    function flatten(nodes: TreeNode[]) {
+      for (const node of nodes) {
+        const cat = allActiveCategories.find((c) => String(c._id) === node.id);
+        if (cat) countBySlug.set(cat.slug, node.productCount);
+        flatten(node.children);
+      }
+    }
+    flatten(roots);
 
-    const categoryMap = new Map(categories.map((c) => [c.slug, c]));
+    const categoryMap = new Map(allCategories.map((c) => [c.slug, c]));
 
     return HOMEPAGE_CATEGORY_SLUGS.map((slug) => {
       const c = categoryMap.get(slug)!;
@@ -810,7 +824,7 @@ async function fetchHomepageCategoriesUncached(): Promise<HomepageCategory[]> {
         title: c.name,
         slug: c.slug,
         href: `/categories/${c.slug}`,
-        items: countMap.get(c.slug) ?? 0,
+        items: countBySlug.get(slug) ?? 0,
       };
     });
   } catch (error) {
@@ -1066,26 +1080,12 @@ export async function fetchStoreProducts(
           variants,
           ratings: p.ratings?.count
             ? {
-                average: p.ratings.average || 4.8,
-                count: p.ratings.count || 12,
-                distribution: [
-                  {
-                    stars: 5,
-                    count: Math.round((p.ratings.count || 12) * 0.8),
-                  },
-                  {
-                    stars: 4,
-                    count: Math.round((p.ratings.count || 12) * 0.2),
-                  },
-                ],
+                average: p.ratings.average || 0,
+                count: p.ratings.count,
               }
             : {
-                average: 4.8,
-                count: 15,
-                distribution: [
-                  { stars: 5, count: 12 },
-                  { stars: 4, count: 3 },
-                ],
+                average: 0,
+                count: 0,
               },
           reviews: [],
           content: {
@@ -1258,26 +1258,12 @@ function mapDbProductToShopItem(p: any): ShopProductItem {
     variants,
     ratings: p.ratings?.count
       ? {
-          average: p.ratings.average || 4.8,
-          count: p.ratings.count || 12,
-          distribution: [
-            {
-              stars: 5,
-              count: Math.round((p.ratings.count || 12) * 0.8),
-            },
-            {
-              stars: 4,
-              count: Math.round((p.ratings.count || 12) * 0.2),
-            },
-          ],
+          average: p.ratings.average || 0,
+          count: p.ratings.count,
         }
       : {
-          average: 4.8,
-          count: 15,
-          distribution: [
-            { stars: 5, count: 12 },
-            { stars: 4, count: 3 },
-          ],
+          average: 0,
+          count: 0,
         },
     reviews: [],
     content: {

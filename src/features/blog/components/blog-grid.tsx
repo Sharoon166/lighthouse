@@ -90,6 +90,7 @@ export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
       search: debouncedSearch,
       status: "published",
       category: activeCategory === "all" ? "" : activeCategory,
+      excludeId: featuredPost?.id ?? "",
     })
       .then((result) => {
         if (!cancelled) setData(result);

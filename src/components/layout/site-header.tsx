@@ -578,7 +578,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
 
       <div
         className={cn(
-          "fixed inset-0 z-40 flex flex-col bg-background px-6 pb-8 pt-24 backdrop-blur-2xl",
+          "fixed inset-0 z-[60] flex flex-col bg-background px-6 pb-8 pt-24 backdrop-blur-2xl",
           "transition-all duration-300 ease-in-out md:hidden",
 
           mobileOpen

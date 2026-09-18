@@ -203,6 +203,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
   };
 
   return (
+    <>
     <header
       className={cn(
         "z-50 w-full transition-transform duration-300 ease-in-out",
@@ -571,6 +572,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           />
         </button>
       </div>
+    </header>
 
       {/* ================================================================
           MOBILE FULLSCREEN MENU
@@ -801,7 +803,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }
 

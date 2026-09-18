@@ -160,16 +160,14 @@ export function ProductDetailTabs({
         </div>
       )}
 
-      {/* Tab 3: Reviews Content matching Image 4 */}
+      {/* TODO: Re-enable when real review/rating data is implemented in DB
       {activeTab === "reviews" && (
         <div
           id="panel-reviews"
           role="tabpanel"
           className="space-y-8"
         >
-          {/* Summary Box */}
           <div className="flex flex-col sm:flex-row items-stretch gap-6 rounded-xl border border-border/60 bg-muted/10 p-6">
-            {/* Rating score box */}
             <div className="flex flex-col items-center justify-center rounded-lg border border-border/60 bg-background p-6 text-center sm:w-48 shrink-0">
               <span className="font-serif text-5xl font-bold text-foreground">
                 {product.ratings.average.toFixed(1)}
@@ -190,7 +188,6 @@ export function ProductDetailTabs({
             </div>
           </div>
 
-          {/* Review List matching Image 4 */}
           <ul className="space-y-4">
             {product.reviews.map((rev) => (
               <li key={rev.id}>
@@ -230,6 +227,7 @@ export function ProductDetailTabs({
           </ul>
         </div>
       )}
+      */}
     </div>
   );
 }

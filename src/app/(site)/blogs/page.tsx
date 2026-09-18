@@ -6,11 +6,11 @@ import { BlogGrid } from "@/features/blog/components/blog-grid";
 import { FeaturedBlogCard } from "@/features/blog/components/featured-blog-card";
 
 export const metadata: Metadata = {
-  title: "Blog | Lighthouse",
+  title: "Blogs | Lighthouse",
   description:
     "Expert lighting guides, interior design trends, and practical tips to help you choose and style fixtures for beautiful, functional spaces.",
   openGraph: {
-    title: "Blog | Lighthouse",
+    title: "Blogs | Lighthouse",
     description:
       "Expert lighting guides, interior design trends, and practical tips to help you choose and style fixtures for beautiful, functional spaces.",
     type: "website",

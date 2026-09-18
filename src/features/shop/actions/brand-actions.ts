@@ -1,6 +1,6 @@
 "use server";
 
-import type { QueryFilter } from "mongoose";
+import mongoose, { type QueryFilter } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdminForAction } from "@/lib/admin-guard";
@@ -252,6 +252,20 @@ export async function listBrands(input: unknown): Promise<BrandListResult> {
     createdAt: document.createdAt.toISOString(),
     updatedAt: document.updatedAt.toISOString(),
   }));
+
+  // Compute actual product counts from products collection
+  const brandIds = brands.map((b) => b.id);
+  const counts = await ProductModel.aggregate([
+    { $match: { "brand._id": { $in: brandIds.map((id) => new mongoose.Types.ObjectId(id)) }, deletedAt: null } },
+    { $group: { _id: "$brand._id", count: { $sum: 1 } } },
+  ]);
+  const countMap = new Map<string, number>();
+  for (const entry of counts) {
+    countMap.set(String(entry._id), entry.count);
+  }
+  for (const brand of brands) {
+    brand.productCount = countMap.get(brand.id) ?? 0;
+  }
 
   return {
     brands,

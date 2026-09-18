@@ -77,7 +77,7 @@ export function ProductDetailTabs({
         <div
           id="panel-description"
           role="tabpanel"
-          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
         >
           {descriptionContent ?? (
             <div className="lg:col-span-7 space-y-4">

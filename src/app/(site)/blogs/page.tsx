@@ -25,15 +25,15 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const [initialData, featuredPost] = await Promise.all([
-    listBlogPosts({
-      page: 1,
-      pageSize: 9,
-      search: "",
-      status: "published",
-    }),
-    getFeaturedPost(),
-  ]);
+  const featuredPost = await getFeaturedPost();
+
+  const initialData = await listBlogPosts({
+    page: 1,
+    pageSize: 9,
+    search: "",
+    status: "published",
+    excludeId: featuredPost?.id ?? "",
+  });
 
   return (
     <>

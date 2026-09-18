@@ -251,7 +251,7 @@ export const aboutStats = [
   { value: "180+", label: "PROJECTS DELIVERED" },
   { value: "98%", label: "CLIENT SATISFACTION" },
   { value: "40+", label: "CITIES SERVED" },
-  { value: "12", label: "YEARS OF PRACTICE" },
+  { value: "08", label: "YEARS OF PRACTICE" },
 ];
 
 export const howWeWork = [

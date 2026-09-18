@@ -113,9 +113,7 @@ export function BlogGrid({ initialData, featuredPost }: BlogGridProps) {
     setPage(1);
   };
 
-  const gridPosts = featuredPost
-    ? data.posts.filter((p) => p.id !== featuredPost.id)
-    : data.posts;
+  const gridPosts = data.posts;
 
   return (
     <>

@@ -1,6 +1,7 @@
 import { ArrowRightIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
+import { getBreadcrumbListSchema } from "@/lib/seo-schemas";
 import { cn } from "@/lib/utils";
 
 export interface BreadcrumbItem {
@@ -16,6 +17,12 @@ interface BreadcrumbProps {
 export function Breadcrumb({ items, className }: BreadcrumbProps) {
   return (
     <nav aria-label="Breadcrumb" className={cn("py-4", className)}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getBreadcrumbListSchema(items)),
+        }}
+      />
       <ol className="flex items-center gap-2 text-sm text-muted-foreground">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;

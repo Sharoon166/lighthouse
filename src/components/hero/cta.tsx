@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function CTA() {
   return (
@@ -17,9 +18,12 @@ export function CTA() {
             From statement pieces to complete lighting solutions, we&apos;ll
             help you find fixtures that suit your space and style.
           </p>
-          <Button size="lg" className="group mx-auto">
-            Get a Free Consultation
-          </Button>
+          <Button
+            nativeButton={false}
+            size="lg"
+            className="group mx-auto"
+            render={<Link href="/contact">Get a Free Consultation</Link>}
+            />
         </div>
       </div>
     </section>

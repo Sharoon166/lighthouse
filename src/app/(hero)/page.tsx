@@ -25,6 +25,7 @@ import {
 } from "@/lib/constants";
 import { fetchHomepageCategories } from "@/lib/shop-data";
 import { cn } from "@/lib/utils";
+import { getLocalBusinessSchema, getOrganizationSchema, getWebSiteSchema } from "@/lib/seo-schemas";
 
 export const metadata: Metadata = {
   title: "Lighthouse | Premium Lighting Solutions in Pakistan",
@@ -52,90 +53,19 @@ export const metadata: Metadata = {
 export default async function Home() {
   const categories = await fetchHomepageCategories();
 
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Lighthouse",
-    url: "https://lighthouse.pk",
-    logo: "https://lighthouse.pk/logo.png",
-    description:
-      "Premium pendants, chandeliers, and architectural lighting fixtures for homes and commercial spaces across Pakistan.",
-    sameAs: [
-      "https://www.facebook.com/lighthouseisb",
-      "https://www.instagram.com/lighthouse.isb",
-      "https://www.linkedin.com/company/light-house-islamabad",
-      "https://www.tiktok.com/@light.house.isb",
-    ],
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: "+92 21 3456 7890",
-      contactType: "customer service",
-      availableLanguage: "English",
-    },
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Shop 1, Bilal Plaza, Blue Area G 7/3 Blue Area",
-      addressLocality: "Islamabad",
-      postalCode: "44000",
-      addressCountry: "PK",
-    },
-  };
-
-  const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Lighthouse",
-    url: "https://lighthouse.pk",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: "https://lighthouse.pk/products?search={search_term_string}",
-      "query-input": "required name=search_term_string",
-    },
-  };
-
-  const localBusinessSchema = {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: "Lighthouse",
-    image: "https://lighthouse.pk/og-image.png",
-    url: "https://lighthouse.pk",
-    telephone: "+92 21 3456 7890",
-    priceRange: "PKR",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Shop 1, Bilal Plaza, Blue Area G 7/3 Blue Area",
-      addressLocality: "Islamabad",
-      postalCode: "44000",
-      addressCountry: "PK",
-    },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: 33.716574,
-      longitude: 73.0698142,
-    },
-    openingHoursSpecification: [
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-        opens: "09:00",
-        closes: "19:00",
-      },
-    ],
-  };
-
   return (
     <main>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getOrganizationSchema()) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getWebSiteSchema()) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getLocalBusinessSchema()) }}
       />
       <section className="relative min-h-125 sm:h-[95dvh] aspect-9/16 sm:aspect-auto max-sm:pt-[70%] sm:flex items-center overflow-hidden px-6 pb-38 sm:pb-0">
         <Image

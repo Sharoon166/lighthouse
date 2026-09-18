@@ -7,11 +7,11 @@ import { fetchStoreCategories } from "@/lib/shop-data";
 export const metadata: Metadata = {
   title: "Our Categories | Lighthouse",
   description:
-    "Browse lighting by category — pendant lights, chandeliers, wall lights, floor lamps, and more. Find the perfect fixture for every room.",
+    "Browse lighting by category — pendant lights, chandeliers, wall lights, floor lamps, and more. Find the perfect fixture for every room and style.",
   openGraph: {
     title: "Our Categories | Lighthouse",
     description:
-      "Browse lighting by category — pendant lights, chandeliers, wall lights, floor lamps, and more. Find the perfect fixture for every room.",
+      "Browse lighting by category — pendant lights, chandeliers, wall lights, floor lamps, and more. Find the perfect fixture for every room and style.",
     type: "website",
   },
   alternates: {

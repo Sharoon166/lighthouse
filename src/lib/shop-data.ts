@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { unstable_cache } from "next/cache";
+import { computeCumulativeCounts } from "@/lib/category-helpers";
 import { connectToDatabase } from "@/lib/db";
 import { CategoryModel } from "@/models/category";
 import { ProductModel } from "@/models/product";
@@ -319,9 +320,9 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       materialsAndCare:
         "Materials: solid brass body, premium linen shade, marble accent base. All brass surfaces are hand-finished and lacquered to prevent tarnishing.\n\nCare: wipe with a soft, dry cloth. Avoid moisture, direct sunlight, and harsh cleaning agents to preserve the natural finish and appearance.",
       shippingAndReturns:
-        "Standard delivery: 3–5 business days within Karachi. Nationwide delivery: 5–8 business days. Free shipping on orders above Rs. 20,000.\n\nReturns accepted within 7 days of delivery. Item must be unused and in original packaging.",
+        "Standard delivery: 3–5 business days within Islamabad. Nationwide delivery: 5–8 business days. Free shipping on orders above Rs. 20,000.\n\nReturns accepted within 7 days of delivery. Item must be unused and in original packaging.",
       payment:
-        "We accept all major debit and credit cards, EasyPaisa, JazzCash, and bank transfers. Cash on delivery available in Karachi and Lahore.\n\nInstallment plans available via Bank Alfalah and Meezan Bank for orders above Rs. 25,000.",
+        "We accept all major debit and credit cards, EasyPaisa, JazzCash, and bank transfers. Cash on delivery available in Islamabad.\n\nInstallment plans available via Bank Alfalah and Meezan Bank for orders above Rs. 25,000.",
       installationAndBulbs:
         "No installation required — simply plug in and use. Takes a standard E27 bulb (not included). We recommend a 10W warm white LED at 2700K for the ideal ambience.",
     },
@@ -470,7 +471,7 @@ export const FALLBACK_PRODUCTS: ShopProductItem[] = [
       materialsAndCare:
         "Heavy steel weighted base with hand-brushed brass finish.",
       shippingAndReturns: "Delivery within 5 business days nationwide.",
-      payment: "Credit Card, COD in Karachi & Lahore.",
+      payment: "Credit Card, COD in Islamabad.",
       installationAndBulbs: "Simple assembly required. Takes E27 bulb.",
     },
     specifications: [
@@ -661,29 +662,12 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
     await connectToDatabase();
     const categoriesFromDb = await CategoryModel.find({
       isActive: true,
-    }).lean();
+    })
+      .sort({ level: 1, sortOrder: 1, name: 1 })
+      .lean({ serialize: true });
 
     if (categoriesFromDb && categoriesFromDb.length > 0) {
-      // Single aggregation to count active products per category slug
-      const counts = await ProductModel.aggregate([
-        {
-          $match: {
-            status: "active",
-            deletedAt: null,
-          },
-        },
-        {
-          $group: {
-            _id: "$category.slug",
-            count: { $sum: 1 },
-          },
-        },
-      ]);
-
-      const countMap = new Map<string, number>();
-      for (const entry of counts) {
-        countMap.set(entry._id, entry.count);
-      }
+      const cumulativeCounts = computeCumulativeCounts(categoriesFromDb);
 
       return categoriesFromDb.map((c) => ({
         id: String(c._id),
@@ -691,7 +675,7 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
         slug: c.slug,
         description: c.description || "Curated decorative lighting collection.",
         image: c.image || "/1.png",
-        designsCount: countMap.get(c.slug) ?? 0,
+        designsCount: cumulativeCounts.get(c.slug) ?? c.productCount ?? 0,
         featured: Boolean(c.featured),
       }));
     }
@@ -765,55 +749,12 @@ async function fetchHomepageCategoriesUncached(): Promise<HomepageCategory[]> {
       return HOMEPAGE_FALLBACK_CATEGORIES;
     }
 
-    // Also fetch ALL active categories to build tree for cumulative counts
+    // Fetch ALL active categories to compute cumulative counts
     const allActiveCategories = await CategoryModel.find({ isActive: true })
       .sort({ level: 1, sortOrder: 1, name: 1 })
       .lean({ serialize: true });
 
-    // Build tree and compute cumulative counts
-    type TreeNode = {
-      id: string;
-      parentId: string | null;
-      productCount: number;
-      children: TreeNode[];
-    };
-    const nodeMap = new Map<string, TreeNode>();
-    for (const c of allActiveCategories) {
-      nodeMap.set(String(c._id), {
-        id: String(c._id),
-        parentId: c.parent ? String(c.parent) : null,
-        productCount: c.productCount || 0,
-        children: [],
-      });
-    }
-    const roots: TreeNode[] = [];
-    for (const node of nodeMap.values()) {
-      if (node.parentId && nodeMap.has(node.parentId)) {
-        nodeMap.get(node.parentId)!.children.push(node);
-      } else {
-        roots.push(node);
-      }
-    }
-    function computeCounts(node: TreeNode): number {
-      let total = node.productCount;
-      for (const child of node.children) {
-        total += computeCounts(child);
-      }
-      node.productCount = total;
-      return total;
-    }
-    for (const root of roots) {
-      computeCounts(root);
-    }
-    const countBySlug = new Map<string, number>();
-    function flatten(nodes: TreeNode[]) {
-      for (const node of nodes) {
-        const cat = allActiveCategories.find((c) => String(c._id) === node.id);
-        if (cat) countBySlug.set(cat.slug, node.productCount);
-        flatten(node.children);
-      }
-    }
-    flatten(roots);
+    const countBySlug = computeCumulativeCounts(allActiveCategories);
 
     const categoryMap = new Map(allCategories.map((c) => [c.slug, c]));
 
@@ -885,52 +826,8 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
       ]),
     ]);
 
-    // Build tree and compute cumulative counts (own + descendants)
-    // Mirrors getCategoryTree logic to keep filter sidebar counts in sync
-    type TreeNode = {
-      id: string;
-      parentId: string | null;
-      productCount: number;
-      children: TreeNode[];
-    };
-    const nodeMap = new Map<string, TreeNode>();
-    for (const c of allCategories) {
-      nodeMap.set(String(c._id), {
-        id: String(c._id),
-        parentId: c.parent ? String(c.parent) : null,
-        productCount: c.productCount || 0,
-        children: [],
-      });
-    }
-    const roots: TreeNode[] = [];
-    for (const node of nodeMap.values()) {
-      if (node.parentId && nodeMap.has(node.parentId)) {
-        nodeMap.get(node.parentId)!.children.push(node);
-      } else {
-        roots.push(node);
-      }
-    }
-    function computeCounts(node: TreeNode): number {
-      let total = node.productCount;
-      for (const child of node.children) {
-        total += computeCounts(child);
-      }
-      node.productCount = total;
-      return total;
-    }
-    for (const root of roots) {
-      computeCounts(root);
-    }
-    // Flatten back to a slug→count map
-    const countBySlug = new Map<string, number>();
-    function flatten(nodes: TreeNode[]) {
-      for (const node of nodes) {
-        const cat = allCategories.find((c) => String(c._id) === node.id);
-        if (cat) countBySlug.set(cat.slug, node.productCount);
-        flatten(node.children);
-      }
-    }
-    flatten(roots);
+    // Compute cumulative counts (own + descendants) via shared helper
+    const countBySlug = computeCumulativeCounts(allCategories);
 
     meta.categories = allCategories.map((c) => ({
       name: c.name,

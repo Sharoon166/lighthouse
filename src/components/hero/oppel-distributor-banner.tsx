@@ -3,6 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import LogoImage from "../shared/logo-img";
 import { Button } from "../ui/button";
+import Link from "next/link";
 
 export function OppelDistributorBanner({
   hideButton = false,
@@ -69,13 +70,20 @@ export function OppelDistributorBanner({
             </address>
 
             {!hideButton && (
-              <Button size="lg" className="group h-12">
-                View Opple Collection{" "}
-                <HugeiconsIcon
-                  icon={ArrowRight02Icon}
-                  className="group-hover:translate-x-1.5 transition-transform size-6"
-                />
-              </Button>
+              <Button
+                size="lg"
+                className="group h-12"
+                nativeButton={false}
+                render={
+                  <Link href="/opple">
+                    View Opple Collection{" "}
+                    <HugeiconsIcon
+                      icon={ArrowRight02Icon}
+                      className="group-hover:translate-x-1.5 transition-transform size-6"
+                    />
+                  </Link>
+                }
+              />
             )}
           </div>
         </header>

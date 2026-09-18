@@ -3,15 +3,16 @@ import { CTA } from "@/components/hero/cta";
 import { ContactForm } from "@/components/shared/contact-form";
 import { PageHero } from "@/components/shared/page-hero";
 import { ShowroomTabs } from "@/components/shared/showroom-tabs";
+import { getLocalBusinessSchema } from "@/lib/seo-schemas";
 
 export const metadata: Metadata = {
   title: "Contact | Lighthouse",
   description:
-    "Get in touch with Lighthouse — questions, complaints, or product help. Visit our showrooms in Islamabad, Lahore, and Karachi.",
+    "Get in touch with Lighthouse — questions, product help, or showroom visits. Visit us in Blue Area, Islamabad.",
   openGraph: {
     title: "Contact | Lighthouse",
     description:
-      "Get in touch with Lighthouse — questions, complaints, or product help. Visit our showrooms in Islamabad, Lahore, and Karachi.",
+      "Get in touch with Lighthouse — questions, product help, or showroom visits. Visit us in Blue Area, Islamabad.",
     type: "website",
   },
   alternates: {
@@ -26,6 +27,10 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getLocalBusinessSchema()) }}
+      />
       <PageHero
         title="Let's talk"
         description="Whether you have a project in mind, a product question, or simply want to visit a showroom — we're here. Every enquiry is answered within one business day."

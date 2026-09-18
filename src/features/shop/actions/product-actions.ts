@@ -658,7 +658,7 @@ export async function listProducts(input: unknown): Promise<ProductListResult> {
     name: document.name,
     slug: document.slug,
     categoryName: document.category.name,
-    brandName: document.brand.name,
+    brandName: document.brand?.name ?? "",
     priceRange: document.priceRange,
     inStock: document.inStock,
     totalStock: document.totalStock,

@@ -46,12 +46,12 @@ export interface Product {
     slug: string;
     ancestorSlugs: string[];
   };
-  brand: {
+  brand?: {
     _id: Types.ObjectId;
     name: string;
     slug: string;
     logo: string;
-  };
+  } | null;
   variantAttributes: string[];
   baseAttributes: Map<string, string>;
   isFeatured: boolean;
@@ -188,7 +188,7 @@ const productSchema = new Schema<Product>(
     specifications: { type: [specificationSchema], default: [] },
     specificationsDescription: { type: String, default: "", trim: true },
     category: { type: categoryRefSchema, required: true },
-    brand: { type: brandRefSchema, required: true },
+    brand: { type: brandRefSchema, default: null },
     variantAttributes: [{ type: String }],
     baseAttributes: { type: Map, of: String, default: () => new Map() },
     images: [{ type: String }],

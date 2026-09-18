@@ -78,7 +78,7 @@ const productBaseSchema = z.object({
 
   category: z.string().trim().min(1, "Category is required"),
 
-  brand: z.string().trim().min(1, "Brand is required"),
+  brand: z.string().trim().optional().or(z.literal("")),
 
   images: z
     .array(z.string().trim())

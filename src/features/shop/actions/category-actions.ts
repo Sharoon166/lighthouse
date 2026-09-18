@@ -1,6 +1,7 @@
 "use server";
 
 import type { QueryFilter } from "mongoose";
+import { applyCumulativeCounts } from "@/lib/category-helpers";
 import { Types } from "mongoose";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
@@ -565,17 +566,7 @@ export async function getCategoryTree(opts?: {
   }
 
   // Compute cumulative product counts (own + all descendants)
-  function computeCounts(node: CategoryTreeNode): number {
-    let total = node.productCount;
-    for (const child of node.children) {
-      total += computeCounts(child);
-    }
-    node.productCount = total;
-    return total;
-  }
-  for (const root of roots) {
-    computeCounts(root);
-  }
+  applyCumulativeCounts(roots);
 
   return roots;
 }

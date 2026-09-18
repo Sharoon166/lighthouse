@@ -8,11 +8,11 @@ import { ProjectGrid } from "@/features/projects/components/project-grid";
 export const metadata: Metadata = {
   title: "Projects | Lighthouse",
   description:
-    "Explore our lighting projects, where thoughtful design and carefully selected fixtures transform spaces into warm, elegant, and inviting environments.",
+    "Explore Lighthouse lighting projects — see how premium fixtures transform residential and commercial spaces across Islamabad.",
   openGraph: {
     title: "Projects | Lighthouse",
     description:
-      "Explore our lighting projects, where thoughtful design and carefully selected fixtures transform spaces into warm, elegant, and inviting environments.",
+      "Explore Lighthouse lighting projects — see how premium fixtures transform residential and commercial spaces across Islamabad.",
     type: "website",
   },
   alternates: {

@@ -8,11 +8,11 @@ import { PageHero } from "@/components/shared/page-hero";
 export const metadata: Metadata = {
   title: "Frequently Asked Questions | Lighthouse",
   description:
-    "Get answers about Lighthouse lighting products, orders, payment methods, shipping across Pakistan, delivery timelines, and return policies.",
+    "Answers about Lighthouse lighting — orders, payment, shipping across Pakistan, delivery times, and return policies.",
   openGraph: {
     title: "Frequently Asked Questions | Lighthouse",
     description:
-      "Get answers about Lighthouse lighting products, orders, payment methods, shipping across Pakistan, delivery timelines, and return policies.",
+      "Answers about Lighthouse lighting — orders, payment, shipping across Pakistan, delivery times, and return policies.",
     type: "website",
   },
   alternates: {
@@ -59,7 +59,7 @@ const FAQ_SECTIONS = [
       {
         question: "Where do you deliver?",
         answer:
-          "We deliver to all major cities and towns across Pakistan including Karachi, Lahore, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, Quetta, and many more. Remote areas may have longer delivery times.",
+          "We deliver to all major cities and towns across Pakistan. Remote areas may have longer delivery times.",
       },
       {
         question: "How long does delivery take?",

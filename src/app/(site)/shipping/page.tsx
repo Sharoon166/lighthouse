@@ -5,7 +5,6 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageHero } from "@/components/shared/page-hero";
 
 export const metadata: Metadata = {
@@ -98,38 +97,15 @@ export default function ShippingPage() {
 
             <h3>Delivery Coverage</h3>
             <p>
-              We deliver to all major cities and towns across Pakistan,
-              including:
+              We deliver nationwide from our Islamabad showroom. Orders within
+              Islamabad are delivered directly; nationwide orders are shipped via
+              trusted courier partners.
             </p>
 
-            <div className="grid sm:grid-cols-3 gap-3 my-6 not-prose">
-              {[
-                "Karachi",
-                "Lahore",
-                "Islamabad",
-                "Rawalpindi",
-                "Faisalabad",
-                "Multan",
-                "Peshawar",
-                "Quetta",
-                "Hyderabad",
-              ].map((city) => (
-                <div
-                  key={city}
-                  className="flex items-center gap-2 p-3 border border-border rounded-lg bg-muted/20"
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-gold"></span>
-                  <span className="text-sm text-foreground">{city}</span>
-                </div>
-              ))}
+            <div className="flex items-center gap-2 p-3 border border-border rounded-lg bg-muted/20 my-6 not-prose w-fit">
+              <span className="w-1.5 h-1.5 rounded-full bg-gold"></span>
+              <span className="text-sm text-foreground">Islamabad &amp; Nationwide</span>
             </div>
-            <p className="text-sm italic">
-              If your area is not listed, please{" "}
-              <Link href="/contact" className="text-gold hover:underline">
-                contact us
-              </Link>{" "}
-              to confirm delivery availability.
-            </p>
 
             <h3>Delivery Times</h3>
             <div className="overflow-x-auto my-6 not-prose">
@@ -214,7 +190,7 @@ export default function ShippingPage() {
                     Express Delivery
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Additional charges apply (select cities only)
+                    Additional charges apply (Islamabad)
                   </p>
                 </div>
               </div>

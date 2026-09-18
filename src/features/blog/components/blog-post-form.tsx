@@ -850,7 +850,7 @@ export function BlogPostForm({
 
                   <div className="space-y-2" data-field="summary">
                     <Label htmlFor="summary">Summary</Label>
-                    <InputGroup className="min-h-[5rem]">
+                    <InputGroup className="min-h-20">
                       <InputGroupTextarea
                         id="summary"
                         value={summary}
@@ -984,7 +984,7 @@ export function BlogPostForm({
 
                   <div className="space-y-2" data-field="author.bio">
                     <Label htmlFor="author-bio">Short bio</Label>
-                    <InputGroup className="min-h-[5rem]">
+                    <InputGroup className="min-h-20">
                       <InputGroupTextarea
                         id="author-bio"
                         value={authorBio}
@@ -1056,7 +1056,7 @@ export function BlogPostForm({
                     <Label htmlFor="seo-meta-description">
                       Meta Description
                     </Label>
-                    <InputGroup className="min-h-[5rem]">
+                    <InputGroup className="min-h-20">
                       <InputGroupTextarea
                         id="seo-meta-description"
                         value={seoMetaDescription}
@@ -1222,7 +1222,7 @@ export function BlogPostForm({
 
                     {/* Hero Image */}
                     {heroImage && (
-                      <div className="relative aspect-[21/9] w-full overflow-hidden rounded-xl border border-border">
+                      <div className="relative aspect-21/9 w-full overflow-hidden rounded-xl border border-border">
                         <Image
                           src={heroImage.url}
                           alt={title || "Cover image"}

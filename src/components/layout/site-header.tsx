@@ -86,7 +86,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
     return () => {
       cancelled = true;
     };
-  }, [pathname]);
+  }, []);
 
   /*
    * --------------------------------------------------

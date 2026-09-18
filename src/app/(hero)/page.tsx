@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import HeroImage from "@/assets/hero-img.webp";
-import MobileHeroImage from "@/assets/hero-img-mobile.png";
+import MobileHeroImage from "@/assets/hero-img-mobile.webp";
 import { CTA } from "@/components/hero/cta";
 import { HeroLinks } from "@/components/hero/hero-links";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import logo from "@/assets/logo-dark.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,11 @@ import {
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import {
+  formatLockoutTime,
+  recordFailedAttempt,
+  resetAttempts,
+} from "@/lib/rate-limit";
 
 function FloatingOrb({ className }: { className?: string }) {
   return <div className={`absolute rounded-full blur-3xl ${className}`} />;
@@ -30,10 +35,61 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [lockoutRemaining, setLockoutRemaining] = useState(0);
+  const [remainingAttempts, setRemainingAttempts] = useState(5);
+  const [synced, setSynced] = useState(false);
+
+  // Sync with server on mount — works in incognito too
+  useEffect(() => {
+    fetch("/api/auth/rate-limit-status")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.locked) {
+          setLockoutRemaining(data.remainingMs);
+          setRemainingAttempts(0);
+        } else {
+          setRemainingAttempts(data.remainingAttempts);
+        }
+        setSynced(true);
+      })
+      .catch(() => setSynced(true)); // fail open
+  }, []);
+
+  // Tick down lockout timer
+  useEffect(() => {
+    if (lockoutRemaining <= 0) return;
+    const interval = setInterval(() => {
+      setLockoutRemaining((prev) => {
+        if (prev <= 1000) {
+          // Lockout expired — re-sync with server
+          fetch("/api/auth/rate-limit-status")
+            .then((r) => r.json())
+            .then((data) => {
+              setRemainingAttempts(data.remainingAttempts);
+            })
+            .catch(() => {});
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lockoutRemaining > 0]);
+
+  const isLockedOut = lockoutRemaining > 0;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    // Double-check lockout
+    if (isLockedOut) {
+      setError(
+        `Too many failed attempts. Try again in ${formatLockoutTime(lockoutRemaining)}.`,
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -44,7 +100,32 @@ function LoginForm() {
       });
 
       if (signInError) {
-        setError(signInError.message || "Invalid email or password.");
+        // Record failure server-side
+        const res = await fetch("/api/auth/rate-limit-status", {
+          method: "POST",
+        });
+        const data = await res.json();
+
+        // Also record locally for immediate UX
+        recordFailedAttempt();
+
+        if (data.locked) {
+          setLockoutRemaining(data.remainingMs);
+          setRemainingAttempts(0);
+          setError(
+            `Too many failed attempts. Your account is temporarily locked. Try again in ${formatLockoutTime(data.remainingMs)}.`,
+          );
+        } else if (data.remainingAttempts <= 2) {
+          setRemainingAttempts(data.remainingAttempts);
+          setError(
+            `Invalid email or password. ${data.remainingAttempts} attempt${data.remainingAttempts === 1 ? "" : "s"} remaining before temporary lockout.`,
+          );
+        } else {
+          setRemainingAttempts(data.remainingAttempts);
+          setError("Invalid email or password.");
+        }
+      } else {
+        resetAttempts();
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -72,7 +153,7 @@ function LoginForm() {
           onBlur={() => setFocused(null)}
           required
           autoComplete="email"
-          disabled={loading}
+          disabled={loading || isLockedOut || !synced}
           className="h-11 transition-shadow focus-visible:shadow-[0_0_0_3px_rgba(42,27,69,0.08)]"
         />
       </div>
@@ -95,7 +176,7 @@ function LoginForm() {
             onBlur={() => setFocused(null)}
             required
             autoComplete="current-password"
-            disabled={loading}
+            disabled={loading || isLockedOut || !synced}
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
@@ -153,6 +234,22 @@ function LoginForm() {
         </div>
       )}
 
+      {!synced && (
+        <div className="h-11 w-full bg-muted animate-pulse rounded-lg" />
+      )}
+
+      {synced && isLockedOut && !isBlocked && (
+        <div className="rounded-lg border border-amber-300/40 bg-amber-50 px-4 py-3 dark:border-amber-400/20 dark:bg-amber-950/30">
+          <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+            Temporary lockout
+          </p>
+          <p className="mt-1 text-xs text-amber-600/80 dark:text-amber-400/70">
+            Too many failed login attempts. Please wait{" "}
+            {formatLockoutTime(lockoutRemaining)} before trying again.
+          </p>
+        </div>
+      )}
+
       {error && (
         <div className="rounded-lg border border-destructive/20 bg-destructive/4 px-4 py-3">
           <p className="text-sm text-destructive">{error}</p>
@@ -162,7 +259,7 @@ function LoginForm() {
       <Button
         type="submit"
         className="h-11 w-full rounded-lg bg-primary text-sm font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98]"
-        disabled={loading}
+        disabled={loading || isLockedOut || !synced}
       >
         {loading ? (
           <span className="inline-flex items-center gap-2">

@@ -6,11 +6,16 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import HeroImage from "@/assets/hero-img.webp";
 import MobileHeroImage from "@/assets/hero-img-mobile.webp";
 import { CTA } from "@/components/hero/cta";
 import { HeroLinks } from "@/components/hero/hero-links";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
+import {
+  FeaturedCategoriesFallback,
+  FeaturedCategoriesStream,
+} from "@/components/shared/featured-categories-stream";
 import { BlogCard } from "@/components/shared/blog-card";
 import { Clients } from "@/components/shared/clients";
 import { Marquee } from "@/components/shared/marquee";
@@ -51,7 +56,7 @@ export const metadata: Metadata = {
 
 // <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto items-end sm:items-center justify-center overflow-hidden px-6 pb-38 sm:pb-0">
 export default async function Home() {
-  const categories = await fetchHomepageCategories();
+  const categoriesPromise = fetchHomepageCategories();
 
   return (
     <main>
@@ -124,51 +129,9 @@ export default async function Home() {
       </Marquee>
 
       <div className="container">
-        <section>
-          <SectionHeader
-            title="Lighting Collections for Every Space"
-            description="Explore our curated range of premium lighting solutions for homes, offices and commercial environments. Find the perfect fixture for every style and every space."
-            ctaText="View All Categories"
-            ctaHref="/categories"
-          />
-
-          <div className="grid grid-cols-12 gap-4">
-            {categories.map((category, index) => (
-              <Link
-                key={category.id}
-                href={category.href}
-                className={cn(
-                  "relative overflow-hidden bg-contain p-6 min-h-66 h-full",
-                  {
-                    "col-span-12 row-span-1 md:col-span-6 lg:col-span-8":
-                      index === 0,
-                    "col-span-6 row-span-1 min-h-66 md:col-span-6 lg:col-span-4 lg:row-span-2":
-                      index === 1,
-                    "col-span-6 row-span-1 h-66 md:col-span-6 lg:col-span-4":
-                      index === 2,
-                    "col-span-12 row-span-1 min-h-62 md:col-span-6 lg:col-span-4":
-                      index === 3,
-                  },
-                )}
-              >
-                <h3 className="text-xl font-normal tracking-tight text-primary">
-                  {category.title}
-                </h3>
-                <p className="uppercase tracking-widest text-gold">
-                  {category.items} Designs
-                </p>
-
-                <Image
-                  src={`/${category.id}.png`}
-                  width={1024}
-                  height={1024}
-                  alt={`${category.title} lighting collection`}
-                  className="absolute -z-10 right-0 top-0 h-full w-full object-cover brightness-180"
-                />
-              </Link>
-            ))}
-          </div>
-        </section>
+        <Suspense fallback={<FeaturedCategoriesFallback />}>
+          <FeaturedCategoriesStream promise={categoriesPromise} />
+        </Suspense>
 
         <section>
           <SectionHeader

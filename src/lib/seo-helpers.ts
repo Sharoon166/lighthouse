@@ -84,8 +84,6 @@ export function generateProductJsonLd(product: {
   brand: string;
   category: string;
   variants: ProductJsonLdVariant[];
-  rating?: number;
-  ratingCount?: number;
 }) {
   const productUrl = `${siteUrl}/products/${product.slug}`;
 
@@ -115,15 +113,6 @@ export function generateProductJsonLd(product: {
         price: v?.salePrice || v?.price || 0,
         availability: availabilityMap[v?.availability || "in_stock"],
       },
-      ...(product.rating && product.ratingCount
-        ? {
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: product.rating,
-              reviewCount: product.ratingCount,
-            },
-          }
-        : {}),
     };
   }
 
@@ -171,14 +160,5 @@ export function generateProductJsonLd(product: {
       (key) => `https://schema.org/${key.toLowerCase()}`,
     ),
     hasVariant,
-    ...(product.rating && product.ratingCount
-      ? {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: product.rating,
-            reviewCount: product.ratingCount,
-          },
-        }
-      : {}),
   };
 }

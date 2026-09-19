@@ -703,7 +703,7 @@ const HOMEPAGE_CATEGORY_SLUGS = [
   "chandeliers",
 ];
 
-const HOMEPAGE_FALLBACK_CATEGORIES: HomepageCategory[] = [
+export const HOMEPAGE_FALLBACK_CATEGORIES: HomepageCategory[] = [
   {
     id: "pendant-lights",
     title: "Pendant Lights",

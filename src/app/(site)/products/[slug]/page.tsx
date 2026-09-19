@@ -77,9 +77,6 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
       availability: v.availability,
       attributes: v.attributes,
     })),
-    ...(product.ratings.count > 0
-      ? { rating: product.ratings.average, ratingCount: product.ratings.count }
-      : {}),
   });
 
   return (

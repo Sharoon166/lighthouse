@@ -42,6 +42,7 @@ export default function RootLayout({
     >
       <head>
         <link rel="preload" as="image" href="/hero-img.webp" />
+        <link rel="preload" as="image" href="/noise-bg.png" />
       </head>
       <body className="min-h-full flex flex-col">
         {children}

@@ -67,6 +67,8 @@ const productBaseSchema = z.object({
 
   description: z.string().trim(),
 
+  descriptionHtml: z.string().trim().optional(),
+
   shortDescription: z
     .string()
     .trim()

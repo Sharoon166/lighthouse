@@ -123,7 +123,7 @@ async function buildProductData(data: z.infer<typeof productInputSchema>) {
   return {
     name: data.name,
     description: data.description,
-    descriptionHtml: "",
+    descriptionHtml: data.descriptionHtml?.trim() || "",
     shortDescription: data.shortDescription || "",
     content: {
       materialsAndCare: data.content?.materialsAndCare?.trim() || "",
@@ -689,7 +689,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   return ProductModel.findOne({
     slug,
     deletedAt: { $eq: null },
-    status: { $ne: "archived" },
+    status: "active",
   }).lean();
 }
 

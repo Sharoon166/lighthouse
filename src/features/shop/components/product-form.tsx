@@ -14,6 +14,7 @@ import {
   Warning,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
+import type { JSONContent } from "@tiptap/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -359,6 +360,22 @@ export function ProductForm({
   const [description, setDescription] = useState(
     initialData?.description ?? "",
   );
+  const [descriptionHtml, setDescriptionHtml] = useState<
+    JSONContent | undefined
+  >(() => {
+    if (initialData?.descriptionHtml) {
+      try {
+        const parsed = JSON.parse(initialData.descriptionHtml);
+        if (parsed && typeof parsed === "object" && parsed.type) {
+          return parsed as JSONContent;
+        }
+        return undefined;
+      } catch {
+        return undefined;
+      }
+    }
+    return undefined;
+  });
   const [shortDescription, setShortDescription] = useState(
     initialData?.shortDescription ?? "",
   );
@@ -739,6 +756,9 @@ export function ProductForm({
     name,
     slug,
     description,
+    descriptionHtml: descriptionHtml
+      ? JSON.stringify(descriptionHtml)
+      : undefined,
     shortDescription: shortDescription.trim() || undefined,
     category: category || "",
     brand: brand || "",
@@ -1161,18 +1181,21 @@ export function ProductForm({
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2" data-field="description">
                   <Label htmlFor="description">Description</Label>
-                  <InputGroup>
-                    <InputGroupTextarea
-                      id="description"
-                      value={description}
-                      onChange={(event) => {
-                        setDescription(event.target.value);
+                  <p className="text-xs text-muted-foreground">
+                    Detailed product description with rich formatting.
+                  </p>
+                  <div className="h-[calc(50dvh-1.5rem)]">
+                    <RichTextEditor
+                      value={descriptionHtml ?? null}
+                      onChange={(json) => {
+                        setDescriptionHtml(json ?? undefined);
                         clearFieldError("description");
                       }}
-                      placeholder="Detailed product description..."
-                      aria-invalid={Boolean(fieldError("description"))}
+                      placeholder="Write a detailed product description..."
+                      className="flex h-full flex-col"
+                      editorClassName="max-h-none min-h-0 flex-1"
                     />
-                  </InputGroup>
+                  </div>
                   {fieldError("description") && (
                     <p className="text-xs text-destructive">
                       {fieldError("description")}

@@ -56,6 +56,7 @@ export interface ShopProductItem {
   discountPercentage?: number;
   shortDescription: string;
   description: string;
+  descriptionHtml?: string;
   images: string[]; // Includes main product + all variant images
   finishes: { name: string; hex: string }[];
   variantAttributes: string[];
@@ -681,7 +682,7 @@ export async function fetchStoreCategories(): Promise<ShopCategoryItem[]> {
     }
   } catch (error) {
     console.warn(
-      "MongoDB query failed for categories, falling back to mock data:",
+      "MongoDB query failed for categories, returning fallback:",
       error,
     );
   }
@@ -801,7 +802,7 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
         .sort({ level: 1, sortOrder: 1, name: 1 })
         .lean({ serialize: true }),
       (ProductModel as any).aggregate([
-        { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
+        { $match: { status: "active", deletedAt: { $eq: null } } },
         {
           $group: {
             _id: {
@@ -815,7 +816,7 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
         { $sort: { count: -1 } },
       ]),
       ProductModel.aggregate([
-        { $match: { status: { $ne: "archived" }, deletedAt: { $eq: null } } },
+        { $match: { status: "active", deletedAt: { $eq: null } } },
         {
           $group: {
             _id: null,
@@ -847,7 +848,7 @@ export async function fetchFilterMetadata(): Promise<FilterMetadata> {
     if (priceAgg[0]) {
       meta.priceRange = {
         min: priceAgg[0].min || 0,
-        max: priceAgg[0].max || 200000,
+        max: priceAgg[0].max ?? 200000,
       };
     }
   } catch (error) {
@@ -876,7 +877,7 @@ export async function fetchStoreProducts(
   try {
     await connectToDatabase();
     const query: Record<string, unknown> = {
-      status: { $ne: "archived" },
+      status: "active",
       deletedAt: { $eq: null },
     };
     if (options.categorySlugs && options.categorySlugs.length > 0) {
@@ -894,7 +895,7 @@ export async function fetchStoreProducts(
     const dbProducts = await ProductModel.find(query).lean({ serialize: true });
     if (dbProducts && dbProducts.length > 0) {
       products = dbProducts.map((p) => {
-        const minPrice = p.priceRange?.min || 15000;
+        const minPrice = p.priceRange?.min ?? 0;
         const defaultVar = p.variants?.[0];
         const origPrice =
           defaultVar?.price && defaultVar?.salePrice
@@ -971,6 +972,7 @@ export async function fetchStoreProducts(
           shortDescription:
             p.shortDescription || p.description?.slice(0, 120) || "",
           description: p.description || "",
+          descriptionHtml: p.descriptionHtml || undefined,
           images: uniqueImages.length ? uniqueImages : ["/products/1.png"],
           finishes,
           variantAttributes,
@@ -987,18 +989,16 @@ export async function fetchStoreProducts(
           reviews: [],
           content: {
             materialsAndCare:
-              p.content?.materialsAndCare || "Solid brass construction.",
+              p.content?.materialsAndCare || "",
             shippingAndReturns:
-              p.content?.shippingAndReturns || "Delivery in 3-5 business days.",
-            payment: p.content?.payment || "All major credit cards accepted.",
+              p.content?.shippingAndReturns || "",
+            payment: p.content?.payment || "",
             installationAndBulbs:
-              p.content?.installationAndBulbs || "Standard E27 fitting.",
+              p.content?.installationAndBulbs || "",
           },
-          specifications: p.specifications || [
-            { key: "Brand", value: p.brand?.name || "Lighthouse" },
-          ],
-          designStyle: "Modern",
-          material: "Brass",
+          specifications: p.specifications || [],
+          designStyle: "",
+          material: "",
           inStock: p.inStock ?? true,
           seo: {
             metaTitle: p.seo?.metaTitle || "",
@@ -1010,7 +1010,7 @@ export async function fetchStoreProducts(
       });
     }
   } catch (error) {
-    console.warn("MongoDB product query failed, using fallback items:", error);
+    console.warn("MongoDB product query failed:", error);
   }
 
   // Filter in memory for search/category/price/material/design
@@ -1076,7 +1076,7 @@ export async function fetchStoreProducts(
 }
 
 function mapDbProductToShopItem(p: any): ShopProductItem {
-  const minPrice = p.priceRange?.min || 15000;
+  const minPrice = p.priceRange?.min ?? 0;
   const defaultVar = p.variants?.[0];
   const origPrice =
     defaultVar?.price && defaultVar?.salePrice
@@ -1149,6 +1149,7 @@ function mapDbProductToShopItem(p: any): ShopProductItem {
     shortDescription:
       p.shortDescription || p.description?.slice(0, 120) || "",
     description: p.description || "",
+    descriptionHtml: p.descriptionHtml || undefined,
     images: uniqueImages.length ? uniqueImages : ["/products/1.png"],
     finishes,
     variantAttributes,
@@ -1165,18 +1166,16 @@ function mapDbProductToShopItem(p: any): ShopProductItem {
     reviews: [],
     content: {
       materialsAndCare:
-        p.content?.materialsAndCare || "Solid brass construction.",
+        p.content?.materialsAndCare || "",
       shippingAndReturns:
-        p.content?.shippingAndReturns || "Delivery in 3-5 business days.",
-      payment: p.content?.payment || "All major credit cards accepted.",
+        p.content?.shippingAndReturns || "",
+      payment: p.content?.payment || "",
       installationAndBulbs:
-        p.content?.installationAndBulbs || "Standard E27 fitting.",
+        p.content?.installationAndBulbs || "",
     },
-    specifications: p.specifications || [
-      { key: "Brand", value: p.brand?.name || "Lighthouse" },
-    ],
-    designStyle: "Modern",
-    material: "Brass",
+    specifications: p.specifications || [],
+    designStyle: "",
+    material: "",
     inStock: p.inStock ?? true,
     seo: {
       metaTitle: p.seo?.metaTitle || "",
@@ -1193,7 +1192,7 @@ export const fetchProductBySlug = cache(
       await connectToDatabase();
       const p = await ProductModel.findOne({
         slug,
-        status: { $ne: "archived" },
+        status: "active",
         deletedAt: { $eq: null },
       }).lean({ serialize: true });
       if (!p) return null;
@@ -1228,11 +1227,11 @@ export async function fetchRelatedProducts(
       .limit(limit)
       .lean({ serialize: true });
 
-    // Fallback: any non-archived products if category match yields nothing
+    // Fallback: any active products if category match yields nothing
     if (dbProducts.length === 0) {
       dbProducts = await ProductModel.find({
         ...baseFilter,
-        status: { $ne: "archived" },
+        status: "active",
       })
         .limit(limit)
         .lean({ serialize: true });
@@ -1241,9 +1240,6 @@ export async function fetchRelatedProducts(
     return dbProducts.map(mapDbProductToShopItem);
   } catch (error) {
     console.warn("Failed to fetch related products:", error);
-    const { products } = await fetchStoreProducts();
-    return products
-      .filter((p) => p.slug !== currentSlug)
-      .slice(0, limit);
+    return [];
   }
 }

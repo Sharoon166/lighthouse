@@ -31,6 +31,9 @@ export function ProductCard({
   }, [isHovered, product.images]);
 
   const priceDisplay = useMemo(() => {
+    if (product.variants.length === 0) {
+      return null; // No active variants — don't show a price
+    }
     if (product.variants.length <= 1) {
       return formatCurrency(product.price);
     }
@@ -86,9 +89,15 @@ export function ProductCard({
           </h3>
         </Link>
         <div className="flex items-center justify-between">
-          <p className="text-muted-foreground font-semibold uppercase font-heading">
-            {priceDisplay}
-          </p>
+          {priceDisplay ? (
+            <p className="text-muted-foreground font-semibold uppercase font-heading">
+              {priceDisplay}
+            </p>
+          ) : (
+            <p className="text-muted-foreground text-sm font-medium uppercase font-heading">
+              Out of stock
+            </p>
+          )}
           {showQuickView && (
             <Button
               variant="secondary"

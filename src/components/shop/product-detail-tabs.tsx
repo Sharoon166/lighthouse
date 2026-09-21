@@ -4,6 +4,7 @@ import { StarIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Image from "next/image";
 import { useState, type ReactNode } from "react";
+import { tiptapContentClassName } from "@/components/shared/rich-text-constants";
 import type { ShopProductItem } from "@/lib/shop-data";
 
 interface ProductDetailTabsProps {

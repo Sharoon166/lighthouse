@@ -88,7 +88,7 @@ export function ProductPurchasePanel({
     return options;
   }, [product.variantAttributes, product.variants]);
 
-  const currentPrice = selectedVariant?.price || product.price;
+  const currentPrice = selectedVariant?.price || product.price || 0;
   const currentOriginalPrice = selectedVariant?.salePrice
     ? selectedVariant.price
     : product.originalPrice;
@@ -146,32 +146,40 @@ export function ProductPurchasePanel({
         </div>
 
         {/* Pricing Row */}
-        <div className="-mt-4 flex items-center gap-3">
-          <RollingNumber
-            value={currentPrice}
-            locales="en-PK"
-            format={{ style: "currency", currency: "PKR" }}
-            duration={500}
-            className="font-heading text-2xl sm:text-3xl font-semibold text-secondary tabular-nums"
-          />
-          {currentOriginalPrice && (
-            <span className="text-base text-muted-foreground line-through">
-              {formatCurrency(currentOriginalPrice)}
-            </span>
-          )}
-          {selectedVariant?.salePrice &&
-            selectedVariant.salePrice < selectedVariant.price && (
-              <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-600">
-                -
-                {Math.round(
-                  ((selectedVariant.price - selectedVariant.salePrice) /
-                    selectedVariant.price) *
-                    100,
-                )}
-                %
+        {selectedVariant || product.variants.length > 0 ? (
+          <div className="-mt-4 flex items-center gap-3">
+            <RollingNumber
+              value={currentPrice}
+              locales="en-PK"
+              format={{ style: "currency", currency: "PKR" }}
+              duration={500}
+              className="font-heading text-2xl sm:text-3xl font-semibold text-secondary tabular-nums"
+            />
+            {currentOriginalPrice && (
+              <span className="text-base text-muted-foreground line-through">
+                {formatCurrency(currentOriginalPrice)}
               </span>
             )}
-        </div>
+            {selectedVariant?.salePrice &&
+              selectedVariant.salePrice < selectedVariant.price && (
+                <span className="rounded bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-600">
+                  -
+                  {Math.round(
+                    ((selectedVariant.price - selectedVariant.salePrice) /
+                      selectedVariant.price) *
+                      100,
+                  )}
+                  %
+                </span>
+              )}
+          </div>
+        ) : (
+          <div className="-mt-4">
+            <p className="text-lg font-semibold text-muted-foreground">
+              Currently unavailable
+            </p>
+          </div>
+        )}
 
         {/* Short Description */}
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed pb-4 border-b-2">
@@ -290,7 +298,7 @@ export function ProductPurchasePanel({
         })}
 
         {/* Stock Status */}
-        {selectedVariant && (
+        {selectedVariant ? (
           <div className="flex items-center gap-2 text-sm">
             <span
               className={`size-2 rounded-full ${
@@ -315,10 +323,29 @@ export function ProductPurchasePanel({
               <span className="text-muted-foreground">Out of Stock</span>
             )}
           </div>
+        ) : (
+          <div className="flex items-center gap-2 text-sm">
+            <span className="size-2 rounded-full bg-red-500" />
+            <span className="text-muted-foreground">No variants available</span>
+          </div>
         )}
 
         {/* Quantity Counter & Add to Cart */}
-        {IS_PHASE_2 ? (
+        {!selectedVariant || product.variants.length === 0 ? (
+          <Button
+            type="button"
+            variant="secondary"
+            size="lg"
+            nativeButton={false}
+            className="w-full tracking-widest uppercase"
+            render={
+              <Link href="/contact">
+                Contact Us for Availability
+                <HugeiconsIcon icon={ArrowRight} size={18} />
+              </Link>
+            }
+          />
+        ) : IS_PHASE_2 ? (
           <div className="flex items-center gap-4 pt-2">
             <div className="flex items-center rounded-full border border-border bg-background">
               <button

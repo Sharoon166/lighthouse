@@ -192,14 +192,7 @@ export function BlogPostDetail({
 
           {/* Main Content */}
           <section className="min-w-0">
-            <div className={cn(tiptapContentClassName, "prose prose-lg prose-slate max-w-none dark:prose-invert")}>
-              <div
-                className="tiptap"
-                dangerouslySetInnerHTML={{
-                  __html: renderTiptapToHtml(post.content),
-                }}
-              />
-            </div>
+            
             <div className="mt-16 p-6 md:p-8 border-t space-y-4">
               <h2 className="text-2xl font-semibold uppercase">Tagged</h2>
               <div className=" flex flex-wrap items-center gap-2">

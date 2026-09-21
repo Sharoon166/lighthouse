@@ -5,10 +5,11 @@ import { CTA } from "@/components/hero/cta";
 import { Breadcrumb } from "@/components/shared/breadcrumb";
 import { ScrollToTop } from "@/components/shared/scroll-to-top";
 import { renderTiptapToHtml } from "@/components/shared/rich-text-server";
-import { tiptapContentClassName } from "@/components/shared/rich-text-constants";
+import { productTiptapContentClassName } from "@/components/shared/rich-text-constants";
 import { ProductCard } from "@/components/shop/product-card";
 import { ProductDetailTabs } from "@/components/shop/product-detail-tabs";
 import { generateProductJsonLd, generateSeoMetadata } from "@/lib/seo-helpers";
+import { cn } from "@/lib/utils";
 import { fetchProductBySlug, fetchRelatedProducts } from "@/lib/shop-data";
 import { ProductDetailClient } from "./product-detail-client";
 
@@ -81,6 +82,16 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     })),
   });
 
+  // Parse descriptionHtml from JSON string to TipTap object for rendering
+  let parsedDescriptionHtml: unknown = null;
+  if (product.descriptionHtml) {
+    try {
+      parsedDescriptionHtml = JSON.parse(product.descriptionHtml);
+    } catch {
+      // Leave as null — will fall back to plain description
+    }
+  }
+
   return (
     <>
       <ScrollToTop />
@@ -118,26 +129,25 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                   <span className="text-xs font-semibold uppercase tracking-widest text-gold">
                     DESIGN &amp; CRAFTSMANSHIP
                   </span>
-                  <h3 className="font-serif leading-none font-normal text-foreground">
-                    Crafted for the spaces that matter most
-                  </h3>
-                  {product.descriptionHtml ? (
+                  {parsedDescriptionHtml ? (
                     <div
-                      className={tiptapContentClassName}
-                      dangerouslySetInnerHTML={{
-                        __html: renderTiptapToHtml(product.descriptionHtml),
-                      }}
-                    />
-                  ) : (
+                      className={cn(
+                        productTiptapContentClassName,
+                        "max-w-[80ch]",
+                      )}
+                    >
+                      <div
+                        className="tiptap"
+                        dangerouslySetInnerHTML={{
+                          __html: renderTiptapToHtml(parsedDescriptionHtml),
+                        }}
+                      />
+                    </div>
+                  ) : product.description ? (
                     <p className="text-muted-foreground leading-relaxed">
                       {product.description}
                     </p>
-                  )}
-                  <p className="text-muted-foreground leading-relaxed">
-                    Each piece is meticulously inspected for quality, ensuring
-                    smooth movement across all joints and flawless luster across
-                    the lacquered metal surfaces.
-                  </p>
+                  ) : null}
                 </div>
               }
               specificationsContent={
@@ -145,27 +155,45 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                   <span className="text-xs font-semibold uppercase tracking-widest text-gold">
                     TECHNICAL SPECIFICATIONS
                   </span>
-                  <h3 className="font-serif leading-none font-normal text-foreground">
-                    Built to last. Specified to perform.
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Every dimension and material choice in the {product.name} is
-                    deliberate. Solid brass construction, linen diffusion, and a
-                    weighted marble base are the result of a two-year development
-                    process focused entirely on longevity and light quality.
-                  </p>
-                  <dl className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
-                    {product.specifications.map((spec) => (
-                      <div key={spec.key} className="space-y-1">
-                        <dt className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                          {spec.key}
-                        </dt>
-                        <dd className="text-xl font-medium text-black font-heading">
-                          {spec.value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
+                  {product.specificationsDescription ? (
+                    <div
+                      className={cn(
+                        productTiptapContentClassName,
+                        "max-w-[80ch]",
+                      )}
+                    >
+                      <div
+                        className="tiptap"
+                        dangerouslySetInnerHTML={{
+                          __html: renderTiptapToHtml(
+                            (() => {
+                              try {
+                                return JSON.parse(
+                                  product.specificationsDescription,
+                                );
+                              } catch {
+                                return null;
+                              }
+                            })(),
+                          ),
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                  {product.specifications.length > 0 && (
+                    <dl className="grid grid-cols-2 gap-x-8 gap-y-6 pt-4">
+                      {product.specifications.map((spec) => (
+                        <div key={spec.key} className="space-y-1">
+                          <dt className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                            {spec.key}
+                          </dt>
+                          <dd className="text-xl font-medium text-black font-heading">
+                            {spec.value}
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
                 </div>
               }
             />
@@ -190,10 +218,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
               <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {relatedProducts.map((relProduct) => (
                   <li key={relProduct.id}>
-                    <ProductCard
-                      product={relProduct}
-                      showQuickView
-                    />
+                    <ProductCard product={relProduct} showQuickView />
                   </li>
                 ))}
               </ul>

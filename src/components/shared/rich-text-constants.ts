@@ -351,6 +351,124 @@ export const tiptapContentClassName =
   "[&_.tiptap_hr]:my-4 " +
   "[&_.tiptap_hr]:border-border";
 
+/**
+ * Product description RTE styling — distinct from the blog prose.
+ * Uses the product detail page's serif / elegant aesthetic.
+ */
+export const productTiptapContentClassName =
+  "product-prose " +
+  /* Base container */
+  "[&_.tiptap]:text-base " +
+  "[&_.tiptap]:text-muted-foreground " +
+  "[&_.tiptap]:leading-relaxed " +
+  "[&_.tiptap]:outline-none " +
+  "[&_.tiptap]:focus:outline-none " +
+  /* Empty editor placeholder */
+  "[&_.tiptap>p.is-editor-empty:first-child::before]:text-muted-foreground/50 " +
+  "[&_.tiptap>p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] " +
+  "[&_.tiptap>p.is-editor-empty:first-child::before]:float-left " +
+  "[&_.tiptap>p.is-editor-empty:first-child::before]:pointer-events-none " +
+  /* Paragraphs */
+  "[&_.tiptap_p]:mb-4 " +
+  "[&_.tiptap_p]:text-muted-foreground " +
+  /* Headings — serif, refined */
+  "[&_.tiptap_h2]:font-serif " +
+  "[&_.tiptap_h2]:text-3xl " +
+  "[&_.tiptap_h2]:font- " +
+  "[&_.tiptap_h2]:text-secondary! " +
+  "[&_.tiptap_h2]:mt-10 " +
+  "[&_.tiptap_h2]:mb-4 " +
+  "[&_.tiptap_h3]:font-serif " +
+  "[&_.tiptap_h3]:text-xl " +
+  "[&_.tiptap_h3]:font-normal " +
+  "[&_.tiptap_h3]:text-foreground " +
+  "[&_.tiptap_h3]:mt-8 " +
+  "[&_.tiptap_h3]:mb-3 " +
+  "[&_.tiptap_h4]:font-serif " +
+  "[&_.tiptap_h4]:text-lg " +
+  "[&_.tiptap_h4]:font-normal " +
+  "[&_.tiptap_h4]:text-foreground " +
+  "[&_.tiptap_h4]:mt-6 " +
+  "[&_.tiptap_h4]:mb-2 " +
+  "[&_.tiptap_h5]:font-serif " +
+  "[&_.tiptap_h5]:text-base " +
+  "[&_.tiptap_h5]:font-normal " +
+  "[&_.tiptap_h5]:text-foreground " +
+  "[&_.tiptap_h5]:mt-6 " +
+  "[&_.tiptap_h5]:mb-2 " +
+  /* Strong / bold — use text-foreground for emphasis */
+  "[&_.tiptap_strong]:text-foreground " +
+  "[&_.tiptap_strong]:font-semibold " +
+  /* Lists */
+  "[&_.tiptap_ul]:list-disc " +
+  "[&_.tiptap_ul]:pl-6 " +
+  "[&_.tiptap_ul]:mb-4 " +
+  "[&_.tiptap_ul]:space-y-1 " +
+  "[&_.tiptap_ul_li]:text-muted-foreground " +
+  "[&_.tiptap_ol]:list-decimal " +
+  "[&_.tiptap_ol]:pl-6 " +
+  "[&_.tiptap_ol]:mb-4 " +
+  "[&_.tiptap_ol]:space-y-1 " +
+  "[&_.tiptap_ol_li]:text-muted-foreground " +
+  /* Blockquote — elegant left border */
+  "[&_.tiptap_blockquote]:border-l-2 " +
+  "[&_.tiptap_blockquote]:border-gold/30 " +
+  "[&_.tiptap_blockquote]:pl-4 " +
+  "[&_.tiptap_blockquote]:italic " +
+  "[&_.tiptap_blockquote]:text-muted-foreground/80 " +
+  "[&_.tiptap_blockquote]:my-6 " +
+  /* Code */
+  "[&_.tiptap_code]:font-mono " +
+  "[&_.tiptap_code]:text-sm " +
+  "[&_.tiptap_code]:bg-muted " +
+  "[&_.tiptap_code]:px-1.5 " +
+  "[&_.tiptap_code]:py-0.5 " +
+  "[&_.tiptap_code]:rounded " +
+  "[&_.tiptap_pre]:overflow-x-auto " +
+  "[&_.tiptap_pre]:rounded-lg " +
+  "[&_.tiptap_pre]:bg-muted " +
+  "[&_.tiptap_pre]:p-4 " +
+  "[&_.tiptap_pre]:my-6 " +
+  "[&_.tiptap_pre_code]:font-mono " +
+  "[&_.tiptap_pre_code]:text-xs " +
+  "[&_.tiptap_pre_code]:bg-transparent " +
+  "[&_.tiptap_pre_code]:p-0 " +
+  /* Figures */
+  "[&_.tiptap_figure]:my-8 " +
+  "[&_.tiptap_figure]:max-w-full " +
+  "[&_.tiptap_figure]:mx-auto " +
+  "[&_.tiptap_figure]:text-center " +
+  "[&_.tiptap_figure[data-align=left]]:mr-auto " +
+  "[&_.tiptap_figure[data-align=left]]:ml-0 " +
+  "[&_.tiptap_figure[data-align=left]]:w-fit " +
+  "[&_.tiptap_figure[data-align=center]]:mx-auto " +
+  "[&_.tiptap_figure[data-align=right]]:ml-auto " +
+  "[&_.tiptap_figure[data-align=right]]:mr-0 " +
+  "[&_.tiptap_figure[data-align=right]]:w-fit " +
+  /* Image inside figure */
+  "[&_.tiptap_figure_img]:block " +
+  "[&_.tiptap_figure_img]:max-w-full " +
+  "[&_.tiptap_figure_img]:h-auto " +
+  "[&_.tiptap_figure_img]:mx-auto " +
+  "[&_.tiptap_figure_img]:rounded-lg " +
+  "[&_.tiptap_figure_img]:border " +
+  "[&_.tiptap_figure_img]:border-border " +
+  /* Caption */
+  "[&_.tiptap_figcaption]:mt-3 " +
+  "[&_.tiptap_figcaption]:text-sm " +
+  "[&_.tiptap_figcaption]:text-muted-foreground/70 " +
+  "[&_.tiptap_figcaption]:italic " +
+  /* Links — gold with subtle underline on hover */
+  "[&_.tiptap_a]:text-gold " +
+  "[&_.tiptap_a]:font-medium " +
+  "[&_.tiptap_a]:no-underline " +
+  "[&_.tiptap_a]:transition-colors " +
+  "[&_.tiptap_a]:cursor-pointer " +
+  "[&_.tiptap_a:hover]:underline " +
+  /* Horizontal rule — subtle */
+  "[&_.tiptap_hr]:my-8 " +
+  "[&_.tiptap_hr]:border-border/60";
+
 export function addHeadingIdsToHtml(html: string): string {
   return html.replace(
     /<h2\b[^>]*>([\s\S]*?)<\/h2>/g,

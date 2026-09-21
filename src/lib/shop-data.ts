@@ -79,6 +79,7 @@ export interface ShopProductItem {
     installationAndBulbs: string;
   };
   specifications: { key: string; value: string }[];
+  specificationsDescription?: string;
   designStyle: string;
   material: string;
   inStock: boolean;
@@ -997,6 +998,7 @@ export async function fetchStoreProducts(
               p.content?.installationAndBulbs || "",
           },
           specifications: p.specifications || [],
+          specificationsDescription: p.specificationsDescription || undefined,
           designStyle: "",
           material: "",
           inStock: p.inStock ?? true,
@@ -1174,6 +1176,7 @@ function mapDbProductToShopItem(p: any): ShopProductItem {
         p.content?.installationAndBulbs || "",
     },
     specifications: p.specifications || [],
+    specificationsDescription: p.specificationsDescription || undefined,
     designStyle: "",
     material: "",
     inStock: p.inStock ?? true,

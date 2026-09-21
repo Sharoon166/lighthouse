@@ -6,7 +6,7 @@ export function CTA() {
     <section
       className="relative flex min-h-[65dvh] items-center overflow-hidden bg-cover bg-left"
       style={{
-        backgroundImage: "url('/cta-image.png')",
+        backgroundImage: "url('/cta-image.webp')",
       }}
     >
       <div className="relative z-10 mx-auto text-center max-w-7xl px-6">

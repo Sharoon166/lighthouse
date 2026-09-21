@@ -346,6 +346,7 @@ export async function restoreProject(
 
   revalidatePath("/admin/projects");
   revalidatePath("/admin/projects/trash");
+  revalidatePath("/projects")
   updateTag("projects");
 
   return { ok: true, message: "Restored." };

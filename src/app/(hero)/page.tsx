@@ -191,7 +191,6 @@ export default async function Home() {
           src="/about-image.webp"
           width={1024}
           height={1024}
-          priority
           alt="Lighthouse showroom with curated lighting displays"
           className="w-full brightness-75 transition-all duration-500 hover:brightness-150 lg:col-start-3 lg:col-span-5 lg:row-start-1"
         />

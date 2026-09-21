@@ -6,11 +6,13 @@ import "./globals.css";
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
   subsets: ["latin"],
+  display: "optional",
 });
 
 const karla = Karla({
   variable: "--font-karla",
   subsets: ["latin"],
+  display: "optional",
 });
 
 export const metadata: Metadata = {
@@ -38,6 +40,9 @@ export default function RootLayout({
       lang="en"
       className={`${playfairDisplay.variable} ${karla.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preload" as="image" href="/hero-img.webp" />
+      </head>
       <body className="min-h-full flex flex-col">
         {children}
         <WhatsAppButton />

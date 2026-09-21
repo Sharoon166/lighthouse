@@ -24,6 +24,7 @@ export function BlogCard({
           alt={title}
           width={600}
           height={400}
+          loading="lazy"
           className="aspect-2/1 w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
       </div>

@@ -552,29 +552,28 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
           {/* ================================================================
             MOBILE MENU BUTTON
         ================================================================= */}
-
         </div>
-      </header>
 
-      {/* Mobile menu toggle — outside header so it stays above the overlay */}
-      <button
-        type="button"
-        aria-label={mobileOpen ? "Close menu" : "Open menu"}
-        aria-expanded={mobileOpen}
-        onClick={() => setMobileOpen((prev) => !prev)}
-        className={cn(
-          "fixed top-3 right-4 z-[70] flex size-10 items-center justify-center rounded-full backdrop-blur-md md:hidden",
-          isHero
-            ? "border border-border/40 bg-background/10 text-background"
-            : "border border-border bg-muted/40 text-foreground",
-          mobileOpen && "text-secondary",
-        )}
-      >
-        <HugeiconsIcon
-          icon={mobileOpen ? Cancel01Icon : Menu11Icon}
-          size={20}
-        />
-      </button>
+        {/* Mobile menu toggle */}
+        <button
+          type="button"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          onClick={() => setMobileOpen((prev) => !prev)}
+          className={cn(
+            "fixed top-3 right-4 z-70 flex size-10 items-center justify-center rounded-full backdrop-blur-md md:hidden",
+            isHero
+              ? "border border-border/40 bg-black/20 text-background"
+              : "border border-border bg-muted/40 text-foreground",
+            mobileOpen && "text-secondary",
+          )}
+        >
+          <HugeiconsIcon
+            icon={mobileOpen ? Cancel01Icon : Menu11Icon}
+            size={20}
+          />
+        </button>
+      </header>
 
       {/* ================================================================
           MOBILE FULLSCREEN MENU
@@ -582,7 +581,7 @@ export function SiteHeader({ variant = "hero" }: SiteHeaderProps) {
 
       <div
         className={cn(
-          "fixed inset-0 z-60 flex flex-col bg-background px-6 pb-8 pt-24 backdrop-blur-2xl",
+          "fixed inset-0 z-40 flex flex-col bg-background px-6 pb-8 pt-24 backdrop-blur-2xl",
           "transition-all duration-300 ease-in-out md:hidden",
 
           mobileOpen

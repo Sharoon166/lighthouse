@@ -108,21 +108,21 @@ export const dummyProjects = [
     title: "The Oak Residence",
     subtitle: "Residential Lighting Design",
     link: "/projects/oak-residence",
-    image: "/projects/oak-residence.png",
+    image: "/projects/oak-residence.webp",
   },
   {
     id: "aurora-penthouse",
     title: "Aurora Penthouse",
     subtitle: "Luxury Apartment Lighting",
     link: "/projects/aurora-penthouse",
-    image: "/projects/aurora-penthouse.png",
+    image: "/projects/aurora-penthouse.webp",
   },
   {
     id: "skyline-bedroom",
     title: "Skyline Bedroom",
     subtitle: "Bedroom Lighting Design",
     link: "/projects/skyline-bedroom",
-    image: "/projects/skyline-bedroom.png",
+    image: "/projects/skyline-bedroom.webp",
   },
 ];
 
@@ -186,7 +186,7 @@ export const featuredBlogs = [
     description:
       "Discover how size, placement and style can transform kitchens, dining areas and living spaces with the...",
     readTime: "5 min read",
-    imageUrl: "/blogs/1.png",
+    imageUrl: "/blogs/1.webp",
   },
   {
     category: "BUYING GUIDE",
@@ -194,7 +194,7 @@ export const featuredBlogs = [
     description:
       "From incorrect fixture sizing to poor layering, learn the most common lighting mistakes and simple...",
     readTime: "5 min read",
-    imageUrl: "/blogs/2.png",
+    imageUrl: "/blogs/2.webp",
   },
   {
     category: "LIGHTING TRENDS",
@@ -202,7 +202,7 @@ export const featuredBlogs = [
     description:
       "Explore the latest trends in luxury lighting, warm ambient tones and statement fixtures that are...",
     readTime: "5 min read",
-    imageUrl: "/blogs/3.png",
+    imageUrl: "/blogs/3.webp",
   },
 ];
 

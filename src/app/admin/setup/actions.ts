@@ -36,7 +36,7 @@ export async function createFirstAdmin({
       // Set role to admin
       await db
         .collection("user")
-        .updateOne({ _id: new ObjectId(userId) }, { $set: { role: "admin" } });
+        .updateOne({ _id: userId }, { $set: { role: "admin" } });
     }
 
     await client.close();

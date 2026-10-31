@@ -33,10 +33,37 @@ export async function createFirstAdmin({
     const userId = (result as any)?.user?.id || (result as any)?.id;
 
     if (userId) {
-      // Set role to admin
-      await db
+      // Promote the new account to admin.
+      //
+      // Important: `user._id` is stored as a BSON ObjectId, so the string id
+      // returned by Better Auth MUST be wrapped in `new ObjectId(...)`.
+      // Filtering on the raw string matches zero documents and fails
+      // silently, which leaves the account stuck at the default "user"
+      // role and triggers login redirects.
+      //
+      // Escape hatch: if this promotion ever breaks, create an admin via
+      // Better Auth's CLI from a terminal:
+      //   npx auth@latest create-admin --email <email> --name "<name>" --role admin
+      if (!ObjectId.isValid(userId)) {
+        await client.close();
+        return { error: "Could not determine the new account id." };
+      }
+
+      const update = await db
         .collection("user")
-        .updateOne({ _id: userId }, { $set: { role: "admin" } });
+        .updateOne({ _id: new ObjectId(userId) }, { $set: { role: "admin" } });
+
+      if (update.matchedCount === 0) {
+        await client.close();
+        return {
+          error:
+            "Account was created but could not be promoted to admin. " +
+            "Set role to \"admin\" for this user in the database, or create " +
+            "an admin via CLI: npx auth@latest create-admin --email " +
+            email +
+            " --role admin",
+        };
+      }
     }
 
     await client.close();

@@ -1,6 +1,6 @@
 "use server";
 
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { auth } from "@/lib/auth";
 
 export async function createFirstAdmin({
@@ -36,7 +36,7 @@ export async function createFirstAdmin({
       // Set role to admin
       await db
         .collection("user")
-        .updateOne({ _id: userId }, { $set: { role: "admin" } });
+        .updateOne({ _id: new ObjectId(userId) }, { $set: { role: "admin" } });
     }
 
     await client.close();

@@ -16,7 +16,7 @@ export async function requireRole(roles: readonly string[]) {
   if (!session) redirect("/admin/login");
 
   const userRole = session.user.role as string;
-  if (!roles.includes(userRole)) redirect("/admin");
+  if (!roles.includes(userRole)) redirect("/admin/login");
 
   // Check if user is blocked
   const db = (await clientPromise).db();

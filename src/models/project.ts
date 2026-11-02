@@ -105,7 +105,7 @@ const testimonialSchema = new Schema(
   {
     quote: { type: String, required: true },
     author: { type: String, required: true },
-    role: { type: String, required: true },
+    role: { type: String, default: "" },
   },
   { _id: false },
 );

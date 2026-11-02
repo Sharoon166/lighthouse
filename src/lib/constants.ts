@@ -258,6 +258,21 @@ export const showrooms = [
   },
 ];
 
+/**
+ * Shown on the product detail page when a field has no content saved
+ * from the dashboard. Keeps the accordions from rendering empty.
+ */
+export const PRODUCT_CONTENT_FALLBACK = {
+  materialsAndCare:
+    "Crafted from premium materials and finished by hand. Wipe with a soft, dry cloth to keep the surface clean; avoid moisture, direct sunlight and harsh cleaning agents to preserve the finish.",
+  shippingAndReturns:
+    "Standard delivery within 3–5 business days in Islamabad and 5–8 business days nationwide. Returns accepted within 7 days of delivery — the item must be unused and in its original packaging.",
+  payment:
+    "We accept all major debit and credit cards, EasyPaisa, JazzCash and bank transfers. Cash on delivery is available in Islamabad.",
+  installationAndBulbs:
+    "No installation required — simply plug in and use. Takes a standard E27 bulb (not included); we recommend a 10W warm white LED at 2700K for the ideal ambience.",
+} as const;
+
 export const BLOG_CATEGORIES = [
   { label: "Design Guide", value: "design-guide" },
   { label: "Trends", value: "trends" },

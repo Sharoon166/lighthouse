@@ -17,7 +17,7 @@ import { useEffect, useMemo, useState } from "react";
 import "@kitlangton/rolling-number/styles.css";
 import Link from "next/link";
 import { PRESET_COLORS } from "@/components/shared/color-picker";
-import { IS_PHASE_2 } from "@/lib/constants";
+import { IS_PHASE_2, PRODUCT_CONTENT_FALLBACK } from "@/lib/constants";
 import { formatCurrency } from "@/lib/format";
 import type { ShopProductItem, ShopProductVariant } from "@/lib/shop-data";
 import { Button } from "../ui/button";
@@ -459,7 +459,8 @@ export function ProductPurchasePanel({
             </button>
             {openAccordions.materialsAndCare && (
               <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-                {product.content.materialsAndCare}
+                {product.content.materialsAndCare ||
+                  PRODUCT_CONTENT_FALLBACK.materialsAndCare}
               </div>
             )}
           </div>
@@ -480,7 +481,8 @@ export function ProductPurchasePanel({
             </button>
             {openAccordions.shippingAndReturns && (
               <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-                {product.content.shippingAndReturns}
+                {product.content.shippingAndReturns ||
+                  PRODUCT_CONTENT_FALLBACK.shippingAndReturns}
               </div>
             )}
           </div>
@@ -501,7 +503,7 @@ export function ProductPurchasePanel({
             </button>
             {openAccordions.payment && (
               <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-                {product.content.payment}
+                {product.content.payment || PRODUCT_CONTENT_FALLBACK.payment}
               </div>
             )}
           </div>
@@ -522,7 +524,8 @@ export function ProductPurchasePanel({
             </button>
             {openAccordions.installationAndBulbs && (
               <div className="mt-2 text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-                {product.content.installationAndBulbs}
+                {product.content.installationAndBulbs ||
+                  PRODUCT_CONTENT_FALLBACK.installationAndBulbs}
               </div>
             )}
           </div>

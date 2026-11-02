@@ -9,28 +9,41 @@ import Link from "next/link";
 import { Suspense } from "react";
 import HeroImage from "@/assets/hero-img.webp";
 import MobileHeroImage from "@/assets/hero-img-mobile.webp";
+import { BlogsFallback, BlogsStream } from "@/components/hero/blogs-stream";
 import { CTA } from "@/components/hero/cta";
 import { HeroLinks } from "@/components/hero/hero-links";
 import { OppelDistributorBanner } from "@/components/hero/oppel-distributor-banner";
 import {
+  ProductsFallback,
+  ProductsStream,
+} from "@/components/hero/products-stream";
+import {
+  ProjectsFallback,
+  ProjectsStream,
+} from "@/components/hero/projects-stream";
+import { Clients } from "@/components/shared/clients";
+import {
   FeaturedCategoriesFallback,
   FeaturedCategoriesStream,
 } from "@/components/shared/featured-categories-stream";
-import { BlogCard } from "@/components/shared/blog-card";
-import { Clients } from "@/components/shared/clients";
 import { Marquee } from "@/components/shared/marquee";
 import { Partners } from "@/components/shared/partners";
-import { SectionHeader } from "@/components/shared/section-header";
 import { Button } from "@/components/ui/button";
+import { marqueeText } from "@/lib/constants";
 import {
-  dummyProducts,
-  dummyProjects,
-  featuredBlogs,
-  marqueeText,
-} from "@/lib/constants";
+  fetchFeaturedProducts,
+  fetchHomepageBlogs,
+  fetchHomepageProjects,
+  HOMEPAGE_FALLBACK_BLOGS,
+  HOMEPAGE_FALLBACK_PRODUCTS,
+  HOMEPAGE_FALLBACK_PROJECTS,
+} from "@/lib/homepage-data";
+import {
+  getLocalBusinessSchema,
+  getOrganizationSchema,
+  getWebSiteSchema,
+} from "@/lib/seo-schemas";
 import { fetchHomepageCategories } from "@/lib/shop-data";
-import { cn } from "@/lib/utils";
-import { getLocalBusinessSchema, getOrganizationSchema, getWebSiteSchema } from "@/lib/seo-schemas";
 
 export const metadata: Metadata = {
   title: "Lighthouse | Premium Lighting Solutions in Pakistan",
@@ -56,13 +69,19 @@ export const metadata: Metadata = {
 
 // <section className="relative min-h-125 flex sm:h-[95dvh] aspect-9/16 sm:aspect-auto items-end sm:items-center justify-center overflow-hidden px-6 pb-38 sm:pb-0">
 export default async function Home() {
+  // Kick all data fetches off in parallel before the first await.
   const categoriesPromise = fetchHomepageCategories();
+  const productsPromise = fetchFeaturedProducts();
+  const projectsPromise = fetchHomepageProjects();
+  const blogsPromise = fetchHomepageBlogs();
 
   return (
     <main>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(getOrganizationSchema()) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getOrganizationSchema()),
+        }}
       />
       <script
         type="application/ld+json"
@@ -70,7 +89,9 @@ export default async function Home() {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(getLocalBusinessSchema()) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getLocalBusinessSchema()),
+        }}
       />
       <section className="relative min-h-125 sm:h-[95dvh] aspect-9/16 sm:aspect-auto max-sm:pt-[70%] sm:flex items-center overflow-hidden px-6 pb-38 sm:pb-0">
         <Image
@@ -118,7 +139,6 @@ export default async function Home() {
         </div>
         <HeroLinks />
       </section>
-
       <Marquee duration="10s" className="bg-gray-900 py-2 text-gold">
         {marqueeText.map((text) => (
           <div key={text} className="contents">
@@ -127,46 +147,17 @@ export default async function Home() {
           </div>
         ))}
       </Marquee>
-
       <div className="container">
         <Suspense fallback={<FeaturedCategoriesFallback />}>
           <FeaturedCategoriesStream promise={categoriesPromise} />
         </Suspense>
 
-        <section>
-          <SectionHeader
-            title="Customer Favorites"
-            description="Explore our most popular lighting designs, chosen by homeowners, architects and interior designers for their exceptional quality and timeless style."
-            ctaText="View all Products"
-            ctaHref="/products"
-          />
-
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-            {dummyProducts.map((product, index) => (
-              <div key={product.id} className="group border">
-                <div className="relative overflow-hidden bg-muted aspect-square">
-                  <Image
-                    src={`/products/${index + 1}.png`}
-                    alt={product.title}
-                    width={1024}
-                    height={1024}
-                    className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-sans text-xl transition-colors hover:text-gold">
-                    {product.title}
-                  </h3>
-                  <p className="font-heading font-semibold uppercase text-muted-foreground">
-                    {product.price}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        <Suspense
+          fallback={<ProductsFallback products={HOMEPAGE_FALLBACK_PRODUCTS} />}
+        >
+          <ProductsStream promise={productsPromise} />
+        </Suspense>
       </div>
-
       <section className="grid overflow-hidden bg-noise pb-0 place-items-center lg:grid-cols-5 lg:pt-0">
         <div className="container space-y-6 lg:col-start-1 lg:col-span-3 lg:row-start-1 z-10 lg:ml-28">
           <h2 className="text-primary">About Lighthouse</h2>
@@ -195,61 +186,18 @@ export default async function Home() {
           className="w-full brightness-75 transition-all duration-500 hover:brightness-150 lg:col-start-3 lg:col-span-5 lg:row-start-1"
         />
       </section>
-
-      <section className="bg-muted mb-0">
-        <div className="container">
-          <SectionHeader
-            title="Lighting That Transforms Every Space"
-            description="Explore a selection of residential and commercial projects featuring our premium lighting solutions, designed to enhance ambience, functionality and style."
-            ctaText="View all Projects"
-            ctaHref="/projects"
-          />
-          <div className="grid md:h-136 grid-cols-5 gap-4">
-            {dummyProjects.map((project, index) => (
-              <Link
-                key={project.id}
-                href={project.link}
-                style={{ backgroundImage: `url(${project.image})` }}
-                className={cn(
-                  `border bg-cover p-4 place-content-end col-span-2 max-md:col-span-5 max-md:aspect-3/2`,
-                  {
-                    "md:col-span-3 md:row-span-2": index === 0,
-                  },
-                )}
-              >
-                <h3 className="text-2xl font-bold text-primary">
-                  {project.title}
-                </h3>
-                <div className="flex items-center gap-4 text-gold">
-                  <p>{project.subtitle}</p>
-                  <HugeiconsIcon icon={ArrowRight02Icon} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      <Suspense
+        fallback={<ProjectsFallback projects={HOMEPAGE_FALLBACK_PROJECTS} />}
+      >
+        <ProjectsStream promise={projectsPromise} />
+      </Suspense>
       <div className="container">
         <Clients />
       </div>
-
       <OppelDistributorBanner />
-
-      <section className="bg-muted mb-0">
-        <div className="container">
-          <SectionHeader
-            title="Lighting Ideas & Design Inspiration"
-            description="Explore expert tips, interior design trends, and practical lighting guides to help you create beautiful, functional spaces with confidence."
-            ctaText="View All Blogs"
-            ctaHref="/blogs"
-          />
-          <div className="grid gap-4 md:grid-cols-3">
-            {featuredBlogs.map((blog) => (
-              <BlogCard key={blog.title} {...blog} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <Suspense fallback={<BlogsFallback blogs={HOMEPAGE_FALLBACK_BLOGS} />}>
+        <BlogsStream promise={blogsPromise} />
+      </Suspense>
       <div className="container">
         <Partners />
         <CTA />
